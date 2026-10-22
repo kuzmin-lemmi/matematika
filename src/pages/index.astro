@@ -64,6 +64,7 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
     </div>
   </section>
   {hero && <section class="new"><div class="wrap"><div class="new-in"><a class="new-preview" href={pageHref(hero.id)} aria-label={hero.data.title}><Preview item={hero} load="visible" /></a><div><p class="eyebrow">Новое</p><h2>{hero.data.title}</h2><p class="muted">{hero.data.summary}</p><a class="btn primary" href={openPageHref(hero)}>Открыть материал →</a></div></div></div></section>}
+  <section class="classes"><div class="wrap"><div class="section-heading"><div><p class="eyebrow">По школьной программе</p><h2>Выбери класс</h2></div><p class="books">Виленкин · Макарычев · Мерзляк</p></div><div class="class-grid">{SITE.grades.map(g => <a class="class-link" href={klassHref(g)}><b>{g}</b><span>{klassName(g)}<small>{g <= 6 ? 'Математика' : 'Алгебра и геометрия'}</small></span><span aria-hidden="true">↗</span></a>)}</div></div></section>
   {shelves.map(({ g, items }) => (
     <section class="shelf">
       <div class="wrap">
@@ -72,7 +73,6 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
       </div>
     </section>
   ))}
-  <section class="classes"><div class="wrap"><div class="section-heading"><div><p class="eyebrow">По школьной программе</p><h2>Выбери класс</h2></div><p class="books">Виленкин · Макарычев · Мерзляк</p></div><div class="class-grid">{SITE.grades.map(g => <a class="class-link" href={klassHref(g)}><b>{g}</b><span>{klassName(g)}<small>{g <= 6 ? 'Математика' : 'Алгебра и геометрия'}</small></span><span aria-hidden="true">↗</span></a>)}</div></div></section>
   {more.length > 0 && <section><div class="wrap"><h2>Курсы и программы</h2><div class="grid">{more.map(item => <ShelfCard item={item} />)}</div></div></section>}
 </Base>
 <script>
