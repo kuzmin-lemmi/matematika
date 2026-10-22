@@ -1,0 +1,27 @@
+---
+// Заголовок, описание и превью ссылки для ВК, мессенджеров и поисковиков
+import { SITE } from '../config';
+interface Props { title: string; description: string; image?: string; noindex?: boolean; }
+// без image превью ссылки не задаётся: общая картинка сайта появится вместе с названием и оформлением
+const { title, description, image, noindex = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const abs = (p: string) => new URL(p, Astro.site).toString();
+const imageUrl = image ? abs(base + image) : '';
+---
+<title>{title}</title>
+<meta name="description" content={description} />
+{noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={abs(Astro.url.pathname)} />}
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:locale" content="ru_RU" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={abs(Astro.url.pathname)} />
+{imageUrl && <>
+  <meta property="og:image" content={imageUrl} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content={imageUrl} />
+</>}
+<link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />

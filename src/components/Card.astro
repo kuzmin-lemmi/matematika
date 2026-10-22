@@ -1,0 +1,66 @@
+---
+import Preview from './Preview.astro';
+import { TYPES, ACCESS, PARTS } from '../config';
+import { openPageHref, pageHref, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady } from '../lib';
+const { item } = Astro.props;
+const d = item.data;
+const external = /^https?:/.test(d.url);
+const ready = isReady(d);
+const dl = ready ? downloadHref(d) : '';
+---
+<article class="card" style={colorVars(d.color)} data-pv-host
+  data-subject={d.subject ?? ''} data-grades={d.grades.join(' ')} data-parts={d.parts.join(' ')}
+  data-text={[d.title, d.summary, d.topic ?? '', subjectLabel(d.subject), ...d.tags].join(' ').toLowerCase()}>
+  <!-- обложка кликабельна мышью, но не дублирует ссылку из заголовка для клавиатуры и скринридера -->
+  <a class="media" href={pageHref(item.id)} tabindex="-1" aria-hidden="true"><Preview item={item} /></a>
+  <div class="body">
+    <div class="meta">
+      <span class="chip">{d.subject ? subjectLabel(d.subject) : TYPES[d.type].label}</span>
+      {d.grades.length > 0 && <span class="chip">{gradeLabel(d.grades)}</span>}
+      {d.access !== 'free' && <span class="chip">{ACCESS[d.access]}</span>}
+    </div>
+    <h3><a href={pageHref(item.id)}>{d.title}</a></h3>
+    {d.topic && <p class="topic ink-c">{d.topic}</p>}
+    <p class="sum">{d.summary}</p>
+    {d.parts.length > 0 && <p class="parts">{d.parts.map(p => <span>{PARTS[p].icon} {PARTS[p].label}</span>)}</p>}
+    <div class="act">
+      {ready && (
+        <a class="btn primary" href={openPageHref(item)} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>
+          {d.type === 'course' ? 'К курсу' : 'Открыть'} {external ? '↗' : '▶'}
+        </a>
+      )}
+      {dl && <a class="btn" href={dl} download={downloadName(d.url)}>⬇ Скачать</a>}
+      <a class="btn" href={pageHref(item.id)}>Подробнее</a>
+    </div>
+  </div>
+</article>
+<style>
+  /* тень лежит на псевдоэлементе и меняет только opacity — так анимация идёт на GPU, без перерисовки */
+  /* уход курсора быстрее входа: пользователь решает медленно, система отвечает сразу */
+  .card{position:relative;isolation:isolate;display:flex;flex-direction:column;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r);
+    transition:transform 120ms var(--ease-out)}
+  .card::before{content:"";position:absolute;inset:-1.5px;z-index:-1;border-radius:inherit;pointer-events:none;opacity:0;
+    box-shadow:0 14px 34px color-mix(in srgb,var(--c) 22%,transparent);transition:opacity 120ms var(--ease-out)}
+  @media (hover:hover) and (pointer:fine){
+    .card:hover{transform:translateY(-3px);transition-duration:180ms}
+    .card:hover::before{opacity:1;transition-duration:180ms}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .card{transition:none}
+    .card:hover{transform:none}
+    .card::before{transition-duration:120ms;transition-timing-function:linear}
+  }
+  .card[hidden]{display:none}
+  .media{display:block;border-radius:calc(var(--r) - 1.5px) calc(var(--r) - 1.5px) 0 0;overflow:hidden}
+  .body{display:flex;flex-direction:column;gap:6px;padding:16px 18px 18px;flex:1}
+  .meta{display:flex;gap:6px;flex-wrap:wrap}
+  h3{margin:.3em 0 0}
+  h3 a{text-decoration:none}
+  .topic{margin:0;font-weight:600}
+  .sum{margin:0;color:var(--soft);font-size:15.5px;flex:1}
+  .parts{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0;font-size:14.5px;font-weight:600}
+  .act{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .act .btn{padding:.55em .95em;font-size:15px}
+  .act .btn.primary{background:var(--cb);border-color:var(--cb);color:#fff}
+  @media (pointer:coarse){ .act .btn{min-height:44px;justify-content:center} }
+</style>

@@ -1,0 +1,72 @@
+---
+// Карточка на полке витрины: превью оживает при наведении
+import Preview from './Preview.astro';
+import { ACCESS, PARTS } from '../config';
+import { openPageHref, pageHref, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady } from '../lib';
+const { item } = Astro.props;
+const d = item.data;
+const external = /^https?:/.test(d.url);
+const ready = isReady(d);
+const dl = ready ? downloadHref(d) : '';
+---
+<article class="sc" style={colorVars(d.color)} data-pv-host>
+  <!-- обложка — только для мыши; клавиатуре и скринридеру хватает ссылки в заголовке -->
+  <a class="media" href={pageHref(item.id)} tabindex="-1" aria-hidden="true"><Preview item={item} /></a>
+  <div class="body">
+    <p class="meta">
+      {d.subject ? subjectLabel(d.subject) : d.type === 'course' ? 'Курс' : 'Программа'}
+      {d.grades.length > 0 && <> · {gradeLabel(d.grades)}</>}
+      {d.access !== 'free' && <> · {ACCESS[d.access]}</>}
+    </p>
+    <h3><a href={pageHref(item.id)}>{d.title}</a></h3>
+    {d.topic && <p class="topic">{d.topic}</p>}
+    {d.parts.length > 0 && <p class="parts" aria-label={d.parts.map(p => PARTS[p].label).join(', ')}>{d.parts.map(p => <span title={PARTS[p].label}>{PARTS[p].icon}</span>)}</p>}
+    <div class="act">
+      {ready && (
+        <a class="play" href={openPageHref(item)} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>
+          {external ? 'Открыть ↗' : '▶ Открыть'}
+        </a>
+      )}
+      {dl && <a class="dl" href={dl} download={downloadName(d.url)} title="Скачать бесплатно — один HTML-файл">⬇ Скачать</a>}
+      {!ready && <a class="dl" href={pageHref(item.id)}>Подробнее</a>}
+    </div>
+  </div>
+</article>
+
+<style>
+  /* тень — на псевдоэлементе, меняется только opacity (GPU) */
+  .sc{position:relative;isolation:isolate;display:flex;flex-direction:column;min-width:0;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;
+    transition:border-color 120ms var(--ease-out)}
+  .sc::before{content:"";position:absolute;inset:-1.5px;z-index:-1;border-radius:inherit;pointer-events:none;opacity:0;
+    box-shadow:0 10px 26px color-mix(in srgb,var(--c) 24%,transparent);transition:opacity 120ms var(--ease-out)}
+  @media (hover:hover) and (pointer:fine){
+    .sc:hover{border-color:var(--c);transition-duration:180ms}
+    .sc:hover::before{opacity:1;transition-duration:180ms}
+  }
+  .media{display:block;border-radius:12px 12px 0 0;overflow:hidden}
+  .body{display:flex;flex-direction:column;gap:2px;padding:10px 12px 12px;flex:1}
+  .meta{margin:0;font-size:12.5px;font-weight:600;color:var(--soft)}
+  h3{margin:.2em 0 0;font-size:15px;line-height:1.25}
+  h3 a{text-decoration:none}
+  .topic{margin:0;color:var(--soft);font-size:13.5px;line-height:1.4;flex:1}
+  .parts{margin:4px 0 0;display:flex;gap:6px;font-size:15px}
+  .act{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .dl{font-weight:700;text-decoration:none;color:var(--ink);border:1.5px solid var(--line);padding:calc(.35em - 1.5px) .7em;border-radius:8px;font-size:13.5px;
+    transition:border-color 160ms var(--ease-out),transform 160ms var(--ease-out)}
+  .play{font-weight:700;text-decoration:none;color:#fff;background:var(--cb);
+    padding:.35em .8em;border-radius:8px;font-size:13.5px;transition:filter 160ms var(--ease-out),transform 160ms var(--ease-out)}
+  @media (hover:hover) and (pointer:fine){
+    .dl:hover{border-color:var(--c)}
+    .play:hover{filter:brightness(1.1)}
+  }
+  .dl:active,.play:active{transform:scale(.97)}
+  /* на тач-экранах и интерактивной доске — цель нажатия не меньше 44px */
+  @media (pointer:coarse){
+    .act{gap:8px}
+    .dl,.play{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding-block:0}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .sc,.dl,.play{transition-timing-function:linear}
+    .dl:active,.play:active{transform:none}
+  }
+</style>

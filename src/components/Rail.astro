@@ -1,0 +1,64 @@
+---
+// Полка-слайдер: карточки в один ряд, листаются стрелками, колесом, свайпом и с клавиатуры (Tab по ссылкам)
+interface Props { label: string; }
+const { label } = Astro.props;
+---
+<div class="rail" data-rail>
+  <div class="track" role="region" aria-label={label}><slot /></div>
+  <button class="arrow prev" type="button" aria-label="Назад" hidden>
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+  </button>
+  <button class="arrow next" type="button" aria-label="Вперёд" hidden>
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4.5 13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+  </button>
+</div>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('[data-rail]').forEach(rail => {
+    const track = rail.querySelector<HTMLElement>('.track')!;
+    const prev = rail.querySelector<HTMLButtonElement>('.prev')!;
+    const next = rail.querySelector<HTMLButtonElement>('.next')!;
+    const update = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      prev.hidden = max < 2 || track.scrollLeft < 2;
+      next.hidden = max < 2 || track.scrollLeft > max - 2;
+    };
+    // листаем на столько карточек, сколько видно, минус одна — чтобы не терять место
+    const go = (dir: number) => {
+      const card = track.querySelector<HTMLElement>(':scope > *');
+      if (!card) return;
+      const step = card.offsetWidth + parseFloat(getComputedStyle(track).columnGap || '0');
+      const n = Math.max(1, Math.floor(track.clientWidth / step) - 1);
+      track.scrollBy({ left: dir * n * step, behavior: reduced.matches ? 'auto' : 'smooth' });
+    };
+    prev.addEventListener('click', () => go(-1));
+    next.addEventListener('click', () => go(1));
+    track.addEventListener('scroll', update, { passive: true });
+    new ResizeObserver(update).observe(track);
+    update();
+  });
+</script>
+
+<style>
+  .rail{position:relative}
+  /* отступы вокруг ряда оставляют место тени карточек: overflow обрезает всё, что выходит за край */
+  .track{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;overscroll-behavior-x:contain;
+    padding:4px 4px 24px;margin:-4px -4px -20px;scroll-padding-inline:4px}
+  .track::-webkit-scrollbar{display:none}
+  .track > :global(*){flex:0 0 calc((100% - 4 * 14px) / 5);min-width:200px;scroll-snap-align:start}
+  .arrow{position:absolute;top:calc(50% - 40px);z-index:2;display:grid;place-items:center;width:44px;height:44px;padding:0;border-radius:50%;
+    border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;box-shadow:0 6px 18px rgba(8,20,48,.18);
+    transition:border-color 160ms var(--ease-out),transform 160ms var(--ease-out),opacity 160ms var(--ease-out)}
+  .arrow[hidden]{display:none}
+  .prev{left:-14px} .next{right:-14px}
+  @media (hover:hover) and (pointer:fine){ .arrow:hover{border-color:var(--accent)} }
+  .arrow:active{transform:scale(.94)}
+  @media (max-width:900px){ .track > :global(*){flex-basis:calc((100% - 2 * 14px) / 3)} }
+  /* телефон: следующая карточка выглядывает из-за края — видно, что ряд листается; листают пальцем, стрелок нет */
+  @media (max-width:640px){
+    .track > :global(*){flex-basis:78%;min-width:0}
+    .arrow{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){ .arrow{transition:none} .arrow:active{transform:none} }
+</style>

@@ -1,0 +1,40 @@
+---
+// Постоянный адрес материала: /zapusk/<slug>/ открывает его на весь экран.
+// Наружу (посты, раздатки, чат класса) даём только этот адрес — файл потом можно будет закрыть подпиской.
+// Параметры адреса передаются материалу: ?mode=board | print | home — сразу нужный режим.
+import { getCollection } from 'astro:content';
+import Meta from '../../components/Meta.astro';
+import { SITE } from '../../config';
+import { openHref, pageHref, isLocalFile, isReady, ogImage } from '../../lib';
+
+export async function getStaticPaths() {
+  const items = (await getCollection('items')).filter(i => isLocalFile(i.data.url) && isReady(i.data));
+  return items.map(item => ({ params: { id: item.id }, props: { item } }));
+}
+const { item } = Astro.props;
+const d = item.data;
+const src = openHref(d.url);
+---
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <Meta title={`${d.title} — ${SITE.short}`} description={d.summary} image={ogImage(item)} />
+  <style>
+    html,body{margin:0;height:100%;background:#081430;overflow:hidden}
+    iframe{display:block;width:100vw;height:100vh;height:100dvh;border:0}
+    noscript a{position:fixed;inset:auto 16px 16px;color:#fff;font:600 16px system-ui,sans-serif}
+  </style>
+</head>
+<body>
+  <iframe id="m" data-src={src} title={d.title} allow="fullscreen; autoplay" allowfullscreen></iframe>
+  <noscript><a href={src}>Открыть «{d.title}»</a> · <a href={pageHref(item.id)}>описание</a></noscript>
+  <script>
+    // адрес материала — с параметрами страницы (?mode=…), фокус сразу в материал, чтобы работала клавиатура
+    const f = document.getElementById('m') as HTMLIFrameElement;
+    f.addEventListener('load', () => { try { f.contentWindow?.focus(); } catch {} });
+    f.src = (f.dataset.src ?? '') + location.search + location.hash;
+  </script>
+</body>
+</html>

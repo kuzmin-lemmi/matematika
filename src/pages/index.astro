@@ -1,0 +1,164 @@
+---
+import Base from '../layouts/Base.astro';
+import Preview from '../components/Preview.astro';
+import ShelfCard from '../components/ShelfCard.astro';
+import Rail from '../components/Rail.astro';
+import { getCollection } from 'astro:content';
+import { SITE, ACCESS, PARTS } from '../config';
+import { openPageHref, pageHref, gradeLabel, klassHref, klassName, colorVars, isReady, gradeSubjects, subjectLabel } from '../lib';
+const all = (await getCollection('items')).sort((a, b) => a.data.order - b.data.order);
+const lessons = all.filter(i => i.data.type === 'lesson');
+const grades = SITE.grades;
+const filled = grades.filter(g => lessons.some(i => i.data.grades.includes(g)));   // полки — только для классов с материалами
+const more = all.filter(i => i.data.type === 'course' || i.data.type === 'app');
+// «Новое» — последний опубликованный материал (по полю added), при равных датах — отмеченный featured
+const time = (i: typeof all[number]) => i.data.added?.getTime() ?? 0;
+const hero = all.filter(i => isReady(i.data) && i.data.added)
+  .sort((a, b) => time(b) - time(a) || Number(b.data.featured) - Number(a.data.featured))[0];
+const h = hero?.data;
+const heroExternal = h ? /^https?:/.test(h.url) : false;
+const added = h?.added?.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+---
+<Base>
+  <section class="brand squared">
+    <div class="wrap brand-in">
+      <div class="txt">
+        <h1>{SITE.name}</h1>
+        <p class="lead">Чертежи для доски, раздатки<br />и&nbsp;тренажёры для дома</p>
+        <p class="sub">{SITE.sub}</p>
+        <ul class="three">
+          <li><b>{PARTS.board.icon} {PARTS.board.label}</b> пошаговые живые чертежи: учитель ведёт, класс отвечает</li>
+          <li><b>{PARTS.print.icon} {PARTS.print.label}</b> у каждого свой вариант, ключ — по номеру варианта</li>
+          <li><b>{PARTS.home.icon} {PARTS.home.label}</b> тренажёр с разбором каждой ошибки</li>
+        </ul>
+      </div>
+      <!-- параллельные прямые a и b, секущая c и пара соответственных углов -->
+      <svg class="art" viewBox="0 0 420 300" aria-hidden="true">
+        <g class="ln">
+          <path d="M20 90H400" /><path d="M20 210H400" /><path d="M110 290 310 10" />
+        </g>
+        <path class="ang" d="M252.9 90H280.9A28 28 0 0 0 269.2 67.2Z" />
+        <path class="ang" d="M167.1 210H195.1A28 28 0 0 0 183.4 187.2Z" />
+        <g class="lbl">
+          <text x="26" y="80">a</text><text x="26" y="200">b</text><text x="300" y="34">c</text>
+          <text x="288" y="70">1</text><text x="202" y="190">2</text>
+        </g>
+        <text class="eq" x="250" y="262">∠1 = ∠2</text>
+      </svg>
+    </div>
+  </section>
+
+  {hero && h && (
+    <section class="feat" style={colorVars(h.color)}>
+      <div class="wrap">
+        <div class="feat-in">
+          <a class="screen" href={pageHref(hero.id)} aria-label={h.title}><Preview item={hero} load="visible" /></a>
+          <div>
+            <p class="kicker">Новое{added && <> · {added}</>}</p>
+            <h2>{h.emoji} {h.title}</h2>
+            <p class="lead2">{h.summary}</p>
+            <p class="facts">
+              {h.subject && <span>{subjectLabel(h.subject)}</span>}
+              {gradeLabel(h.grades) && <span>{gradeLabel(h.grades)}</span>}
+              {h.duration && <span>⏱ {h.duration}</span>}
+              <span>{ACCESS[h.access]}</span>
+            </p>
+            <div class="cta">
+              <a class="btn primary" href={openPageHref(hero)} target={heroExternal ? '_blank' : undefined} rel={heroExternal ? 'noopener' : undefined}>
+                {heroExternal ? 'Открыть ↗' : '▶ Открыть'}
+              </a>
+              <a class="btn" href={pageHref(hero.id)}>Подробнее</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="pick">
+    <div class="wrap">
+      <h2>Материалы по классам</h2>
+      <div class="tiles">
+        {grades.map(g => (
+          <a class={`tile${filled.includes(g) ? '' : ' empty'}`} href={klassHref(g)}>
+            <b>{g}</b>
+            <span>{filled.includes(g) ? gradeSubjects(g).map(subjectLabel).join(' · ').toLowerCase() : 'скоро'}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {filled.map(g => (
+    <section class="shelf">
+      <div class="wrap">
+        <div class="head"><h2>{klassName(g)}</h2><a href={klassHref(g)}>Все материалы {g} класса →</a></div>
+        <Rail label={`${klassName(g)}: материалы`}>
+          {lessons.filter(i => i.data.grades.includes(g)).map(i => <ShelfCard item={i} />)}
+        </Rail>
+      </div>
+    </section>
+  ))}
+
+  {more.length > 0 && (
+    <section class="shelf">
+      <div class="wrap">
+        <div class="head"><h2>Курсы и программы</h2><a href={SITE.github}>Проект на GitHub ↗</a></div>
+        <Rail label="Курсы и программы">{more.map(i => <ShelfCard item={i} />)}</Rail>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .brand{position:relative;overflow:hidden}
+  .brand-in{position:relative;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:center;gap:clamp(12px,3vw,32px)}
+  .txt{padding:clamp(8px,2vw,24px) 0}
+  .brand h1{font-size:clamp(36px,5.4vw,68px);line-height:.98;letter-spacing:-.035em;margin:0 0 .2em}
+  .lead{font:800 clamp(20px,2.4vw,30px)/1.15 var(--display);letter-spacing:-.02em;margin:0 0 12px}
+  .sub{font-weight:600;font-size:clamp(15px,1.4vw,18px);color:var(--soft);margin:0 0 18px}
+  .three{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-width:56ch}
+  .three li{padding:10px 14px;border-radius:12px;background:var(--surface);border:1.5px solid var(--line);color:var(--soft)}
+  .three b{color:var(--ink);margin-right:.4em}
+  .art{display:block;width:100%;max-height:340px}
+  .art .ln path{fill:none;stroke:var(--ink);stroke-width:4;stroke-linecap:round}
+  .art .ang{fill:color-mix(in srgb,var(--warm) 45%,transparent);stroke:var(--warm);stroke-width:3}
+  .art .lbl text{font:italic 700 26px var(--display);fill:var(--ink)}
+  .art .eq{font:800 30px var(--display);fill:var(--accent)}
+
+  .feat{padding-bottom:0}
+  .feat-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(18px,3vw,36px);align-items:center;
+    padding:clamp(14px,2vw,22px);border-radius:calc(var(--r) + 4px);background:var(--surface);border:1.5px solid var(--line)}
+  .kicker{font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-size:12px;margin:0 0 8px}
+  .feat h2{font-size:clamp(22px,2.6vw,30px)}
+  .lead2{color:var(--soft);margin:0 0 10px;max-width:50ch}
+  .facts{display:flex;flex-wrap:wrap;gap:4px 16px;margin:0 0 16px;font-weight:600;font-size:15px}
+  .cta{display:flex;gap:8px;flex-wrap:wrap}
+  .feat .primary{background:var(--cb);border-color:var(--cb);color:#fff}
+  .screen{display:block;border-radius:var(--r);overflow:hidden;box-shadow:0 18px 40px color-mix(in srgb,var(--c) 28%,transparent),0 3px 10px rgba(0,0,0,.1)}
+
+  .pick{padding-bottom:0}
+  .pick h2{font-size:clamp(18px,1.8vw,22px)}
+  .tiles{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr))}
+  .tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:104px;padding:14px 8px;
+    border-radius:16px;background:var(--surface);border:1.5px solid var(--line);text-decoration:none;text-align:center;
+    transition:border-color 180ms var(--ease-out),background-color 180ms var(--ease-out),transform 160ms var(--ease-out)}
+  @media (hover:hover) and (pointer:fine){ .tile:hover{border-color:var(--accent);background:var(--tint)} }
+  .tile:active{transform:scale(.97)}
+  .tile.empty b{color:var(--soft);opacity:.7}
+  .tile b{font:800 clamp(40px,5vw,52px)/1 var(--display);color:var(--accent);letter-spacing:-.03em}
+  .tile span{font-weight:700;font-size:15px;color:var(--soft)}
+
+  .shelf{padding-bottom:0}
+  .head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .head h2{margin:0;font-size:clamp(18px,1.8vw,22px)}
+  .head a{font-weight:600;font-size:15px;color:var(--accent);text-decoration:none}
+  @media (pointer:coarse){ .head a{display:inline-flex;align-items:center;min-height:44px} .tile{min-height:56px} }
+
+  @media (max-width:820px){
+    .brand-in{grid-template-columns:1fr}
+    .art{max-height:220px}
+    .feat-in{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){ .tile{transition:border-color 180ms linear} .tile:active{transform:none} }
+</style>

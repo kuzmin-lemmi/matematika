@@ -1,0 +1,160 @@
+---
+import '../styles/global.css';
+import { SITE } from '../config';
+import { klassName } from '../lib';
+import Logo from '../components/Logo.astro';
+import Meta from '../components/Meta.astro';
+interface Props { title?: string; description?: string; image?: string; noindex?: boolean; }
+const { title, description = SITE.tagline, image, noindex } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const full = title ? `${title} — ${SITE.short}` : SITE.name;
+const path = Astro.url.pathname;
+---
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <Meta title={full} description={description} image={image} noindex={noindex} />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <!-- сохранённая тема применяется до отрисовки, чтобы страница не мигала -->
+  <script is:inline>try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}document.documentElement.classList.add('js')</script>
+</head>
+<body>
+  <a class="skip" href="#main">Перейти к содержимому</a>
+  <header class="top">
+    <div class="wrap bar">
+      <a class="logo" href={base}><Logo size={38} /><span>{SITE.short}</span></a>
+      <nav id="nav" aria-label="Разделы">
+        <div class="grades">
+          {SITE.grades.map(g => (
+            <a href={`${base}klass/${g}/`} aria-current={path.includes(`/klass/${g}/`) ? 'page' : undefined}>{klassName(g)}</a>
+          ))}
+        </div>
+        <div class="rest">
+          <a href={`${base}catalog/?part=board`}>Для доски</a>
+          <a href={`${base}catalog/?part=print`}>Раздатки</a>
+          <a href={`${base}catalog/`} aria-current={path.includes('/catalog') ? 'page' : undefined}>Каталог</a>
+        </div>
+      </nav>
+      <div class="tools">
+        <button class="theme" id="theme" type="button" aria-label="Тёмная тема" aria-pressed="false">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.75" /><path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor" /></svg>
+        </button>
+        <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="nav">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path class="l1" d="M3 6h14" /><path class="l2" d="M3 10h14" /><path class="l3" d="M3 14h14" /></svg>
+          <span>Меню</span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main" tabindex="-1"><slot /></main>
+  <footer>
+    <div class="wrap foot">
+      <span class="brand"><Logo size={28} /><b>{SITE.short}</b> · материалы по математике для 5–8 классов · © {new Date().getFullYear()} {SITE.author}</span>
+      <span class="links">
+        <a href={SITE.github}>GitHub</a>
+        {SITE.vk && <a href={SITE.vk}>ВКонтакте</a>}
+      </span>
+    </div>
+  </footer>
+</body>
+</html>
+<script>
+  // выпадающее меню на узком экране: кнопка «Меню», Esc и щелчок мимо закрывают, на широком экране меню закрывается само
+  const header = document.querySelector<HTMLElement>('header.top');
+  const burger = document.getElementById('burger') as HTMLButtonElement | null;
+  if (header && burger) {
+    const setOpen = (open: boolean) => {
+      header.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', String(open));
+      burger.querySelector('span')!.textContent = open ? 'Закрыть' : 'Меню';
+    };
+    burger.addEventListener('click', () => setOpen(!header.classList.contains('open')));
+    addEventListener('keydown', e => {
+      if (e.key === 'Escape' && header.classList.contains('open')) { setOpen(false); burger.focus(); }
+    });
+    document.addEventListener('click', e => {
+      if (header.classList.contains('open') && !header.contains(e.target as Node)) setOpen(false);
+    });
+    matchMedia('(min-width: 961px)').addEventListener('change', e => { if (e.matches) setOpen(false); });
+  }
+
+  // переключатель темы: по умолчанию тема системы, выбор запоминается (localStorage только для удобства)
+  const btn = document.getElementById('theme') as HTMLButtonElement | null;
+  if (btn) {
+    const mq = matchMedia('(prefers-color-scheme: dark)');
+    const isDark = () => {
+      const t = document.documentElement.dataset.theme;
+      return t ? t === 'dark' : mq.matches;
+    };
+    const sync = () => btn.setAttribute('aria-pressed', String(isDark()));
+    btn.addEventListener('click', () => {
+      const next = isDark() ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('theme', next); } catch {}
+      sync();
+    });
+    mq.addEventListener('change', sync);
+    sync();
+  }
+</script>
+<style>
+  .skip{position:absolute;left:12px;top:-60px;z-index:30;padding:.6em 1em;border-radius:10px;background:var(--ink);color:var(--bg);font-weight:700;text-decoration:none}
+  .skip:focus{top:calc(8px + env(safe-area-inset-top,0px))}
+  main:focus{outline:none}
+  .top{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;font:800 21px var(--display);letter-spacing:-.02em}
+  .logo svg{flex:none}
+  nav{display:flex;gap:4px;align-items:center}
+  nav .grades,nav .rest{display:flex;gap:4px;flex-wrap:wrap}
+  nav a{text-decoration:none;font-weight:600;padding:.4em .75em;border-radius:10px;color:var(--soft);transition:color 160ms var(--ease-out),background-color 160ms var(--ease-out)}
+  @media (hover:hover) and (pointer:fine){ nav a:hover{color:var(--ink);background:var(--tint)} }
+  nav a[aria-current]{color:var(--accent);background:var(--tint)}
+  .tools{display:flex;align-items:center;gap:8px}
+  .theme{flex:none;display:grid;place-items:center;width:40px;height:40px;padding:0;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;
+    transition:border-color 160ms var(--ease-out),transform 160ms var(--ease-out)}
+  @media (hover:hover) and (pointer:fine){ .theme:hover{border-color:var(--accent)} }
+  .theme:active{transform:scale(.94)}
+  .theme[aria-pressed="true"] svg{transform:scaleX(-1)}
+  .burger{display:none;align-items:center;gap:8px;height:40px;padding:0 14px 0 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:700 15px var(--body);cursor:pointer;
+    transition:border-color 160ms var(--ease-out),transform 160ms var(--ease-out)}
+  .burger svg path{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;transform-box:fill-box;transform-origin:center;transition:transform 200ms var(--ease-out),opacity 150ms var(--ease-out)}
+  .burger[aria-expanded="true"] .l1{transform:translateY(4px) rotate(45deg)}
+  .burger[aria-expanded="true"] .l2{opacity:0}
+  .burger[aria-expanded="true"] .l3{transform:translateY(-4px) rotate(-45deg)}
+  @media (hover:hover) and (pointer:fine){ .burger:hover{border-color:var(--accent)} }
+  .burger:active{transform:scale(.96)}
+  @media (pointer:coarse){
+    .theme,.burger{height:44px}
+    .theme{width:44px}
+    .links a{min-height:44px;display:inline-flex;align-items:center}
+  }
+  /* узкий экран: меню прячется в выпадающую панель (без скрипта остаётся обычной строкой в две линии) */
+  @media (max-width:960px){
+    .bar{flex-wrap:wrap;height:auto;min-height:64px;padding-top:0;padding-bottom:0}
+    nav{order:3;flex:1 0 100%;flex-direction:column;align-items:stretch;gap:2px;padding:4px 0 10px}
+    html.js .burger{display:inline-flex}
+    html.js .bar{height:64px;flex-wrap:nowrap}
+    html.js nav{display:none;position:absolute;left:0;right:0;top:100%;padding:12px max(16px,env(safe-area-inset-left,0px)) 16px;
+      background:var(--surface);border-bottom:1px solid var(--line);box-shadow:0 18px 30px rgba(8,20,48,.14);max-height:calc(100dvh - 64px);overflow-y:auto}
+    html.js .top.open nav{display:flex;animation:drop 200ms var(--ease-out)}
+    nav .grades{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+    nav .rest{flex-direction:column;gap:2px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+    nav .grades a{text-align:center;border:1.5px solid var(--line);padding:.6em .5em;min-height:44px;display:flex;align-items:center;justify-content:center}
+    nav .rest a{padding:.7em .75em;min-height:44px;display:flex;align-items:center}
+    nav a[aria-current]{border-color:var(--accent)}
+    .logo span:last-child{display:inline}
+  }
+  @keyframes drop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+  @media (max-width:360px){ .burger span{display:none} .burger{padding:0 12px} }
+  @media (prefers-reduced-motion:reduce){ .theme:active,.burger:active{transform:none} nav a,.theme,.burger,.burger svg path{transition-duration:.01ms} html.js .top.open nav{animation:none} }
+  footer{border-top:1px solid var(--line);background:var(--surface);margin-top:40px;padding:24px 0 calc(24px + env(safe-area-inset-bottom,0px))}
+  .foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:var(--soft);font-size:15px}
+  .brand{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .brand b{color:var(--ink)}
+  .links{display:flex;gap:16px;align-items:center}
+</style>

@@ -1,0 +1,43 @@
+---
+// Строка списка класса: превью слева, справа — описание материала и кнопки режимов
+import Preview from './Preview.astro';
+import { ACCESS, PARTS, TYPES } from '../config';
+import { openPageHref, pageHref, downloadHref, downloadName, colorVars, isReady, isLocalFile } from '../lib';
+const { item, n } = Astro.props;
+const d = item.data;
+const ready = isReady(d);
+const dl = ready ? downloadHref(d) : '';
+---
+<article class="row" style={colorVars(d.color)}>
+  <a class="media" href={pageHref(item.id)} tabindex="-1" aria-hidden="true"><Preview item={item} load="visible" /></a>
+  <div class="body">
+    <p class="kicker ink-c"><span class="n">{n}</span>{d.topic ?? TYPES[d.type].label}</p>
+    <h3><a href={pageHref(item.id)}>{d.title}</a></h3>
+    <p class="sum">{d.summary}</p>
+    {d.duration && <p class="facts">⏱ {d.duration}</p>}
+    <div class="act">
+      {ready && isLocalFile(d.url) && d.parts.map(p => <a class="btn part" href={openPageHref(item, p)}>{PARTS[p].icon} {PARTS[p].label}</a>)}
+      {dl && <a class="btn" href={dl} download={downloadName(d.url)}>⬇ Скачать</a>}
+      <a class="btn" href={pageHref(item.id)}>Подробнее</a>
+      {d.access !== 'free' && <span class="chip">{ACCESS[d.access]}</span>}
+    </div>
+  </div>
+</article>
+
+<style>
+  .row{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:clamp(14px,2.5vw,28px);align-items:start;
+    padding:16px;background:var(--surface);border:1.5px solid var(--line);border-radius:16px}
+  .media{display:block;border-radius:12px;overflow:hidden}
+  .body{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .kicker{margin:0;display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px}
+  .n{flex:none;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--cb);color:#fff;font:800 11px var(--display)}
+  h3{margin:0;font-size:clamp(17px,1.7vw,21px)}
+  h3 a{text-decoration:none}
+  .sum{margin:0;color:var(--soft);font-size:15px}
+  .facts{margin:0;color:var(--soft);font-size:14px}
+  .act{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:4px}
+  .act .btn{padding:.5em .9em;font-size:14.5px}
+  @media (pointer:coarse){ .act .btn{min-height:44px;justify-content:center} }
+  .part{background:var(--cb);border-color:var(--cb);color:#fff}
+  @media (max-width:760px){ .row{grid-template-columns:1fr} }
+</style>

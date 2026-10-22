@@ -1,0 +1,85 @@
+---
+import Base from '../layouts/Base.astro';
+import Card from '../components/Card.astro';
+import { getCollection } from 'astro:content';
+import { SUBJECTS, PARTS } from '../config';
+const all = (await getCollection('items')).sort((a, b) => a.data.order - b.data.order);
+const grades = [...new Set(all.flatMap(i => i.data.grades))].sort((a, b) => a - b);
+---
+<Base title="Каталог" description="Все материалы: чертежи для доски, раздатки и тренажёры по математике, алгебре и геометрии">
+  <section>
+    <div class="wrap">
+      <h1>Каталог</h1>
+      <div class="filters">
+        <div class="row" data-filter="subject">
+          <button aria-pressed="true" data-v="">Все предметы</button>
+          {Object.entries(SUBJECTS).map(([k, s]) => <button data-v={k}>{s.label}</button>)}
+        </div>
+        <div class="row" data-filter="grade">
+          <button aria-pressed="true" data-v="">Любой класс</button>
+          {grades.map(g => <button data-v={String(g)}>{g} класс</button>)}
+        </div>
+        <div class="row" data-filter="part">
+          <button aria-pressed="true" data-v="">Любой режим</button>
+          {Object.entries(PARTS).map(([k, p]) => <button data-v={k}>{p.icon} {p.label}</button>)}
+        </div>
+        <label class="sr" for="q">Поиск по каталогу</label>
+        <input id="q" type="search" placeholder="Поиск: тема или слово, например «дроби» или «угол»" />
+      </div>
+      <p id="empty" class="muted" role="status" aria-live="polite"></p>
+      <div class="grid" id="list">{all.map(i => <Card item={i} />)}</div>
+    </div>
+  </section>
+</Base>
+<script>
+  type Key = 'subject' | 'grade' | 'part';
+  const state: Record<Key | 'q', string> = { subject: '', grade: '', part: '', q: '' };
+  const params = new URLSearchParams(location.search);
+  for (const k of ['subject', 'grade', 'part', 'q'] as const) state[k] = params.get(k) ?? '';
+  const q = document.getElementById('q') as HTMLInputElement;
+  q.value = state.q;
+
+  function apply() {
+    let shown = 0;
+    document.querySelectorAll<HTMLElement>('#list .card').forEach(c => {
+      const okSubject = !state.subject || c.dataset.subject === state.subject;
+      const okGrade = !state.grade || (c.dataset.grades ?? '').split(' ').includes(state.grade);
+      const okPart = !state.part || (c.dataset.parts ?? '').split(' ').includes(state.part);
+      const okQ = !state.q || state.q.toLowerCase().split(/\s+/).every(w => (c.dataset.text ?? '').includes(w));
+      c.hidden = !(okSubject && okGrade && okPart && okQ);
+      if (!c.hidden) shown++;
+    });
+    // область role="status" остаётся в разметке, меняется только текст — так скринридер его объявляет
+    (document.getElementById('empty') as HTMLElement).textContent = shown > 0 ? '' : 'Ничего не нашлось — попробуйте другой запрос.';
+    document.querySelectorAll<HTMLElement>('[data-filter]').forEach(row => {
+      const key = row.dataset.filter as Key;
+      row.querySelectorAll<HTMLButtonElement>('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === state[key])));
+    });
+    const p = new URLSearchParams();
+    for (const k of ['subject', 'grade', 'part', 'q'] as const) if (state[k]) p.set(k, state[k]);
+    history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : ''));
+  }
+  document.querySelectorAll<HTMLElement>('[data-filter]').forEach(row => {
+    row.addEventListener('click', e => {
+      const b = (e.target as HTMLElement).closest('button'); if (!b) return;
+      state[row.dataset.filter as Key] = b.dataset.v ?? ''; apply();
+    });
+  });
+  q.addEventListener('input', () => { state.q = q.value.trim(); apply(); });
+  apply();
+</script>
+<style>
+  .filters{display:flex;flex-direction:column;gap:10px;margin:8px 0 24px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  #empty{margin:0 0 16px}
+  #empty:empty{display:none}
+  .row button{font:600 15px var(--body);border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:.45em 1em;cursor:pointer;
+    transition:border-color 160ms var(--ease-out),transform 160ms var(--ease-out)}
+  @media (hover:hover) and (pointer:fine){ .row button:hover{border-color:var(--accent)} }
+  .row button:active{transform:scale(.97)}
+  .row button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  @media (pointer:coarse){ .row button{min-height:44px} }
+  @media (prefers-reduced-motion:reduce){ .row button{transition:border-color 160ms linear} .row button:active{transform:none} }
+  input[type=search]{font:500 16px var(--body);padding:.7em 1em;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);max-width:560px}
+</style>

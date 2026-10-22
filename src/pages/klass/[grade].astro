@@ -1,0 +1,73 @@
+---
+// Список класса: материалы по предметам (5–6 — математика, 7–8 — алгебра и геометрия), по порядку учебника
+import Base from '../../layouts/Base.astro';
+import LessonRow from '../../components/LessonRow.astro';
+import { getCollection } from 'astro:content';
+import { klassHref, klassName, gradeSubjects, isReady } from '../../lib';
+import { SITE, SUBJECTS } from '../../config';
+
+export async function getStaticPaths() {
+  return SITE.grades.map(g => ({ params: { grade: String(g) } }));
+}
+
+const grades = SITE.grades;
+const g = Number(Astro.params.grade);
+const items = (await getCollection('items'))
+  .filter(i => i.data.type === 'lesson' && i.data.grades.includes(g))
+  .sort((a, b) => a.data.order - b.data.order);
+const groups = gradeSubjects(g)
+  .map(s => ({ s, list: items.filter(i => i.data.subject === s) }))
+  .filter(x => x.list.length > 0);
+const title = g <= 6 ? `Математика · ${klassName(g)}` : `Алгебра и геометрия · ${klassName(g)}`;
+const books = gradeSubjects(g).map(s => SUBJECTS[s].textbook).join(' и ');
+---
+<Base title={title} description={`Чертежи для доски, раздатки и тренажёры для ${g} класса — по учебникам: ${books}.`} noindex={!items.some(i => isReady(i.data))}>
+  <section class="top">
+    <div class="wrap">
+      <nav class="tabs" aria-label="Класс">
+        {grades.map(x => <a href={klassHref(x)} aria-current={x === g ? 'page' : undefined}>{klassName(x)}</a>)}
+      </nav>
+      <h1>{title}</h1>
+      {items.length > 0 && <p class="lead">По порядку учебника ({books}). У каждого материала — режимы для доски, раздатки и дома.</p>}
+    </div>
+  </section>
+  {groups.map(({ s, list }) => (
+    <section class="list">
+      <div class="wrap rows">
+        {groups.length > 1 && <h2>{SUBJECTS[s].label} · {SUBJECTS[s].textbook}</h2>}
+        {list.map((i, n) => <LessonRow item={i} n={n + 1} />)}
+      </div>
+    </section>
+  ))}
+  {items.length === 0 && (
+    <section class="list">
+      <div class="wrap">
+        <div class="soon">
+          <b>Материалы для {klassName(g)} скоро появятся</b>
+          <p>Пока загляните в другие классы или в <a href={`${import.meta.env.BASE_URL}catalog/`}>каталог</a>.</p>
+        </div>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .top{padding-bottom:4px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .tabs a{text-decoration:none;font-weight:700;font-size:14.5px;padding:.4em .9em;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--soft)}
+  .tabs a{transition:color 160ms var(--ease-out),transform 160ms var(--ease-out)}
+  @media (hover:hover) and (pointer:fine){ .tabs a:hover{color:var(--ink)} }
+  .tabs a:active{transform:scale(.97)}
+  .tabs a[aria-current]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  @media (pointer:coarse){ .tabs a{display:inline-flex;align-items:center;min-height:44px} }
+  @media (prefers-reduced-motion:reduce){ .tabs a:active{transform:none} }
+  h1{font-size:clamp(22px,2.6vw,32px)}
+  .lead{color:var(--soft);font-size:16px;margin:0;max-width:60ch}
+  .list{padding-top:14px;padding-bottom:0}
+  .rows{display:flex;flex-direction:column;gap:14px}
+  .rows h2{margin:6px 0 0;font-size:clamp(18px,1.8vw,22px)}
+  .soon{padding:clamp(28px,5vw,56px) 20px;text-align:center;border-radius:var(--r);border:1.5px dashed var(--line);background:var(--surface)}
+  .soon b{font:800 clamp(18px,2.2vw,22px) var(--display)}
+  .soon p{margin:.5em 0 0;color:var(--soft)}
+  .soon a{color:var(--accent);font-weight:600}
+</style>
