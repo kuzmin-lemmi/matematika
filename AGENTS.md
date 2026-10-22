@@ -91,6 +91,7 @@ public/
   materials/*.html       сами материалы — самодостаточные HTML-файлы
   posts/                 картинки-превью (светлая и -dark), ролики
 scripts/capture-posters.mjs  снимает картинки-превью через Chrome (npm run posters)
+templates/material.html  шаблон материала: стартовый экран, три режима, CONFIG, генератор по номеру варианта, window.APP
 materials-src/           исходники больших материалов (модули), собираются в public/materials/ — когда понадобится
 tests/                   автотесты материалов (node:test + jsdom) — не в public/
 docs/                    стратегия, план, форматы, банк идей, техника, домашние задания
@@ -98,7 +99,7 @@ docs/                    стратегия, план, форматы, банк 
 
 ## 4. Как добавить материал (самая частая задача)
 
-1. Материал положи в `public/materials/<slug>.html`. Slug — латиница через дефис, транслит названия
+1. Скопируй `templates/material.html` в `public/materials/<slug>.html` и замени всё, что помечено «ЗАМЕНИ». Slug — латиница через дефис, транслит названия
    (`slozhenie-drobei`, `ugly-pri-parallelnyh-pryamyh`).
 2. Создай или обнови `src/content/items/<slug>.md`:
 

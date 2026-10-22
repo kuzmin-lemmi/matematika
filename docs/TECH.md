@@ -1,7 +1,8 @@
 # Техника материалов
 
 Как сделать то, что требуют `AGENTS.md` и `docs/FORMATS.md`, в одном HTML-файле без библиотек.
-Код ниже — образцы; общий шаблон материала собирается вместе с первым пилотом (`docs/ROADMAP.md`, этап 1).
+Код ниже — образцы. Новый материал начинай с шаблона `templates/material.html` (собран из пилота
+`public/materials/slozhenie-drobei.html` — там развёрнутые примеры: полоски на SVG, пошаговый ввод, кодовое слово).
 
 ## Адрес и режимы
 
@@ -90,8 +91,19 @@ const parseNum = s => {
 
 - Степени — `<sup>`, смешанное число — целая часть и `.frac` рядом.
 - Поле ввода дроби — два `<input inputmode="numeric">` этажом в той же разметке `.frac`.
-- **Шрифт:** проверить, что в выбранном шрифте есть `∠ △ ∥ ⊥ − · ² ³ √ π °`; запасные — `'Cambria Math', 'Segoe UI Symbol'`.
-  На школьных компьютерах Windows смотреть особенно внимательно.
+- **Шрифт** (проверено 2026-10-22): в Golos Text есть `− · × ² ³ √ ° ± ≈ ≤ ≥ № → ←`, но **нет `∠ △ ∥ ⊥ π ≠ ∞ □`**.
+  Их берём из подмножества Noto Sans Math (~8 КБ), а без сети — из системных `'Cambria Math'`, `'Segoe UI Symbol'`:
+
+```html
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%E2%88%A0%E2%96%B3%E2%88%A5%E2%8A%A5%CF%80%E2%89%A0%E2%88%9E%E2%96%A1&display=swap" rel="stylesheet">
+```
+
+```css
+font-family: 'Golos Text', 'Noto Sans Math', 'Cambria Math', 'Segoe UI Symbol', 'Segoe UI', system-ui, sans-serif;
+```
+
+  Нужен новый знак — проверь его в Golos Text и, если его нет, допиши в параметр `text=` (в `src/layouts/Base.astro`
+  и в материалах). На школьных компьютерах Windows смотреть особенно внимательно.
 
 ## Проверка выражений (пошаговый ввод в алгебре)
 

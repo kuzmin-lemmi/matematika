@@ -2,8 +2,9 @@
 :root{
   --bg:#F6F3EB; --surface:#FFFDF8; --ink:#203B31; --soft:#5C7065; --line:#D8DFD2; --accent:#256449; --accent-ink:#FFFFFF;
   --warm:#B94C2D; --tint:#E8EEDF; --grid:rgba(37,100,73,.10);
-  --display:'Golos Text','Segoe UI',system-ui,-apple-system,sans-serif;
-  --body:'Golos Text','Segoe UI',system-ui,-apple-system,sans-serif;
+  /* Noto Sans Math и Cambria Math — только для знаков, которых нет в Golos Text: ∠ △ ∥ ⊥ π ≠ ∞ □ */
+  --display:'Golos Text','Noto Sans Math','Cambria Math','Segoe UI Symbol','Segoe UI',system-ui,-apple-system,sans-serif;
+  --body:'Golos Text','Noto Sans Math','Cambria Math','Segoe UI Symbol','Segoe UI',system-ui,-apple-system,sans-serif;
   --r:12px;
   --ease-out:cubic-bezier(.23,1,.32,1);
   color-scheme:light;

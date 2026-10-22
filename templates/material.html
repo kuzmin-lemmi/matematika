@@ -1,0 +1,524 @@
+<!doctype html>
+<!--
+  Шаблон материала «Матшага». Собран из первого пилота — public/materials/slozhenie-drobei.html,
+  там же смотри развёрнутые примеры: полоски на SVG, пошаговый ввод, кодовое слово, ловушки.
+  Как начать: скопируй файл в public/materials/<slug>.html и замени всё, что помечено «ЗАМЕНИ».
+  Пример внутри шаблона — сложение двузначных чисел: он работает, чтобы было видно, как связаны части.
+  Правила — AGENTS.md (раздел 5), docs/FORMATS.md, docs/TECH.md.
+-->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Название темы — Матшаг</title><!-- ЗАМЕНИ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- знаки, которых нет в Golos Text (∠ △ ∥ ⊥ π ≠ ∞ □), — подмножество Noto Sans Math -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%E2%88%A0%E2%96%B3%E2%88%A5%E2%8A%A5%CF%80%E2%89%A0%E2%88%9E%E2%96%A1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F3EB; --surface:#FFFDF8; --ink:#203B31; --soft:#5C7065; --line:#D8DFD2; --grid:rgba(37,100,73,.09);
+  --accent:#256449; --accent-ink:#FFFFFF; --a:#B94C2D; --a-soft:#F4D8CC;
+  --ok:#256449; --ok-soft:#E1EFE5; --bad:#B3261E; --bad-soft:#F8E1DE; --info-soft:#F1ECDD;
+  --font:'Golos Text','Noto Sans Math','Cambria Math','Segoe UI Symbol','Segoe UI',system-ui,-apple-system,sans-serif;
+  --r:14px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
+    --accent:#99D7B4; --accent-ink:#153725; --a:#FFAE8C; --a-soft:#9A5038;
+    --ok:#99D7B4; --ok-soft:#24402F; --bad:#FF9C8F; --bad-soft:#4A2622; --info-soft:#2E3A2F; color-scheme:dark; }
+}
+:root[data-theme="dark"]{ --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
+  --accent:#99D7B4; --accent-ink:#153725; --a:#FFAE8C; --a-soft:#9A5038;
+  --ok:#99D7B4; --ok-soft:#24402F; --bad:#FF9C8F; --bad-soft:#4A2622; --info-soft:#2E3A2F; color-scheme:dark; }
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:400 18px/1.45 var(--font);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:.5em 1em;font-weight:600}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+[hidden]{display:none !important}
+.screen{min-height:100vh;min-height:100dvh}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 48px}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.1;margin:0 .12em;text-align:center}
+.frac > :last-child{border-top:.08em solid currentColor;padding:0 .15em;align-self:stretch}
+
+/* стартовый экран */
+#start .wrap{max-width:880px;padding-top:48px}
+.kicker{color:var(--soft);font-weight:600;margin:0 0 6px}
+h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px}
+.lead{font-size:20px;color:var(--soft);margin:0 0 32px}
+.modes{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.mode{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;padding:22px;border-radius:var(--r);min-height:150px}
+.mode b{font-size:26px}
+.mode span{font-weight:400;color:var(--soft)}
+.topright{position:fixed;top:calc(12px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right))}
+.icon{padding:.35em .6em;min-width:44px;min-height:44px}
+
+/* доска: на проекторе шрифт не мельче 28px */
+#board{display:grid;grid-template-rows:auto auto 1fr auto;height:100vh;height:100dvh;padding:12px clamp(12px,3vw,40px)}
+.bbar{display:flex;align-items:center;gap:12px;font-size:24px}
+.bbar .ttl{font-weight:700;flex:1}
+.bbar .cnt{color:var(--soft);font-weight:600}
+.btext{font-size:clamp(28px,2.5vw,38px);line-height:1.28;padding:4px 0 8px}
+.btext .q{font-weight:700}
+.btext .a.hide{visibility:hidden}
+.bstage{min-height:0;display:flex;align-items:center;justify-content:center}
+.bstage svg{width:100%;height:100%}
+.bctl{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding-top:8px}
+.bctl button{font-size:24px;min-height:56px}
+#board.preview .bctl{visibility:hidden}
+svg .big{font:700 120px var(--font);fill:var(--ink);text-anchor:middle}
+svg .bar{fill:var(--a-soft);stroke:var(--a);stroke-width:4}
+
+/* раздатка */
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;margin-bottom:24px}
+.panel .row{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.panel input{padding:.3em .5em;border:2px solid var(--line);border-radius:10px;background:var(--bg)}
+.panel input[type=number]{width:5em}
+.note{color:var(--soft);font-size:16px;margin:0}
+.sheets{display:grid;gap:24px;justify-items:center;overflow-x:auto}
+.page{width:210mm;min-height:297mm;padding:12mm;background:#fff;color:#000;box-shadow:0 2px 16px rgba(0,0,0,.18);font-size:12pt;line-height:1.35}
+.sheet{display:flex;flex-direction:column;gap:3mm}
+.shead{display:grid;grid-template-columns:1fr 22mm 28mm auto;gap:4mm;font-size:11pt;align-items:end}
+.shead span{border-bottom:1px solid #000;padding-bottom:1mm;white-space:nowrap}
+.shead .vn{border:1.5px solid #000;padding:1mm 2mm;font-weight:700}
+.sheet h2{font-size:14pt;margin:1mm 0 0}
+.tasks{display:grid;grid-template-columns:1fr 1fr;gap:3mm 6mm;margin:0;padding:0;list-style:none}
+.task{break-inside:avoid;font-size:15pt}
+.cells{height:25mm;margin-top:1.5mm;border:1px solid #bbb;
+  background-image:linear-gradient(#cfcfcf .3mm,transparent .3mm),linear-gradient(90deg,#cfcfcf .3mm,transparent .3mm);
+  background-size:5mm 5mm;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+table.ans,table.key{border-collapse:collapse;width:100%;font-size:11pt}
+table.ans td,table.ans th,table.key td,table.key th{border:1px solid #000;padding:1mm;text-align:center}
+table.ans .tall td{height:12mm}
+
+/* тренажёр */
+.hhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:16px}
+.hhead h2{margin:0;font-size:26px;flex:1}
+.stats{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--soft);font-weight:600}
+.stats b{color:var(--ink)}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:clamp(16px,3vw,28px);margin-top:12px}
+.taskx{font-size:clamp(30px,6vw,46px);font-weight:700;margin:4px 0 16px;text-align:center}
+.inrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:26px;justify-content:center}
+.inrow input{width:4em;padding:.15em .2em;text-align:center;border:2px solid var(--line);border-radius:10px;background:var(--bg);font-weight:700}
+.hbtns{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.fb{margin-top:16px;padding:14px 16px;border-radius:12px;font-size:19px}
+.fb.ok{background:var(--ok-soft);border-left:6px solid var(--ok)}
+.fb.bad{background:var(--bad-soft);border-left:6px solid var(--bad)}
+.fb.info{background:var(--info-soft);border-left:6px solid var(--soft)}
+.fb .tag{font-weight:700;display:block}
+.work{list-style:none;padding:0;display:grid;gap:10px}
+.work li{background:var(--bg);border-radius:10px;padding:10px 14px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px;z-index:20}
+.overlay .card{max-width:720px;max-height:90vh;overflow:auto}
+
+@media (prefers-reduced-motion: reduce){ *{animation:none !important;transition:none !important} }
+@page{size:A4;margin:0}
+@media print{
+  html,body{background:#fff !important;color:#000 !important;background-image:none !important;padding:0}
+  .no-print,.screen:not(#print){display:none !important}
+  #print .wrap{max-width:none;padding:0}
+  .sheets{display:block}
+  .page{box-shadow:none;break-after:page;min-height:auto;height:297mm;overflow:hidden}
+  .page.key{height:auto;overflow:visible}
+  .page:last-child{break-after:auto}
+  body.print-key .page:not(.key){display:none}
+  body.print-sheets .page.key{display:none}
+}
+</style>
+</head>
+<body>
+
+<section id="start" class="screen" hidden>
+  <div class="topright no-print"><button class="icon" type="button" data-act="theme" aria-label="Сменить тему">◐</button></div>
+  <div class="wrap">
+    <p class="kicker">5 класс · Виленкин и др. · Математика</p><!-- ЗАМЕНИ -->
+    <h1>Название темы</h1><!-- ЗАМЕНИ -->
+    <p class="lead">Одна тема в трёх режимах: показ на доске, раздатка и тренажёр с разбором ошибок.</p>
+    <div class="modes">
+      <button class="mode" type="button" data-go="board"><b>🖥 На доске</b><span>ЗАМЕНИ: что увидит класс.</span></button>
+      <button class="mode" type="button" data-go="print"><b>🖨 Раздатка</b><span>У каждого свой вариант, ключ — по номеру варианта.</span></button>
+      <button class="mode" type="button" data-go="home"><b>🏠 Тренировка</b><span>Задания с разбором каждой ошибки.</span></button>
+    </div>
+  </div>
+</section>
+
+<section id="board" class="screen" hidden>
+  <div class="bbar">
+    <button class="icon" type="button" data-act="menu" aria-label="Меню (Esc)">☰</button>
+    <span class="ttl">Название темы</span><!-- ЗАМЕНИ -->
+    <span class="cnt" id="bCnt"></span>
+  </div>
+  <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
+  <div class="bstage" id="bStage"></div>
+  <div class="bctl">
+    <button type="button" data-act="prev">← Назад</button>
+    <button type="button" class="main" data-act="next" id="bNext">Показать</button>
+    <button type="button" data-act="restart">Заново</button>
+    <button type="button" data-act="numbers">Другие числа</button>
+    <button type="button" data-act="theme">◐ Тема</button>
+    <button type="button" data-act="full">⛶ Весь экран</button>
+  </div>
+</section>
+
+<section id="print" class="screen" hidden>
+  <div class="wrap">
+    <div class="hhead no-print"><button class="icon" type="button" data-act="menu" aria-label="Меню">☰</button><h2>Раздатка</h2></div>
+    <div class="panel no-print">
+      <div class="row">
+        <label>Вариантов <input type="number" id="pCount" min="1" max="40"></label>
+        <button type="button" id="pNew">Новые номера</button>
+      </div>
+      <label style="display:grid;gap:4px">Номера вариантов (ключ восстанавливается по номеру)<input type="text" id="pNums" autocomplete="off"></label>
+      <p class="note" id="pMsg"></p>
+      <div class="row"><button type="button" class="main" id="pPrint">🖨 Печать листов</button><button type="button" id="pPrintKey">🔑 Печать ключа</button></div>
+    </div>
+    <div class="sheets" id="pSheets"></div>
+  </div>
+</section>
+
+<section id="home" class="screen" hidden>
+  <div class="wrap">
+    <div class="hhead">
+      <button class="icon" type="button" data-act="menu" aria-label="Меню">☰</button>
+      <h2>Тренировка</h2>
+      <button type="button" data-act="help">📖 Справка</button>
+    </div>
+    <div id="hPlay">
+      <div class="stats" id="hStats"></div>
+      <div class="card">
+        <div class="taskx" id="hTask"></div>
+        <div class="inrow" id="hIn"></div>
+        <div id="hFb"></div>
+        <div class="hbtns">
+          <button type="button" class="main" id="hCheck">Проверить</button>
+          <button type="button" id="hHint">Подсказка</button>
+          <button type="button" class="main" id="hNext" hidden>Дальше →</button>
+        </div>
+      </div>
+    </div>
+    <div id="hEnd" hidden></div>
+  </div>
+</section>
+
+<div class="overlay" id="help" hidden>
+  <div class="card" role="dialog" aria-modal="true">
+    <h3>Справка</h3>
+    <p>ЗАМЕНИ: теория по теме — формулировки как в учебнике класса.</p>
+    <div class="hbtns"><button type="button" class="main" data-act="help-close">Понятно</button></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ================= Параметры: учитель может поменять их за минуту =================
+const CONFIG = {
+  board: { previewDelay: 1700 },               // превью на сайте: пауза между шагами, мс
+  print: { variants: 25 },
+  home: { round: 10, points: 10, hintPenalty: 3, maxMultiplier: 3 },
+};
+// Версия генератора — первая часть номера варианта «1-4817». Изменил генератор — увеличь версию
+// и оставь старую ветку, пока на неё есть напечатанные листы.
+const GEN_VERSION = 1;
+
+const P = new URLSearchParams(location.search);
+const MODE = ['board', 'print', 'home'].includes(P.get('mode')) ? P.get('mode') : null;
+const PREVIEW = P.get('preview') === '1';
+const $ = id => document.getElementById(id);
+const SLUG = 'slug-materiala';   // ЗАМЕНИ: ключ для localStorage
+const store = {
+  get(k) { try { return localStorage.getItem(`matshag:${SLUG}:${k}`); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(`matshag:${SLUG}:${k}`, String(v)); } catch {} },
+};
+
+// ================= Генератор по зерну: никакого Math.random() внутри =================
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const int = (rnd, a, b) => a + Math.floor(rnd() * (b - a + 1));
+const taskRnd = (n, i) => mulberry32(GEN_VERSION * 1000003 + n * 7919 + i * 104729 + 1);
+
+// ЗАМЕНИ: типы заданий. gen — задание из зерна, bad — вырожденные случаи, answer — ответ,
+// explain — объяснение неверного ответа (с вычислением; типичная ошибка называется по имени).
+const TYPES = {
+  carry: {
+    title: 'Сложение с переходом через десяток',
+    gen: rnd => ({ a: int(rnd, 11, 89), b: int(rnd, 11, 89) }),
+    bad: t => t.a % 10 + t.b % 10 < 10 || t.a + t.b > 99,   // без перехода через десяток — не то, что тренируем
+    text: t => `${t.a} + ${t.b}`,
+    answer: t => t.a + t.b,
+    explain(t, v) {
+      const r = t.a + t.b;
+      if (v === r - 10) return { cat: 'carry', msg: `Ты потерял десяток при переходе: ${t.a % 10} + ${t.b % 10} = ${t.a % 10 + t.b % 10}, единицу запоминаем и прибавляем к десяткам. ${t.a} + ${t.b} = ${r}.` };
+      return { cat: 'calc', msg: `Сложим по разрядам: единицы ${t.a % 10} + ${t.b % 10}, десятки ${Math.floor(t.a / 10)} + ${Math.floor(t.b / 10)}. ${t.a} + ${t.b} = ${r}.` };
+    },
+    hint: t => `Сначала сложи единицы: ${t.a % 10} + ${t.b % 10}.`,
+  },
+};
+const CATS = {   // ЗАМЕНИ: типы ошибок для блока «Над чем поработать»
+  carry: ['Переход через десяток', 'Если единиц получилось больше 9, десяток прибавь к десяткам.'],
+  calc: ['Вычисления', 'Считай по разрядам и проверяй прикидкой.'],
+};
+function generate(type, rnd, tries = 500) {
+  for (let k = 0; k < tries; k++) {
+    const t = TYPES[type].gen(rnd);
+    if (!TYPES[type].bad?.(t)) return { type, ...t };
+  }
+  throw new Error('Генератор не нашёл задание: ' + type);
+}
+
+// Вариант раздатки: задания и ответы восстанавливаются по номеру
+const KINDS_V1 = ['carry', 'carry', 'carry', 'carry', 'carry', 'carry'];   // ЗАМЕНИ: состав варианта
+function makeVariant(num, version = GEN_VERSION) {
+  if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
+  const tasks = [];
+  KINDS_V1.forEach((type, i) => {
+    const rnd = taskRnd(num, i);
+    let t;
+    do t = generate(type, rnd); while (tasks.some(u => TYPES[type].text(u) === TYPES[type].text(t)));
+    tasks.push(t);
+  });
+  return { num, label: version + '-' + num, tasks, answers: tasks.map(t => TYPES[t.type].answer(t)) };
+}
+
+// ================= Экраны =================
+let screen = null;
+function show(name) {
+  boardStopPreview();
+  screen = name;
+  ['start', 'board', 'print', 'home'].forEach(s => { $(s).hidden = s !== name; });
+  $('help').hidden = true;
+  if (name === 'board') renderBoard();
+  if (name === 'print') renderPrint();
+  if (name === 'home') homeStart();
+}
+function toggleTheme() {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+  store.set('theme', root.dataset.theme);
+}
+async function toggleFull() {
+  try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen(); } catch {}
+}
+
+// ================= 🖥 На доске: сценарий из шагов «вопрос → показ» =================
+const B = { ex: null, steps: [], i: 0, phase: 0, timer: 0 };
+// ЗАМЕНИ: шаги показа. q — вопрос классу, a — ответ после «Показать», draw(phase) — SVG.
+function buildSteps(t) {
+  const svg = inner => `<svg viewBox="0 0 980 300" role="img" aria-label="Чертёж">${inner}</svg>`;
+  const u = t.a % 10 + t.b % 10;
+  return [
+    { q: `Сколько будет ${t.a} + ${t.b}? Запишите в тетрадь.`, a: 'Проверим по разрядам.',
+      draw: () => svg(`<text class="big" x="490" y="190">${t.a} + ${t.b}</text>`) },
+    { q: `Сколько будет единиц: ${t.a % 10} + ${t.b % 10}?`, a: `${u} — это 1 десяток и ${u - 10} единиц.`,
+      draw: ph => svg(`<rect class="bar" x="100" y="120" width="${ph ? u * 40 : (t.a % 10) * 40}" height="60"/>`) },
+    { q: 'Сколько всего?', a: `${t.a} + ${t.b} = ${t.a + t.b}.`,
+      draw: ph => svg(`<text class="big" x="490" y="190">${ph ? t.a + t.b : '?'}</text>`) },
+  ];
+}
+function boardNumbers(random) {
+  const rnd = random ? mulberry32((Math.random() * 4294967296) >>> 0) : mulberry32(1);
+  B.ex = generate(Object.keys(TYPES)[0], rnd);
+  B.steps = buildSteps(B.ex); B.i = 0; B.phase = 0;
+}
+function renderBoard() {
+  if (!B.steps.length) boardNumbers(false);
+  const st = B.steps[B.i];
+  $('bCnt').textContent = `Шаг ${B.i + 1} из ${B.steps.length}`;
+  $('bQ').innerHTML = st.q;
+  $('bA').innerHTML = st.a;
+  $('bA').classList.toggle('hide', B.phase === 0);
+  $('bStage').innerHTML = st.draw(B.phase);
+  $('bNext').textContent = B.phase === 0 ? 'Показать' : 'Далее →';
+  $('bNext').disabled = B.i === B.steps.length - 1 && B.phase === 1;
+}
+function boardNext() { if (B.phase === 0) B.phase = 1; else if (B.i < B.steps.length - 1) { B.i++; B.phase = 0; } renderBoard(); }
+function boardPrev() { if (B.phase === 1) B.phase = 0; else if (B.i > 0) { B.i--; B.phase = 1; } renderBoard(); }
+function boardGo(i, phase = 0) { B.i = Math.max(0, Math.min(i, B.steps.length - 1)); B.phase = phase ? 1 : 0; renderBoard(); }
+// превью на сайте: доска сама идёт по шагам, без звука и фокуса
+function boardStartPreview() {
+  $('board').classList.add('preview');
+  B.timer = setInterval(() => (B.i === B.steps.length - 1 && B.phase === 1 ? boardGo(0) : boardNext()), CONFIG.board.previewDelay);
+}
+function boardStopPreview() { clearInterval(B.timer); B.timer = 0; }
+function boardPoster() { boardStopPreview(); boardGo(1, 1); }   // ЗАМЕНИ: кадр для npm run posters
+
+// ================= 🖨 Раздатка =================
+let printNums = [];
+const newNumbers = count => { const s = new Set(); while (s.size < count) s.add(1000 + Math.floor(Math.random() * 9000)); return [...s]; };
+function parseNums(text) {
+  const nums = [], bad = [];
+  for (const part of text.split(/[\s,;]+/).filter(Boolean)) {
+    const m = part.match(/^(?:(\d+)[-–])?(\d{4})$/);
+    if (!m || (m[1] && +m[1] !== GEN_VERSION)) bad.push(part); else if (!nums.includes(+m[2])) nums.push(+m[2]);
+  }
+  return { nums, bad };
+}
+function sheetHTML(v) {
+  const cols = v.tasks.map((_, i) => `<th>${i + 1}</th>`).join(''), empty = v.tasks.map(() => '<td></td>').join('');
+  return `<div class="sheet">
+    <div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">Вариант ${v.label}</span></div>
+    <h2>Название темы</h2>
+    <ol class="tasks">${v.tasks.map((t, i) => `<li class="task"><b>${i + 1})</b> ${TYPES[t.type].text(t)} =<div class="cells"></div></li>`).join('')}</ol>
+    <table class="ans"><tr><th>Задание</th>${cols}</tr><tr class="tall"><th>Ответ</th>${empty}</tr></table></div>`;
+}
+function keyHTML(vs) {
+  return `<div class="page key"><h2>Ключ учителя</h2><table class="key"><tr><th>Вариант</th>${vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('')}</tr>
+    ${vs.map(v => `<tr><td><b>${v.label}</b></td>${v.answers.map(a => `<td>${a}</td>`).join('')}</tr>`).join('')}</table></div>`;
+}
+function renderPrint() {
+  if (!printNums.length) { printNums = newNumbers(CONFIG.print.variants); $('pCount').value = printNums.length; }
+  $('pNums').value = printNums.map(n => GEN_VERSION + '-' + n).join(', ');
+  drawSheets();
+}
+function drawSheets() {
+  const vs = printNums.map(n => makeVariant(n));
+  $('pSheets').innerHTML = (vs.length ? keyHTML(vs) : '') + vs.map(v => `<div class="page">${sheetHTML(v)}</div>`).join('');
+  return vs;
+}
+function printNow(what) {
+  document.body.classList.remove('print-key', 'print-sheets');
+  document.body.classList.add(what === 'key' ? 'print-key' : 'print-sheets');
+  try { window.print(); } catch {}
+}
+
+// ================= 🏠 Тренировка =================
+const H = { rnd: null, n: 0, score: 0, streak: 0, clean: 0, cats: {}, task: null, hints: 0, wait: false, finished: false };
+function homeStart({ seed } = {}) {
+  Object.assign(H, { n: 0, score: 0, streak: 0, clean: 0, cats: {}, finished: false, rnd: mulberry32(seed ?? ((Math.random() * 4294967296) >>> 0)) });
+  $('hPlay').hidden = false; $('hEnd').hidden = true;
+  homeNewTask();
+}
+function homeNewTask(type = Object.keys(TYPES)[0]) {
+  H.task = generate(type, H.rnd); H.n++; H.hints = 0; H.wait = false;
+  homeRender();
+}
+function homeCheck(v) {
+  if (H.wait || H.finished) return null;
+  if (v == null || Number.isNaN(v)) return { ok: false, empty: true, msg: 'Впиши ответ.' };
+  const T = TYPES[H.task.type], right = T.answer(H.task);
+  let r;
+  if (v === right) {
+    H.streak++; H.clean++;
+    const mult = Math.min(CONFIG.home.maxMultiplier, 1 + Math.floor((H.streak - 1) / 3));
+    H.gain = Math.max(0, CONFIG.home.points - H.hints * CONFIG.home.hintPenalty) * mult;
+    H.score += H.gain;
+    r = { ok: true, msg: `${T.text(H.task)} = ${right}. +${H.gain}` };
+  } else {
+    H.streak = 0; H.gain = 0;
+    r = { ok: false, ...T.explain(H.task, v) };
+    H.cats[r.cat] = (H.cats[r.cat] || 0) + 1;
+  }
+  H.wait = true; H.last = r;
+  homeRender(r);
+  return r;
+}
+function homeContinue() {
+  if (!H.wait) return;
+  if (H.n >= CONFIG.home.round) return homeEnd();
+  homeNewTask(H.task.type);   // после ошибки — задание того же типа с другими числами
+}
+function homeHint() {
+  if (H.wait) return null;
+  H.hints++;
+  const text = TYPES[H.task.type].hint(H.task);
+  homeRender({ hint: text });
+  return text;
+}
+function homeEnd() {
+  H.finished = true;
+  const best = +store.get('best') || 0;
+  if (H.score > best) store.set('best', H.score);
+  const cats = Object.entries(H.cats).sort((x, y) => y[1] - x[1]);
+  $('hPlay').hidden = true; $('hEnd').hidden = false;
+  $('hEnd').innerHTML = `<div class="card"><h2>Итоги</h2><p>Очки: <b>${H.score}</b> (рекорд: ${Math.max(best, H.score)}). Без ошибок: <b>${H.clean} из ${CONFIG.home.round}</b></p>
+    <h3>Над чем поработать</h3>${cats.length ? `<ul class="work">${cats.map(([c, k]) => `<li><b>${CATS[c][0]}</b> — ошибок: ${k}<br>${CATS[c][1]}</li>`).join('')}</ul>` : '<p>Ошибок нет!</p>'}
+    <div class="hbtns"><button type="button" class="main" data-act="again">Ещё раз</button></div></div>`;
+}
+function homeRender(fb) {
+  $('hStats').innerHTML = `<span>Задание <b>${H.n}</b> из ${CONFIG.home.round}</span><span>Очки: <b>${H.score}</b></span><span>Серия: <b>${H.streak}</b></span>`;
+  $('hTask').innerHTML = `${TYPES[H.task.type].text(H.task)} = ?`;
+  $('hIn').innerHTML = H.wait ? '' : '<input id="hAns" inputmode="numeric" autocomplete="off" aria-label="Ответ">';
+  $('hFb').innerHTML = !fb ? '' : fb.hint ? `<div class="fb info"><span class="tag">Подсказка</span>${fb.hint}</div>`
+    : fb.empty ? `<div class="fb info">${fb.msg}</div>`
+    : `<div class="fb ${fb.ok ? 'ok' : 'bad'}"><span class="tag">${fb.ok ? 'Верно' : 'Ошибка'}</span>${fb.msg}</div>`;
+  $('hCheck').hidden = H.wait; $('hHint').hidden = H.wait; $('hNext').hidden = !H.wait;
+  $('hHint').textContent = `Подсказка (−${CONFIG.home.hintPenalty})`;
+  if (!PREVIEW) (H.wait ? $('hNext') : $('hAns')).focus();
+}
+// ввод: запятая или точка, любой минус, пробелы внутри
+const parseNum = s => { const t = String(s).replace(/\s+/g, '').replace(',', '.').replace(/[−–]/g, '-'); return t === '' || isNaN(+t) ? null : +t; };
+
+// ================= Управление =================
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-go],[data-act]');
+  if (!el) return;
+  if (el.dataset.go) return show(el.dataset.go);
+  const act = el.dataset.act;
+  if (act === 'menu') { if (document.fullscreenElement) toggleFull(); show('start'); }
+  if (act === 'next') boardNext();
+  if (act === 'prev') boardPrev();
+  if (act === 'restart') boardGo(0);
+  if (act === 'numbers') { boardNumbers(true); renderBoard(); }
+  if (act === 'theme') toggleTheme();
+  if (act === 'full') toggleFull();
+  if (act === 'help') $('help').hidden = false;
+  if (act === 'help-close') $('help').hidden = true;
+  if (act === 'again') homeStart();
+});
+$('hCheck').addEventListener('click', () => { const r = homeCheck(parseNum($('hAns')?.value ?? '')); if (r?.empty) homeRender(r); });
+$('hHint').addEventListener('click', homeHint);
+$('hNext').addEventListener('click', homeContinue);
+$('hIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('hCheck').click(); } });
+$('pNew').addEventListener('click', () => { printNums = newNumbers(Math.max(1, Math.min(40, +$('pCount').value || CONFIG.print.variants))); renderPrint(); });
+$('pNums').addEventListener('change', () => {
+  const { nums, bad } = parseNums($('pNums').value);
+  $('pMsg').textContent = bad.length ? `Не понял номера: ${bad.join(', ')}. Номер — как на листе, например ${GEN_VERSION}-4817.` : '';
+  if (nums.length) { printNums = nums.slice(0, 40); drawSheets(); }
+});
+$('pPrint').addEventListener('click', () => printNow('sheets'));
+$('pPrintKey').addEventListener('click', () => printNow('key'));
+addEventListener('afterprint', () => document.body.classList.remove('print-key', 'print-sheets'));
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input') && e.key !== 'Escape') return;
+  if (e.key === 'Escape') { if (!$('help').hidden) $('help').hidden = true; else if (screen !== 'start') show('start'); return; }
+  if (screen === 'home' && e.key === 'Enter' && H.wait) { e.preventDefault(); homeContinue(); return; }
+  if (screen !== 'board') return;
+  if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); boardNext(); }
+  else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); boardPrev(); }
+  else if ('fFаА'.includes(e.key)) toggleFull();
+});
+
+// ================= Запуск =================
+(() => {
+  const th = store.get('theme');
+  if (th === 'dark' || th === 'light') document.documentElement.dataset.theme = th;
+  if (PREVIEW) { show('board'); boardStartPreview(); } else show(MODE || 'start');
+})();
+
+// Для автотестов и снимка превью (npm run posters: AFTER → 'APP.board.poster()')
+window.APP = {
+  CONFIG, GEN_VERSION, TYPES, generate, makeVariant, taskRnd, mulberry32, parseNums, parseNum,
+  show, get screen() { return screen; },
+  board: { get steps() { return B.steps; }, get i() { return B.i; }, get phase() { return B.phase; }, next: boardNext, prev: boardPrev, go: boardGo, poster: boardPoster },
+  print: { draw: drawSheets, set nums(v) { printNums = v; } },
+  home: { state: H, start: homeStart, check: homeCheck, hint: homeHint, next: homeContinue },
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,1075 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Сложение дробей с разными знаменателями — Матшаг</title>
+<meta name="description" content="Сложение и вычитание дробей с разными знаменателями: показ на доске, раздатка с кодовым словом и тренажёр с разбором ошибок. 6 класс.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%E2%88%A0%E2%96%B3%E2%88%A5%E2%8A%A5%CF%80%E2%89%A0%E2%88%9E%E2%96%A1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F3EB; --surface:#FFFDF8; --ink:#203B31; --soft:#5C7065; --line:#D8DFD2; --grid:rgba(37,100,73,.09);
+  --accent:#256449; --accent-ink:#FFFFFF;
+  --a:#B94C2D; --a-soft:#F4D8CC;          /* первая дробь — заливка */
+  --b:#2F6F8F; --b-soft:#D3E6EE;          /* вторая дробь — штриховка */
+  --n:#7D847C; --n-soft:#E6E8E2;          /* неверный ответ */
+  --ok:#256449; --ok-soft:#E1EFE5; --bad:#B3261E; --bad-soft:#F8E1DE; --info-soft:#F1ECDD;
+  --font:'Golos Text','Noto Sans Math','Cambria Math','Segoe UI Symbol','Segoe UI',system-ui,-apple-system,sans-serif;
+  --r:14px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
+    --accent:#99D7B4; --accent-ink:#153725;
+    --a:#FFAE8C; --a-soft:#9A5038; --b:#8FCBE3; --b-soft:#2D6378; --n:#C9D2C8; --n-soft:#3E5047;
+    --ok:#99D7B4; --ok-soft:#24402F; --bad:#FF9C8F; --bad-soft:#4A2622; --info-soft:#2E3A2F;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
+  --accent:#99D7B4; --accent-ink:#153725;
+  --a:#FFAE8C; --a-soft:#9A5038; --b:#8FCBE3; --b-soft:#2D6378; --n:#C9D2C8; --n-soft:#3E5047;
+  --ok:#99D7B4; --ok-soft:#24402F; --bad:#FF9C8F; --bad-soft:#4A2622; --info-soft:#2E3A2F;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:400 18px/1.45 var(--font);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:.5em 1em;font-weight:600}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+[hidden]{display:none !important}
+.screen{min-height:100vh;min-height:100dvh}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 48px}
+
+/* дроби этажом */
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.1;margin:0 .12em;text-align:center}
+.frac > :last-child{border-top:.08em solid currentColor;padding:0 .15em;align-self:stretch}
+.mixed{white-space:nowrap}
+.mixed > .w{vertical-align:middle}
+.expr{white-space:nowrap}
+.op{margin:0 .25em}
+
+/* стартовый экран */
+#start .wrap{max-width:880px;padding-top:48px}
+.kicker{color:var(--soft);font-weight:600;margin:0 0 6px}
+h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing:-.01em}
+.lead{font-size:20px;color:var(--soft);margin:0 0 32px;max-width:40em}
+.modes{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.mode{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;padding:22px;border-radius:var(--r);min-height:170px}
+.mode b{font-size:26px}
+.mode span{font-weight:400;color:var(--soft)}
+.mode:hover{transform:translateY(-2px)}
+.topright{position:fixed;top:calc(12px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));display:flex;gap:8px;z-index:5}
+.icon{padding:.35em .6em;min-width:44px;min-height:44px}
+
+/* доска */
+#board{display:grid;grid-template-rows:auto auto 1fr auto;height:100vh;height:100dvh;padding:12px clamp(12px,3vw,40px)}
+.bbar{display:flex;align-items:center;gap:12px;font-size:24px}
+.bbar .ttl{font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap}
+.btext{font-size:clamp(28px,2.5vw,38px);line-height:1.28;padding:4px 0 8px}
+.btext .q{font-weight:700}
+.btext .a{margin-top:.3em;color:var(--ink)}
+.btext .a ol{margin:.1em 0;padding-left:1.3em}
+.btext .a.hide{visibility:hidden}
+.bstage{min-height:0;display:flex;align-items:center;justify-content:center}
+.bstage svg{width:100%;height:100%;max-height:100%}
+.bctl{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding-top:8px}
+.bctl button{font-size:24px;min-height:56px;padding:.3em 1em}
+.bctl .main{min-width:9em}
+#board.preview .bctl{visibility:hidden}
+
+svg .cell{stroke:var(--ink);stroke-width:1.5}
+svg .cell.e{fill:var(--surface)}
+svg .cell.fa{fill:var(--a-soft)}
+svg .cell.fb{fill:url(#hb)}
+svg .cell.fn{fill:url(#hn)}
+svg .frame{fill:none;stroke:var(--ink);stroke-width:4}
+svg .frame.fa{stroke:var(--a)} svg .frame.fb{stroke:var(--b)} svg .frame.fn{stroke:var(--n)}
+svg .div{stroke:var(--ink);stroke-width:3.5}
+svg .sub{stroke:var(--ink);stroke-width:1.6;stroke-dasharray:6 5}
+svg .sub.new{animation:draw .9s ease-out both}
+svg .hl{fill:none;stroke:var(--ink);stroke-width:7}
+svg .lbl text{font:700 32px var(--font);fill:var(--ink);text-anchor:middle}
+svg .lbl line{stroke:var(--ink);stroke-width:3}
+svg .lbl.ca text{fill:var(--a)} svg .lbl.ca line{stroke:var(--a)}
+svg .lbl.cb text{fill:var(--b)} svg .lbl.cb line{stroke:var(--b)}
+svg .lbl.cn text{fill:var(--n)} svg .lbl.cn line{stroke:var(--n)}
+svg .tick{stroke:var(--ink);stroke-width:3}
+svg .ticktext{font:700 26px var(--font);fill:var(--soft);text-anchor:middle}
+svg .row.new{animation:fade .6s ease-out both}
+@keyframes draw{from{opacity:0;stroke-dashoffset:40}to{opacity:1;stroke-dashoffset:0}}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){ svg .sub.new, svg .row.new, .mode:hover{animation:none;transform:none} }
+
+/* раздатка: панель */
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;margin-bottom:24px}
+.panel .row{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.panel label{display:inline-flex;gap:8px;align-items:center}
+.panel input[type=number]{width:5em}
+.panel input[type=text]{width:100%;min-width:0;padding:.4em .6em;border:2px solid var(--line);border-radius:10px;background:var(--bg)}
+.panel input[type=number]{padding:.3em .5em;border:2px solid var(--line);border-radius:10px;background:var(--bg)}
+.note{color:var(--soft);font-size:16px;margin:0}
+.err{color:var(--bad);font-weight:600}
+.sheets{display:grid;gap:24px;justify-items:center;overflow-x:auto}
+
+/* лист A4: на экране — как на бумаге */
+.page{width:210mm;min-height:297mm;padding:12mm;background:#fff;color:#000;box-shadow:0 2px 16px rgba(0,0,0,.18);font-size:12pt;line-height:1.35}
+.page.half .sheet{height:136mm;overflow:hidden;gap:2mm}
+.page.half .sheet + .sheet{border-top:1px dashed #888;padding-top:4mm}
+.half .sheet h2{display:none}
+.half .tasks{grid-template-columns:repeat(3,1fr);gap:2mm 4mm}
+.half .instr{font-size:10pt;line-height:1.25}
+.half .bank{font-size:11pt;gap:1mm}
+.half table.ans .tall td{height:8mm}
+.half .bank .bk > :first-child{padding:.5mm 1mm}
+.sheet{display:flex;flex-direction:column;gap:3mm}
+.shead{display:grid;grid-template-columns:1fr 22mm 28mm auto;gap:4mm;font-size:11pt;align-items:end}
+.shead span{border-bottom:1px solid #000;padding-bottom:1mm;white-space:nowrap}
+.shead .vn{border:1.5px solid #000;padding:1mm 2mm;font-weight:700}
+.sheet h2{font-size:14pt;margin:1mm 0 0}
+.sheet .instr{margin:0;font-size:11pt}
+.tasks{display:grid;grid-template-columns:1fr 1fr;gap:3mm 6mm;margin:0;padding:0;list-style:none}
+.task{break-inside:avoid;font-size:15pt}
+.task .no{font-weight:700;margin-right:2mm}
+.cells{height:30mm;margin-top:1.5mm;border:1px solid #bbb;
+  background-image:linear-gradient(#cfcfcf .3mm,transparent .3mm),linear-gradient(90deg,#cfcfcf .3mm,transparent .3mm);
+  background-size:5mm 5mm;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+.compact .cells{display:none}
+.bank{display:flex;flex-wrap:wrap;gap:1.5mm;font-size:12pt}
+.bank .bk{border:1px solid #000;min-width:13mm;text-align:center;display:flex;flex-direction:column}
+.bank .bk > :first-child{padding:1mm 1.5mm;flex:1;display:flex;align-items:center;justify-content:center}
+.bank .bk > :last-child{border-top:1px solid #000;font-weight:700;padding:.5mm}
+.sub-h{font-weight:700;font-size:11pt;margin:1mm 0 0}
+table.ans{border-collapse:collapse;width:100%;font-size:11pt;table-layout:fixed}
+table.ans td,table.ans th{border:1px solid #000;padding:1mm;text-align:center}
+table.ans th:first-child{width:18mm;text-align:left}
+table.ans .tall td{height:13mm}
+.word{font-size:11pt}
+.key h2{font-size:15pt;margin:0 0 3mm}
+table.key{border-collapse:collapse;width:100%;font-size:11pt}
+table.key td,table.key th{border:1px solid #000;padding:1mm 1.5mm;text-align:center}
+table.key td:first-child{font-weight:700;white-space:nowrap}
+
+/* тренажёр */
+.hhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:16px}
+.hhead h2{margin:0;font-size:26px;flex:1;min-width:12em}
+.levels{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:16px 0}
+.level{text-align:left;padding:16px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.level[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
+.level small{font-weight:400;color:var(--soft)}
+.stats{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--soft);font-weight:600}
+.stats b{color:var(--ink)}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:clamp(16px,3vw,28px)}
+.taskx{font-size:clamp(30px,6vw,46px);font-weight:700;margin:4px 0 16px;text-align:center}
+.done-steps{display:grid;gap:8px;margin-bottom:12px;font-size:20px}
+.done-steps .ds{color:var(--soft)}
+.done-steps .ds b{color:var(--ink);font-weight:600}
+.stepq{font-size:22px;font-weight:600;margin:8px 0 12px}
+.inrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;font-size:26px}
+.inrow input{width:3.2em;padding:.15em .2em;text-align:center;border:2px solid var(--line);border-radius:10px;background:var(--bg);font-weight:700}
+.inrow .frac input{width:2.6em;margin:2px 0}
+.inrow .frac.fin > :last-child{border-top:3px solid currentColor;padding-top:4px}
+.hbtns{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.fb{margin-top:16px;padding:14px 16px;border-radius:12px;font-size:19px;line-height:1.5}
+.fb.ok{background:var(--ok-soft);border-left:6px solid var(--ok)}
+.fb.bad{background:var(--bad-soft);border-left:6px solid var(--bad)}
+.fb.info{background:var(--info-soft);border-left:6px solid var(--soft)}
+.fb .tag{font-weight:700;display:block;margin-bottom:2px}
+.work{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:10px}
+.work li{background:var(--bg);border-radius:10px;padding:10px 14px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px;z-index:20}
+.overlay .card{max-width:720px;max-height:90vh;overflow:auto}
+.overlay h3{margin:0 0 8px;font-size:24px}
+.overlay h4{margin:16px 0 4px}
+.overlay p{margin:4px 0}
+
+@page{size:A4;margin:0}
+@media print{
+  html,body{background:#fff !important;color:#000 !important;background-image:none !important;padding:0}
+  .no-print,.screen:not(#print),.topright{display:none !important}
+  #print .wrap{max-width:none;padding:0}
+  .sheets{display:block;overflow:visible}
+  .page{box-shadow:none;margin:0;break-after:page;min-height:auto;height:297mm;overflow:hidden}
+  .page.key{height:auto;overflow:visible}
+  table.key tr{break-inside:avoid}
+  .page:last-child{break-after:auto}
+  body.print-key .page:not(.key){display:none}
+  body.print-sheets .page.key{display:none}
+}
+@media (max-width:600px){
+  .bbar{font-size:18px}
+  .bctl button{font-size:18px;min-height:48px}
+}
+</style>
+</head>
+<body>
+
+<!-- стартовый экран -->
+<section id="start" class="screen" hidden>
+  <div class="topright no-print">
+    <button class="icon" id="themeBtn" type="button" title="Светлая или тёмная тема" aria-label="Сменить тему">◐</button>
+  </div>
+  <div class="wrap">
+    <p class="kicker">6 класс · Виленкин и др. · Математика</p>
+    <h1>Сложение и вычитание дробей с разными знаменателями</h1>
+    <p class="lead">Одна тема в трёх режимах: показ на доске, раздатка с кодовым словом и тренажёр, который объясняет каждую ошибку.</p>
+    <div class="modes">
+      <button class="mode" type="button" data-go="board"><b>🖥 На доске</b><span>Полоски дробей: доли дробятся до общего знаменателя на глазах класса. Учитель ведёт по шагам.</span></button>
+      <button class="mode" type="button" data-go="print"><b>🖨 Раздатка</b><span>У каждого свой вариант, верные ответы складываются в слово. Ключ — по номеру варианта.</span></button>
+      <button class="mode" type="button" data-go="home"><b>🏠 Тренировка</b><span>Решение по шагам: общий знаменатель, множители, сумма, сокращение. Разбор каждой ошибки.</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- доска -->
+<section id="board" class="screen" hidden>
+  <div class="bbar">
+    <button class="icon" type="button" data-act="menu" title="Меню (Esc)" aria-label="Меню">☰</button>
+    <span class="ttl">Сложение дробей с разными знаменателями</span>
+    <span class="cnt" id="bCnt"></span>
+  </div>
+  <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
+  <div class="bstage" id="bStage"></div>
+  <div class="bctl">
+    <button type="button" data-act="prev" title="Назад (←, PageUp)">← Назад</button>
+    <button type="button" class="main" data-act="next" id="bNext" title="Далее (→, Пробел, PageDown)">Показать</button>
+    <button type="button" data-act="restart">Заново</button>
+    <button type="button" data-act="numbers">Другие числа</button>
+    <button type="button" data-act="theme" title="Светлая или тёмная тема">◐ Тема</button>
+    <button type="button" data-act="full" title="Во весь экран (F)">⛶ Весь экран</button>
+  </div>
+</section>
+
+<!-- раздатка -->
+<section id="print" class="screen" hidden>
+  <div class="wrap">
+    <div class="hhead no-print">
+      <button class="icon" type="button" data-act="menu" aria-label="Меню">☰</button>
+      <h2>Раздатка: сложение и вычитание дробей</h2>
+    </div>
+    <div class="panel no-print">
+      <div class="row">
+        <label>Вариантов <input type="number" id="pCount" min="1" max="40"></label>
+        <button type="button" id="pNew">Новые номера</button>
+        <label><input type="checkbox" id="pSpace"> место для решения (сетка)</label>
+        <label><input type="checkbox" id="pTwo"> два варианта на листе</label>
+      </div>
+      <label style="display:grid;gap:4px">Номера вариантов (можно вписать свои — ключ восстановится по номеру)
+        <input type="text" id="pNums" autocomplete="off" spellcheck="false">
+      </label>
+      <p class="note" id="pMsg"></p>
+      <div class="row">
+        <button type="button" class="main" id="pPrint">🖨 Печать листов</button>
+        <button type="button" id="pPrintKey">🔑 Печать ключа</button>
+      </div>
+      <p class="note">В каждом варианте 6 заданий: знаменатель делится на другой, взаимно простые знаменатели, знаменатели с общим делителем, ответ с сокращением, с выделением целой части и вычитание. Печать — A4, поля браузера — «по умолчанию» или «нет».</p>
+    </div>
+    <div class="sheets" id="pSheets"></div>
+  </div>
+</section>
+
+<!-- тренажёр -->
+<section id="home" class="screen" hidden>
+  <div class="wrap">
+    <div class="hhead">
+      <button class="icon" type="button" data-act="menu" aria-label="Меню">☰</button>
+      <h2>Тренировка: дроби с разными знаменателями</h2>
+      <button type="button" data-act="help">📖 Справка</button>
+    </div>
+    <div id="hSetup">
+      <p>Выбери уровень. Решаем по шагам: общий знаменатель → дополнительные множители → числитель → сокращение → целая часть.</p>
+      <div class="levels" id="hLevels"></div>
+      <label style="display:flex;gap:8px;align-items:center;font-size:20px"><input type="checkbox" id="hSub"> и вычитание тоже</label>
+      <div class="hbtns"><button type="button" class="main" id="hGo">Начать</button></div>
+    </div>
+    <div id="hPlay" hidden>
+      <div class="stats" id="hStats"></div>
+      <div class="card" style="margin-top:12px">
+        <div class="taskx" id="hTask"></div>
+        <div class="done-steps" id="hDone"></div>
+        <div id="hStep"></div>
+        <div id="hFb"></div>
+        <div class="hbtns">
+          <button type="button" class="main" id="hCheck">Проверить</button>
+          <button type="button" id="hHint">Подсказка (−<span id="hPen"></span>)</button>
+          <button type="button" class="main" id="hNext" hidden>Дальше →</button>
+        </div>
+      </div>
+    </div>
+    <div id="hEnd" hidden></div>
+  </div>
+</section>
+
+<div class="overlay" id="help" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="helpT">
+    <h3 id="helpT">Справка: дроби с разными знаменателями</h3>
+    <h4>Правило</h4>
+    <p>Чтобы сложить (вычесть) дроби с разными знаменателями, надо:</p>
+    <p>1) привести дроби к наименьшему общему знаменателю;<br>2) сложить (вычесть) их числители, а знаменатель оставить тот же;<br>3) если можно — сократить ответ и выделить целую часть.</p>
+    <h4>Наименьший общий знаменатель</h4>
+    <p>Это НОК знаменателей — наименьшее число, которое делится на оба знаменателя. Выписывай числа, кратные большему знаменателю, пока не найдёшь то, что делится на меньший. Для 4 и 6: 6 — не делится на 4, 12 — делится. НОК(4, 6) = 12.</p>
+    <h4>Дополнительный множитель</h4>
+    <p>Общий знаменатель раздели на знаменатель дроби: 12 : 4 = 3. По основному свойству дроби умножаем на 3 и числитель, и знаменатель: <span class="expr" id="helpEx1"></span>.</p>
+    <h4>Сокращение</h4>
+    <p>Числитель и знаменатель делим на их НОД: <span class="expr" id="helpEx2"></span> (разделили на 3).</p>
+    <h4>Целая часть</h4>
+    <p>Делим числитель на знаменатель с остатком: 17 : 12 = 1 (ост. 5). Неполное частное — целая часть, остаток — числитель дробной части: <span class="expr" id="helpEx3"></span>.</p>
+    <div class="hbtns"><button type="button" class="main" data-act="help-close">Понятно</button></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ================= Параметры: учитель может поменять их за минуту =================
+const CONFIG = {
+  maxDen: 12,               // наибольший знаменатель в задании
+  maxLcm: 40,               // наибольший общий знаменатель в раздатке и тренажёре
+  board: {
+    maxLcm: 24,             // на доске полоски режутся на доли — больше 24 долей плохо видно
+    first: [{ n: 2, d: 3 }, { n: 3, d: 4 }],    // первый пример
+    second: [{ n: 1, d: 4 }, { n: 1, d: 6 }],   // пример «произведение знаменателей или НОК»
+    previewDelay: 1700,     // превью на сайте: пауза между шагами, мс
+  },
+  print: {
+    variants: 25,           // сколько вариантов печатать по умолчанию
+    traps: 2,               // сколько ответов-ловушек на задание в таблице букв
+    space: true,            // сетка для решения под каждым заданием
+  },
+  home: {
+    round: 10,              // заданий в тренировке
+    points: [10, 15, 20],   // очки за задание по уровням
+    hintPenalty: 3,         // штраф за подсказку
+    maxMultiplier: 3,       // множитель за серию: +1 за каждые 3 задания подряд без ошибок
+    subtraction: true,      // вычитание включено по умолчанию
+  },
+};
+// Версия генератора — первая часть номера варианта «1-4817». Изменил генератор или состав
+// заданий раздатки — увеличь версию и оставь старую ветку, пока на неё есть напечатанные листы.
+const GEN_VERSION = 1;
+const MINUS = '−';
+
+const P = new URLSearchParams(location.search);
+const MODE = ['board', 'print', 'home'].includes(P.get('mode')) ? P.get('mode') : null;
+const PREVIEW = P.get('preview') === '1';
+const $ = id => document.getElementById(id);
+const store = {
+  get(k) { try { return localStorage.getItem('matshag:slozhenie-drobei:' + k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem('matshag:slozhenie-drobei:' + k, String(v)); } catch {} },
+};
+
+// ================= Точная арифметика и генератор по зерну =================
+const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b, a % b]; return a; };
+const lcm = (a, b) => a / gcd(a, b) * b;
+const frac = (n, d) => { const g = gcd(n, d) || 1; return { n: n / g, d: d / g }; };
+const cmp = (x, y) => x.n * y.d - y.n * x.d;
+const toMixed = f => { const w = Math.floor(f.n / f.d); return { w, n: f.n - w * f.d, d: f.d }; };
+const formKey = m => (m.w ? m.w + ' ' : '') + (m.n ? m.n + '/' + m.d : '');
+
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const int = (rnd, a, b) => a + Math.floor(rnd() * (b - a + 1));
+const pick = (rnd, arr) => arr[Math.floor(rnd() * arr.length)];
+function shuffle(rnd, arr) {
+  const r = arr.slice();
+  for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
+  return r;
+}
+const taskRnd = (n, i) => mulberry32(GEN_VERSION * 1000003 + n * 7919 + i * 104729 + 1);
+
+// Типы заданий. den — какие знаменатели, need — что нужно сделать с ответом.
+// den: mult — один делится на другой; coprime — взаимно простые; common — общий делитель, но не кратные;
+//      shared — mult или common; any — любые. need: none — ответ меньше 1 и не сокращается;
+//      reduce — ответ меньше 1 и сокращается; whole — ответ больше 1; any — любой.
+const SPECS = {
+  mult:    { den: 'mult',    op: '+',   need: 'none',   title: 'Знаменатель одной дроби делится на знаменатель другой' },
+  coprime: { den: 'coprime', op: '+',   need: 'none',   title: 'Знаменатели — взаимно простые числа' },
+  common:  { den: 'common',  op: '+',   need: 'none',   title: 'У знаменателей есть общий делитель' },
+  reduce:  { den: 'shared',  op: '+',   need: 'reduce', title: 'Ответ нужно сократить' },
+  whole:   { den: 'any',     op: '+',   need: 'whole',  title: 'Нужно выделить целую часть' },
+  sub:     { den: 'shared',  op: MINUS, need: 'any',    title: 'Вычитание' },
+};
+const LEVELS = [
+  { den: 'mult',    title: 'Уровень 1', text: 'Один знаменатель делится на другой: 1/3 + 5/12' },
+  { den: 'coprime', title: 'Уровень 2', text: 'Взаимно простые знаменатели: 2/3 + 3/4' },
+  { den: 'common',  title: 'Уровень 3', text: 'У знаменателей общий делитель: 5/6 + 3/8' },
+];
+
+// Решение с общим знаменателем D (по умолчанию — наименьшим)
+function solve(t, D = lcm(t.a.d, t.b.d)) {
+  const { a, b, op } = t;
+  const ka = D / a.d, kb = D / b.d;
+  const N = op === '+' ? a.n * ka + b.n * kb : a.n * ka - b.n * kb;
+  const g = gcd(N, D);
+  const res = { n: N / g, d: D / g };
+  return { L: lcm(a.d, b.d), D, ka, kb, N, g, res, mixed: toMixed(res) };
+}
+
+function genTask(rnd, spec, maxDen = CONFIG.maxDen, maxLcm = CONFIG.maxLcm) {
+  for (let k = 0; k < 5000; k++) {
+    const da = int(rnd, 2, maxDen), db = int(rnd, 2, maxDen);
+    if (da === db) continue;
+    const g = gcd(da, db), isMult = da % db === 0 || db % da === 0;
+    if (lcm(da, db) > maxLcm) continue;
+    if (spec.den === 'mult' && !isMult) continue;
+    if (spec.den === 'coprime' && g !== 1) continue;
+    if (spec.den === 'common' && (g === 1 || isMult)) continue;
+    if (spec.den === 'shared' && g === 1) continue;
+    const an = int(rnd, 1, da - 1), bn = int(rnd, 1, db - 1);
+    if (gcd(an, da) !== 1 || gcd(bn, db) !== 1) continue;   // слагаемые — несократимые дроби
+    let a = { n: an, d: da }, b = { n: bn, d: db };
+    if (spec.op === MINUS && cmp(a, b) < 0) [a, b] = [b, a];  // уменьшаемое больше вычитаемого
+    const t = { a, b, op: spec.op };
+    const s = solve(t);
+    if (s.N <= 0 || s.res.d === 1) continue;                  // ответ — ноль или целое число
+    const improper = s.res.n > s.res.d, reducible = s.g > 1;
+    if (spec.need === 'none' && (improper || reducible)) continue;
+    if (spec.need === 'reduce' && (improper || !reducible)) continue;
+    if (spec.need === 'whole' && !improper) continue;
+    return t;
+  }
+  throw new Error('Генератор не нашёл задание: ' + JSON.stringify(spec));
+}
+
+// Ответы-ловушки на типичных ошибках (в той записи, в какой их напишет ученик)
+function traps(t) {
+  const { a, b, op } = t, s = solve(t), out = [];
+  const add = (m, why) => { if (m && m.d > 0 && (m.w > 0 || m.n > 0)) out.push({ m, why }); };
+  const unreduced = s.g > 1 ? { ...toMixed({ n: s.N, d: s.D }), d: s.D } : null;
+  const improper = s.res.n > s.res.d ? { w: 0, n: s.res.n, d: s.res.d } : null;
+  // сложили (вычли) числители и знаменатели
+  const naive = op === '+' ? { w: 0, n: a.n + b.n, d: a.d + b.d }
+    : (a.n > b.n && a.d > b.d ? { w: 0, n: a.n - b.n, d: a.d - b.d } : null);
+  // домножили только знаменатели, числители оставили
+  const k = op === '+' ? a.n + b.n : a.n - b.n;
+  const onlyDen = k > 0 ? toMixed(frac(k, s.L)) : null;
+  const order = s.g > 1 ? [[unreduced, 'reduce'], [naive, 'naive'], [onlyDen, 'onlyDen'], [improper, 'whole']]
+    : improper ? [[improper, 'whole'], [naive, 'naive'], [onlyDen, 'onlyDen']]
+    : [[naive, 'naive'], [onlyDen, 'onlyDen']];
+  order.forEach(([m, why]) => add(m, why));
+  const right = formKey(s.mixed), seen = new Set([right]);
+  return out.filter(x => { const k2 = formKey(x.m); if (seen.has(k2)) return false; seen.add(k2); return true; });
+}
+
+// Раздатка, версия 1: шесть заданий, верные ответы складываются в слово
+const KINDS_V1 = ['mult', 'coprime', 'common', 'reduce', 'whole', 'sub'];
+const WORDS_V1 = ['КОМПАС', 'ЛАНДЫШ', 'МОЛНИЯ', 'ГЛОБУС', 'ПОДВИГ', 'КАРТОН', 'ЦИРКУЛ', 'ЯСТРЕБ',
+  'СОЛНЦЕ', 'ЖУРНАЛ', 'БАРСУК', 'ЛИСТОК', 'ГЕПАРД', 'ПРИЧАЛ', 'СУГРОБ', 'ФОНАРЬ'];
+const ABC = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ';
+const sameTask = (x, y) => cmp(x.a, y.a) === 0 && cmp(x.b, y.b) === 0 && x.op === y.op;
+
+function makeVariant(num, version = GEN_VERSION) {
+  if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
+  const tasks = [];
+  KINDS_V1.forEach((kind, i) => {
+    const rnd = taskRnd(num, i);
+    let t;
+    do t = genTask(rnd, SPECS[kind]);
+    while (tasks.some(u => sameTask(u, t) || formKey(solve(u).mixed) === formKey(solve(t).mixed)));
+    tasks.push(t);
+  });
+  const rnd = taskRnd(num, 99);
+  const word = pick(rnd, WORDS_V1);
+  const answers = tasks.map(t => solve(t).mixed);
+  const bank = new Map();   // запись ответа → буква
+  answers.forEach((m, i) => bank.set(formKey(m), { m, letter: word[i] }));
+  const decoys = shuffle(rnd, [...ABC].filter(ch => !word.includes(ch)));
+  tasks.forEach(t => traps(t).slice(0, CONFIG.print.traps).forEach(({ m }) => {
+    const k = formKey(m);
+    if (!bank.has(k)) bank.set(k, { m, letter: decoys.shift() });
+  }));
+  return { num, version, label: version + '-' + num, tasks, answers, word, bank: shuffle(rnd, [...bank.values()]) };
+}
+
+// ================= Запись дробей =================
+const F = f => `<span class="frac"><span>${f.n}</span><span>${f.d}</span></span>`;
+const F2 = (n, d) => `<span class="frac"><span>${n}</span><span>${d}</span></span>`;
+const M = m => m.w ? `<span class="mixed"><span class="w">${m.w}</span>${m.n ? F(m) : ''}</span>` : F(m);
+const T = t => `<span class="expr">${F(t.a)}<span class="op">${t.op}</span>${F(t.b)}</span>`;
+const plural = (n, one, few, many) => {
+  const m10 = n % 10, m100 = n % 100;
+  return m10 === 1 && m100 !== 11 ? one : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? few : many;
+};
+
+// ================= Экраны =================
+let screen = null;
+function show(name) {
+  boardStopPreview();
+  screen = name;
+  ['start', 'board', 'print', 'home'].forEach(s => { $(s).hidden = s !== name; });
+  $('help').hidden = true;
+  if (name === 'board') renderBoard();
+  if (name === 'print') renderPrint();
+  if (name === 'home') homeSetup();
+}
+function toggleTheme() {
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+  store.set('theme', document.documentElement.dataset.theme);
+}
+async function toggleFull() {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch {}
+}
+
+// ================= 🖥 На доске =================
+// Полоски: x0 — начало, U — длина единицы. Рядом с полоской подпись-дробь.
+const SV = { x0: 150, U: 400, rowH: 96, top: 14, h: 58 };
+const B = { e1: null, e2: null, steps: [], i: 0, phase: 0, timer: 0 };
+
+function svgLabel(cx, cy, f, cls) {
+  const w = Math.max(String(f.n).length, String(f.d).length) * 11 + 12;
+  return `<g class="lbl ${cls}"><text x="${cx}" y="${cy - 9}">${f.n}</text>` +
+    `<line x1="${cx - w}" x2="${cx + w}" y1="${cy}" y2="${cy}"/><text x="${cx}" y="${cy + 33}">${f.d}</text></g>`;
+}
+// Ряд-полоска: cells — сколько ячеек, filled — сколько закрашено, k — во сколько раз раздроблена каждая доля
+function stripRow(y, r) {
+  const { x0, U, h } = SV, units = r.units || 1, total = r.cells * units;
+  const cw = U / r.cells;
+  let s = `<g class="row${r.appear ? ' new' : ''}">`;
+  for (let i = 0; i < total; i++) {
+    let cls = 'e';
+    if (r.parts) { let acc = 0; for (const [cnt, c] of r.parts) { if (i >= acc && i < acc + cnt) cls = 'f' + c; acc += cnt; } }
+    else if (i < r.filled) cls = 'f' + r.color;
+    s += `<rect class="cell ${cls}" x="${x0 + i * cw}" y="${y}" width="${cw}" height="${h}"/>`;
+  }
+  const k = r.k || 1;
+  for (let i = 1; i < total; i++) {
+    const x = x0 + i * cw;
+    if (i % k === 0) s += `<line class="div" x1="${x}" x2="${x}" y1="${y}" y2="${y + h}"/>`;
+    else s += `<line class="sub${r.anim ? ' new' : ''}" x1="${x}" x2="${x}" y1="${y}" y2="${y + h}"/>`;
+  }
+  for (let u = 0; u < units; u++) s += `<rect class="frame f${r.color || ''}" x="${x0 + u * U}" y="${y}" width="${U}" height="${h}"/>`;
+  if (r.hl) s += `<rect class="hl" x="${x0}" y="${y - 6}" width="${cw * k}" height="${h + 12}" rx="4"/>`;
+  if (r.ticks) for (let u = 0; u <= units; u++) {
+    const x = x0 + u * U;
+    s += `<line class="tick" x1="${x}" x2="${x}" y1="${y + h}" y2="${y + h + 12}"/><text class="ticktext" x="${x}" y="${y + h + 38}">${u}</text>`;
+  }
+  s += svgLabel(70, y + h / 2 - 8, r.label, 'c' + (r.lc || r.color || ''));
+  return s + '</g>';
+}
+const rowF = (f, color, opt = {}) => ({ cells: f.d * (opt.k || 1), filled: f.n * (opt.k || 1), color, label: f, ...opt });
+
+function boardSVG(rows) {
+  const ticks = rows.some(r => r.ticks);
+  const H = SV.top + rows.length * SV.rowH + (ticks ? 30 : 0);
+  return `<svg viewBox="0 0 980 ${H}" role="img" aria-label="Полоски дробей" preserveAspectRatio="xMidYMid meet">` +
+    `<defs><pattern id="hb" patternUnits="userSpaceOnUse" width="14" height="14" patternTransform="rotate(45)">` +
+    `<rect width="14" height="14" style="fill:var(--b-soft)"/><line x1="3" y1="0" x2="3" y2="14" style="stroke:var(--b);stroke-width:5"/></pattern>` +
+    `<pattern id="hn" patternUnits="userSpaceOnUse" width="12" height="12">` +
+    `<rect width="12" height="12" style="fill:var(--n-soft)"/><circle cx="6" cy="6" r="2.2" style="fill:var(--n)"/></pattern></defs>` +
+    rows.map((r, i) => stripRow(SV.top + i * SV.rowH, r)).join('') + '</svg>';
+}
+
+function buildSteps(e1, e2) {
+  const [a, b] = e1, s = solve({ a, b, op: '+' }), L = s.L;
+  const n1 = a.n * s.ka, n2 = b.n * s.kb, N = s.N;
+  const nv = { n: a.n + b.n, d: a.d + b.d };
+  const big = cmp(a, b) > 0 ? a : b, small = big === a ? b : a;
+  const half = { n: 1, d: 2 };
+  const ab = (split, o = {}) => [
+    rowF(a, 'a', split ? { k: s.ka, anim: o.anim } : { hl: o.hl }),
+    rowF(b, 'b', split ? { k: s.kb, anim: o.anim } : { hl: o.hl }),
+  ];
+  const sumRow = (appear, ticks) => ({ cells: L, parts: [[n1, 'a'], [n2, 'b']], units: Math.ceil(N / L), label: { n: N, d: L }, lc: '', appear, ticks });
+  const cut = (d, k) => `каждую долю ${F({ n: 1, d })} — на ${k} ${plural(k, 'часть', 'части', 'частей')}`;
+  const tail = (X, g) => {     // сокращение и целая часть
+    let t = '';
+    if (g > 1) t += ` = ${F(X)}`;
+    if (X.n > X.d) t += ` = ${M(toMixed(X))}`;
+    return t;
+  };
+  const steps = [];
+  steps.push({
+    q: `Сколько будет ${F(a)} + ${F(b)}? Запишите ответ в тетрадь.`,
+    a: `Часто пишут: ${F(a)} + ${F(b)} = ${F(nv)} — складывают числители и знаменатели. Проверим полосками.`,
+    rows: () => ab(false),
+  });
+  steps.push({
+    q: `Может ли сумма быть равна ${F(nv)}? Сравните ${F(nv)} со слагаемыми.`,
+    a: `${F(nv)} меньше, чем ${F(big)}, а сумма больше каждого слагаемого. Значит, ${F(nv)} — неверно.` +
+      (cmp(a, half) > 0 && cmp(b, half) > 0 ? ' Обе дроби больше половины — вместе они больше целого.' : ''),
+    rows: ph => ph ? [...ab(false), rowF(nv, 'n', { appear: true })] : ab(false),
+  });
+  steps.push({
+    q: 'Почему нельзя сразу сложить доли?',
+    a: `Доля первой полоски — ${F({ n: 1, d: a.d })}, второй — ${F({ n: 1, d: b.d })}. Доли разного размера, а складывать можно только одинаковые.`,
+    rows: ph => ab(false, { hl: ph === 1 }),
+  });
+  steps.push({
+    q: 'На сколько частей разрезать каждую долю, чтобы все доли стали одинаковыми?',
+    a: `Разрежем ${cut(a.d, s.ka)}, ${cut(b.d, s.kb)}. Все доли стали ${F({ n: 1, d: L })}: ${L} делится и на ${a.d}, и на ${b.d}. НОК(${a.d}, ${b.d}) = ${L} — наименьший общий знаменатель.`,
+    rows: ph => ab(ph === 1, { anim: true }),
+  });
+  steps.push({
+    q: `Сколько долей ${F({ n: 1, d: L })} в ${F(a)}? А в ${F(b)}?`,
+    a: `${F(a)} = ${F2(a.n + '·' + s.ka, a.d + '·' + s.ka)} = ${F({ n: n1, d: L })}, ${F(b)} = ${F2(b.n + '·' + s.kb, b.d + '·' + s.kb)} = ${F({ n: n2, d: L })}. ${s.ka} и ${s.kb} — дополнительные множители.`,
+    rows: () => ab(true),
+  });
+  steps.push({
+    q: `Сколько долей ${F({ n: 1, d: L })} получится вместе?`,
+    a: `${n1} + ${n2} = ${N}, значит ${F(a)} + ${F(b)} = ${F({ n: n1, d: L })} + ${F({ n: n2, d: L })} = ${F({ n: N, d: L })}.`,
+    rows: ph => ph ? [...ab(true), sumRow(true, true)] : ab(true),
+  });
+  if (s.g > 1 || N > L) {
+    steps.push({
+      q: N > L ? `${F({ n: N, d: L })} — больше целого. Как записать ответ?` : `Можно ли записать ${F({ n: N, d: L })} проще?`,
+      a: `${F({ n: N, d: L })}${tail(s.res, s.g)}` + (s.g > 1 ? ` — сократили на ${s.g}` : '') +
+        (s.res.n > s.res.d ? `${s.g > 1 ? ',' : ' —'} выделили целую часть: ${s.res.n} : ${s.res.d} = ${s.mixed.w} (ост. ${s.mixed.n})` : '') + '.',
+      rows: () => [...ab(true), sumRow(false, true)],
+    });
+  }
+  steps.push({
+    q: 'Как сложить дроби с разными знаменателями? Сформулируйте правило.',
+    a: '<ol><li>Привести дроби к наименьшему общему знаменателю.</li><li>Сложить числители, знаменатель оставить.</li><li>Сократить, выделить целую часть.</li></ol>',
+    rows: () => [...ab(true), sumRow(false, true)],
+  });
+  // второй пример: произведение знаменателей или НОК
+  const [c, d] = e2, s2 = solve({ a: c, b: d, op: '+' }), L2 = s2.L;
+  const ab2 = split => [rowF(c, 'a', split ? { k: s2.ka, anim: true } : {}), rowF(d, 'b', split ? { k: s2.kb, anim: true } : {})];
+  steps.push({
+    q: `${F(c)} + ${F(d)}. Какой общий знаменатель взять: ${c.d * d.d} = ${c.d} · ${d.d} или ${L2}?`,
+    a: `Подходят оба: делятся и на ${c.d}, и на ${d.d}. Но ${L2} меньше — числа меньше: ${F(c)} + ${F(d)} = ${F({ n: c.n * s2.ka, d: L2 })} + ${F({ n: d.n * s2.kb, d: L2 })} = ${F({ n: s2.N, d: L2 })}${tail(s2.res, s2.g)}.`,
+    rows: ph => ph ? [...ab2(true), { cells: L2, parts: [[c.n * s2.ka, 'a'], [d.n * s2.kb, 'b']], units: Math.ceil(s2.N / L2), label: { n: s2.N, d: L2 }, appear: true, ticks: true }] : ab2(false),
+  });
+  // вычитание на первом примере
+  const x = big.n * (L / big.d), y = small.n * (L / small.d), sd = solve({ a: big, b: small, op: MINUS });
+  steps.push({
+    q: `А как найти разность ${F(big)} ${MINUS} ${F(small)}?`,
+    a: `Так же: общий знаменатель, потом вычитаем числители: ${F(big)} ${MINUS} ${F(small)} = ${F({ n: x, d: L })} ${MINUS} ${F({ n: y, d: L })} = ${F({ n: x - y, d: L })}${tail(sd.res, sd.g)}.`,
+    rows: ph => {
+      const r = [rowF(big, big === a ? 'a' : 'b', { k: L / big.d }), rowF(small, small === a ? 'a' : 'b', { k: L / small.d })];
+      return ph ? [...r, { cells: L, filled: x - y, color: big === a ? 'a' : 'b', label: { n: x - y, d: L }, appear: true }] : r;
+    },
+  });
+  return steps;
+}
+
+function boardNumbers(random) {
+  if (!random) { B.e1 = CONFIG.board.first; B.e2 = CONFIG.board.second; }
+  else {
+    const rnd = mulberry32((Math.random() * 4294967296) >>> 0);
+    let t1, t2;
+    do t1 = genTask(rnd, { den: 'coprime', op: '+', need: 'any' }, CONFIG.maxDen, CONFIG.board.maxLcm);
+    while (sameTask(t1, { a: B.e1[0], b: B.e1[1], op: '+' }));
+    t2 = genTask(rnd, { den: 'common', op: '+', need: 'any' }, CONFIG.maxDen, CONFIG.board.maxLcm);
+    B.e1 = [t1.a, t1.b]; B.e2 = [t2.a, t2.b];
+  }
+  B.steps = buildSteps(B.e1, B.e2);
+  B.i = 0; B.phase = 0;
+}
+function renderBoard() {
+  if (!B.steps.length) boardNumbers(false);
+  const st = B.steps[B.i];
+  $('bCnt').textContent = `Шаг ${B.i + 1} из ${B.steps.length}`;
+  $('bQ').innerHTML = st.q;
+  $('bA').innerHTML = st.a;
+  $('bA').classList.toggle('hide', B.phase === 0);
+  $('bStage').innerHTML = boardSVG(st.rows(B.phase));
+  const last = B.i === B.steps.length - 1 && B.phase === 1;
+  $('bNext').textContent = B.phase === 0 ? 'Показать' : 'Далее →';
+  $('bNext').disabled = last;
+}
+function boardNext() {
+  if (B.phase === 0) B.phase = 1;
+  else if (B.i < B.steps.length - 1) { B.i++; B.phase = 0; }
+  renderBoard();
+}
+function boardPrev() {
+  if (B.phase === 1) B.phase = 0;
+  else if (B.i > 0) { B.i--; B.phase = 1; }
+  renderBoard();
+}
+function boardGo(i, phase = 0) { B.i = Math.max(0, Math.min(i, B.steps.length - 1)); B.phase = phase ? 1 : 0; renderBoard(); }
+// превью на сайте: доска сама идёт по первым шагам — полоски дробятся и складываются
+function boardStartPreview() {
+  $('board').classList.add('preview');
+  B.timer = setInterval(() => {
+    if (B.i >= 5 && B.phase === 1) boardGo(0, 0);
+    else boardNext();
+  }, CONFIG.board.previewDelay);
+}
+function boardStopPreview() { clearInterval(B.timer); B.timer = 0; }
+function boardPoster() { boardStopPreview(); boardGo(5, 1); }
+
+// ================= 🖨 Раздатка =================
+let printNums = [];
+function newNumbers(count) {
+  const set = new Set();
+  while (set.size < count) set.add(1000 + Math.floor(Math.random() * 9000));
+  return [...set];
+}
+function parseNums(text) {
+  const nums = [], bad = [];
+  for (const part of text.split(/[\s,;]+/).filter(Boolean)) {
+    const m = part.match(/^(?:(\d+)[-–])?(\d{4})$/);
+    if (!m || (m[1] && +m[1] !== GEN_VERSION)) bad.push(part);
+    else if (!nums.includes(+m[2])) nums.push(+m[2]);
+  }
+  return { nums, bad };
+}
+function sheetHTML(v) {
+  const bank = v.bank.map(x => `<div class="bk"><div>${M(x.m)}</div><div>${x.letter}</div></div>`).join('');
+  const cols = v.tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  const empty = v.tasks.map(() => '<td></td>').join('');
+  return `<div class="sheet">
+    <div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">Вариант ${v.label}</span></div>
+    <h2>Сложение и вычитание дробей с разными знаменателями</h2>
+    <p class="instr">Вычисли. Ответ запиши несократимой дробью, у неправильной дроби выдели целую часть.
+    Найди свой ответ в таблице букв и впиши букву — получится слово. Нет ответа в таблице или слово не сложилось — ищи ошибку.</p>
+    <ol class="tasks">${v.tasks.map((t, i) => `<li class="task"><span class="no">${i + 1})</span>${T(t)} =<div class="cells"></div></li>`).join('')}</ol>
+    <p class="sub-h">Таблица букв</p><div class="bank">${bank}</div>
+    <table class="ans"><tr><th>Задание</th>${cols}</tr><tr class="tall"><th>Ответ</th>${empty}</tr><tr><th>Буква</th>${empty}</tr></table>
+    <div class="word">Слово: ______________________</div>
+  </div>`;
+}
+function keyHTML(vs) {
+  const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  return `<div class="page key"><h2>Ключ учителя · сложение и вычитание дробей</h2>
+    <table class="key"><tr><th>Вариант</th>${head}<th>Слово</th></tr>
+    ${vs.map(v => `<tr><td>${v.label}</td>${v.answers.map(m => `<td>${M(m)}</td>`).join('')}<td><b>${v.word}</b></td></tr>`).join('')}
+    </table><p style="font-size:10pt">Слово сложилось — все ответы верны. Ключ всегда можно восстановить по номеру варианта в режиме «Раздатка».</p></div>`;
+}
+function renderPrint() {
+  if (!printNums.length) {
+    printNums = newNumbers(CONFIG.print.variants);
+    $('pCount').value = printNums.length;
+    $('pSpace').checked = CONFIG.print.space;
+  }
+  $('pNums').value = printNums.map(n => GEN_VERSION + '-' + n).join(', ');
+  drawSheets();
+}
+function drawSheets() {
+  const vs = printNums.map(n => makeVariant(n));
+  const space = $('pSpace').checked, two = $('pTwo').checked && !space;
+  $('pTwo').disabled = space;
+  let html = '';
+  if (two) for (let i = 0; i < vs.length; i += 2)
+    html += `<div class="page half compact">${sheetHTML(vs[i])}${vs[i + 1] ? sheetHTML(vs[i + 1]) : ''}</div>`;
+  else html = vs.map(v => `<div class="page${space ? '' : ' compact'}">${sheetHTML(v)}</div>`).join('');
+  $('pSheets').innerHTML = (vs.length ? keyHTML(vs) : '') + html;
+  return vs;
+}
+function printNow(what) {
+  document.body.classList.remove('print-key', 'print-sheets');
+  document.body.classList.add(what === 'key' ? 'print-key' : 'print-sheets');
+  try { window.print(); } catch {}
+}
+
+// ================= 🏠 Тренировка =================
+const CATS = {
+  naive:   ['Сложение знаменателей', 'Общий знаменатель должен делиться на оба знаменателя — складывать знаменатели нельзя.'],
+  den:     ['Общий знаменатель', 'Ищи НОК: выписывай кратные большего знаменателя, пока не найдёшь число, которое делится на меньший.'],
+  mult:    ['Дополнительные множители', 'Дополнительный множитель = общий знаменатель : знаменатель дроби.'],
+  onlyDen: ['Домножение только знаменателя', 'Числитель и знаменатель умножают на одно и то же число — иначе дробь меняется.'],
+  num:     ['Вычисление числителя', 'Каждый числитель умножь на свой дополнительный множитель, потом сложи или вычти.'],
+  reduce:  ['Сокращение', 'В конце проверь: есть ли у числителя и знаменателя общий делитель? Дели на НОД.'],
+  whole:   ['Целая часть', 'Числитель дели на знаменатель с остатком: частное — целая часть, остаток — числитель.'],
+};
+const H = { level: 0, sub: CONFIG.home.subtraction, rnd: null, n: 0, score: 0, streak: 0, clean: 0, cats: {},
+  task: null, D: 0, s: null, steps: [], si: 0, errs: 0, hints: 0, hintLevel: 0, wait: false, repeat: null, finished: false, history: [] };
+
+function homeSetup() {
+  $('hSetup').hidden = false; $('hPlay').hidden = true; $('hEnd').hidden = true;
+  $('hLevels').innerHTML = LEVELS.map((L, i) => {
+    const best = +store.get('best' + i) || 0;
+    return `<button type="button" class="level" data-level="${i}" aria-pressed="${i === H.level}"><b>${L.title}</b>${L.text}<small>Рекорд: ${best}</small></button>`;
+  }).join('');
+  $('hSub').checked = H.sub;
+}
+function homeStart({ level = H.level, sub = H.sub, seed } = {}) {
+  Object.assign(H, { level, sub, n: 0, score: 0, streak: 0, clean: 0, cats: {}, repeat: null, finished: false, history: [],
+    rnd: mulberry32(seed ?? ((Math.random() * 4294967296) >>> 0)) });
+  $('hSetup').hidden = true; $('hEnd').hidden = true; $('hPlay').hidden = false;
+  homeNewTask();
+}
+function homeNewTask() {
+  const op = H.repeat ?? (H.sub && H.rnd() < 0.35 ? MINUS : '+');
+  H.task = genTask(H.rnd, { den: LEVELS[H.level].den, op, need: 'any' });
+  H.n++; H.errs = 0; H.hints = 0; H.hintLevel = 0; H.wait = false; H.taskDone = false; H.D = 0; H.si = 0;
+  H.steps = ['den', 'mult', 'num']; H.s = null; H.repeat = null;
+  homeRender();
+}
+// после выбора общего знаменателя D — какие шаги ещё нужны
+function homePlanAfterD() {
+  H.s = solve(H.task, H.D);
+  H.steps = ['den', 'mult', 'num'];
+  if (H.s.g > 1) H.steps.push('reduce');
+  if (H.s.res.n > H.s.res.d) H.steps.push('whole');
+}
+const cur = () => H.steps[H.si];
+const rawF = () => ({ n: H.s.N, d: H.D });
+const opWord = () => H.task.op === '+' ? 'сложил' : 'вычел';
+
+// Проверка шага. values: den {v}, mult {a, b}, num {v}, reduce {n, d}, whole {w, n, d}
+function homeCheck(values) {
+  if (H.wait || H.finished) return null;
+  const t = H.task, { a, b, op } = t, step = cur();
+  const need = Object.values(values).some(v => v == null || Number.isNaN(v));
+  if (need) return { ok: false, empty: true, msg: 'Заполни все поля.' };
+  let r;
+  if (step === 'den') {
+    const v = values.v, L = lcm(a.d, b.d);
+    if (v > 0 && v % a.d === 0 && v % b.d === 0) {
+      H.D = v;
+      r = v === L ? { ok: true, msg: `Верно: ${L} делится и на ${a.d}, и на ${b.d}, меньше такого числа нет.` }
+        : { ok: true, msg: `Подходит: ${v} делится и на ${a.d}, и на ${b.d}. Но наименьший общий знаменатель — ${L}: с ним числа меньше.` };
+    } else {
+      H.D = L;
+      const why = v === 0 ? 'знаменатель не может быть равен нулю'
+        : [a.d, b.d].filter(d => v % d !== 0).map(d => `${v} не делится на ${d}`).join(', ');
+      r = v === a.d + b.d
+        ? { ok: false, cat: 'naive', msg: `Ты сложил знаменатели: ${a.d} + ${b.d} = ${v}. Так общий знаменатель не находят — он должен делиться на оба знаменателя, а ${why}. Подходит ${L}: ${L} : ${a.d} = ${L / a.d}, ${L} : ${b.d} = ${L / b.d}.` }
+        : { ok: false, cat: 'den', msg: `${why[0].toUpperCase() + why.slice(1)}. Общий знаменатель должен делиться и на ${a.d}, и на ${b.d}. Наименьший — НОК(${a.d}, ${b.d}) = ${L}.` };
+    }
+    homePlanAfterD();
+  } else if (step === 'mult') {
+    const { ka, kb } = H.s;
+    if (values.a === ka && values.b === kb) r = { ok: true, msg: `Верно: ${H.D} : ${a.d} = ${ka}, ${H.D} : ${b.d} = ${kb}.` };
+    else if (values.a === kb && values.b === ka) r = { ok: false, cat: 'mult', msg: `Множители перепутаны местами. К первой дроби: ${H.D} : ${a.d} = ${ka}, ко второй: ${H.D} : ${b.d} = ${kb}.` };
+    else r = { ok: false, cat: 'mult', msg: `Дополнительный множитель — это общий знаменатель, делённый на знаменатель дроби: ${H.D} : ${a.d} = ${ka}, ${H.D} : ${b.d} = ${kb}. Проверка: ${a.d} · ${ka} = ${H.D}, ${b.d} · ${kb} = ${H.D}.` };
+  } else if (step === 'num') {
+    const { ka, kb, N } = H.s, x = a.n * ka, y = b.n * kb;
+    const calc = `${a.n} · ${ka} = ${x}, ${b.n} · ${kb} = ${y}; ${x} ${op} ${y} = ${N}`;
+    const plain = op === '+' ? a.n + b.n : a.n - b.n;
+    const one = op === '+' ? [x + b.n, a.n + y] : [x - b.n, a.n - y];
+    if (values.v === N) r = { ok: true, msg: `Верно: ${calc}.` };
+    else if (values.v === plain) r = { ok: false, cat: 'onlyDen', msg: `Ты ${opWord()} числители ${a.n} и ${b.n}, не умножив их на дополнительные множители, — получилось, что домножили только знаменатели. Так дробь меняется: числитель и знаменатель умножают на одно и то же число. ${calc}.` };
+    else if (one.includes(values.v)) r = { ok: false, cat: 'mult', msg: `Ты домножил только один числитель. Домножаем оба: ${calc}.` };
+    else r = { ok: false, cat: 'num', msg: `Проверь вычисления: ${calc}.` };
+  } else if (step === 'reduce') {
+    const { N, g, res } = H.s, D = H.D, { n, d } = values;
+    if (n === res.n && d === res.d) r = { ok: true, msg: `Верно: НОД(${N}, ${D}) = ${g}, ${N} : ${g} = ${res.n}, ${D} : ${g} = ${res.d}.` };
+    else if (d > 0 && n * D === N * d && n === N) r = { ok: false, cat: 'reduce', msg: `Дробь ${F(rawF())} можно сократить: ${N} и ${D} делятся на ${g}. ${F(rawF())} = ${F(res)}.` };
+    else if (d > 0 && n * D === N * d) r = { ok: false, cat: 'reduce', msg: `Сократил, но не до конца: ${n} и ${d} ещё делятся на ${gcd(n, d)}. Делим сразу на НОД(${N}, ${D}) = ${g}: ${F(rawF())} = ${F(res)}.` };
+    else r = { ok: false, cat: 'reduce', msg: `${F({ n, d })} не равно ${F(rawF())}. При сокращении числитель и знаменатель делят на одно и то же число — на их НОД: НОД(${N}, ${D}) = ${g}, ${N} : ${g} = ${res.n}, ${D} : ${g} = ${res.d}.` };
+  } else if (step === 'whole') {
+    const X = H.s.res, m = H.s.mixed, { w, n, d } = values;
+    const calc = `${X.n} : ${X.d} = ${m.w} (ост. ${m.n}), значит ${F(X)} = ${M(m)}`;
+    if (w === m.w && n === m.n && d === m.d) r = { ok: true, msg: `Верно: ${calc}.` };
+    else if (w === m.w && n === X.n) r = { ok: false, cat: 'whole', msg: `Числитель дробной части — остаток от деления, а не весь числитель: ${calc}.` };
+    else r = { ok: false, cat: 'whole', msg: `Делим числитель на знаменатель с остатком: неполное частное — целая часть, остаток — числитель, знаменатель тот же. ${calc}.` };
+  }
+  if (!r.ok) { H.errs++; H.cats[r.cat] = (H.cats[r.cat] || 0) + 1; }
+  H.history.push({ n: H.n, step, ok: r.ok, cat: r.cat });
+  H.wait = true;
+  H.lastFb = r;
+  homeAfterCheck(r);
+  return r;
+}
+function homeAfterCheck(r) {
+  const lastStep = H.si === H.steps.length - 1;
+  if (lastStep) homeFinishTask();
+  homeRender(r);
+}
+function homeFinishTask() {
+  const base = CONFIG.home.points[H.level];
+  if (H.errs === 0) {
+    H.streak++; H.clean++;
+    const mult = Math.min(CONFIG.home.maxMultiplier, 1 + Math.floor((H.streak - 1) / 3));
+    H.gain = Math.max(0, base - H.hints * CONFIG.home.hintPenalty) * mult;
+  } else {
+    H.streak = 0; H.gain = 0;
+    H.repeat = H.task.op;   // после ошибки — задание того же вида с другими числами
+  }
+  H.score += H.gain;
+  H.taskDone = true;
+}
+function homeContinue() {
+  if (!H.wait) return;
+  if (H.taskDone) {
+    H.taskDone = false;
+    if (H.n >= CONFIG.home.round) return homeEnd();
+    return homeNewTask();
+  }
+  H.si++; H.wait = false; H.hintLevel = 0;
+  homeRender();
+}
+function homeHint() {
+  if (H.wait || H.finished) return null;
+  const { a, b } = H.task, step = cur(), L = lcm(a.d, b.d);
+  const hints = {
+    den: [`Выпиши числа, кратные ${Math.max(a.d, b.d)}: ${Math.max(a.d, b.d)}, ${2 * Math.max(a.d, b.d)}, ${3 * Math.max(a.d, b.d)}, … Первое, которое делится на ${Math.min(a.d, b.d)}, — наименьший общий знаменатель.`,
+      `НОК(${a.d}, ${b.d}) = ${L}.`],
+    mult: [`Раздели общий знаменатель на знаменатель каждой дроби: ${H.D} : ${a.d} и ${H.D} : ${b.d}.`,
+      H.s && `${H.D} : ${a.d} = ${H.s.ka}, ${H.D} : ${b.d} = ${H.s.kb}.`],
+    num: [H.s && `Умножь каждый числитель на свой множитель: ${a.n} · ${H.s.ka} и ${b.n} · ${H.s.kb}, потом ${H.task.op === '+' ? 'сложи' : 'вычти'}.`,
+      H.s && `${a.n} · ${H.s.ka} = ${a.n * H.s.ka}, ${b.n} · ${H.s.kb} = ${b.n * H.s.kb}.`],
+    reduce: [H.s && `Найди НОД числителя ${H.s.N} и знаменателя ${H.D}.`, H.s && `НОД(${H.s.N}, ${H.D}) = ${H.s.g}.`],
+    whole: [H.s && `Раздели ${H.s.res.n} на ${H.s.res.d} с остатком.`, H.s && `${H.s.res.n} : ${H.s.res.d} = ${H.s.mixed.w} (ост. ${H.s.mixed.n}).`],
+  }[step];
+  const text = hints[Math.min(H.hintLevel, hints.length - 1)];
+  if (H.hintLevel < hints.length) { H.hints++; H.hintLevel++; }
+  H.lastHint = text;
+  homeRender({ hint: text });
+  return text;
+}
+function homeEnd() {
+  H.finished = true;
+  const key = 'best' + H.level, best = +store.get(key) || 0, record = H.score > best;
+  if (record) store.set(key, H.score);
+  const cats = Object.entries(H.cats).sort((x, y) => y[1] - x[1]);
+  $('hPlay').hidden = true; $('hEnd').hidden = false;
+  $('hEnd').innerHTML = `<div class="card">
+    <h2 style="margin-top:0">Итоги: ${LEVELS[H.level].title.toLowerCase()}</h2>
+    <p style="font-size:22px">Очки: <b>${H.score}</b>${record ? ' — новый рекорд!' : ` (рекорд: ${Math.max(best, H.score)})`}<br>
+    Без ошибок: <b>${H.clean} из ${CONFIG.home.round}</b></p>
+    <h3>Над чем поработать</h3>
+    ${cats.length ? `<ul class="work">${cats.map(([c, k]) => `<li><b>${CATS[c][0]}</b> — ошибок: ${k}<br>${CATS[c][1]}</li>`).join('')}</ul>`
+      : `<p>Ошибок нет. ${H.level < 2 ? 'Попробуй следующий уровень.' : 'Отличная работа!'}</p>`}
+    <div class="hbtns"><button type="button" class="main" data-act="again">Ещё раз</button>
+    ${H.level < 2 && !cats.length ? `<button type="button" data-act="nextlevel">Следующий уровень</button>` : ''}
+    <button type="button" data-act="setup">Выбрать уровень</button></div></div>`;
+}
+
+const numIn = (k, label = '') => `<input data-k="${k}" inputmode="numeric" autocomplete="off" aria-label="${label}">`;
+const fracIn = (kn = 'n', kd = 'd') => `<span class="frac fin">${numIn(kn, 'числитель')}${numIn(kd, 'знаменатель')}</span>`;
+function homeRender(fb) {
+  const t = H.task, { a, b, op } = t, step = cur();
+  const mult = Math.min(CONFIG.home.maxMultiplier, 1 + Math.floor(H.streak / 3));
+  $('hStats').innerHTML = `<span>Задание <b>${H.n}</b> из ${CONFIG.home.round}</span><span>Очки: <b>${H.score}</b></span>` +
+    `<span>Серия: <b>${H.streak}</b>${mult > 1 ? ` (×${mult})` : ''}</span><span>${LEVELS[H.level].title}</span>`;
+  $('hTask').innerHTML = `${T(t)} = ?`;
+  $('hPen').textContent = CONFIG.home.hintPenalty;
+  // готовые шаги
+  const done = [];
+  const passed = s => { const k = H.steps.indexOf(s); return k >= 0 && (k < H.si || (k === H.si && H.wait)); };
+  if (H.s && passed('den')) done.push(`Общий знаменатель: <b>${H.D}</b>`);
+  if (H.s && passed('mult')) done.push(`${F(a)} ${op} ${F(b)} = ${F({ n: a.n * H.s.ka, d: H.D })} ${op} ${F({ n: b.n * H.s.kb, d: H.D })}`);
+  if (H.s && passed('num')) done.push(`= ${F(rawF())}`);
+  if (H.s && passed('reduce')) done.push(`= ${F(H.s.res)} (сократили на ${H.s.g})`);
+  if (H.s && passed('whole')) done.push(`= ${M(H.s.mixed)}`);
+  $('hDone').innerHTML = done.map(d => `<div class="ds">${d}</div>`).join('');
+  // текущий шаг
+  const no = H.si + 1;
+  let html = '';
+  if (!H.wait) {
+    if (step === 'den') html = `<div class="stepq">Шаг ${no}. Найди общий знаменатель дробей ${F(a)} и ${F(b)}.</div><div class="inrow">Общий знаменатель: ${numIn('v', 'общий знаменатель')}</div>`;
+    if (step === 'mult') html = `<div class="stepq">Шаг ${no}. Найди дополнительные множители.</div><div class="inrow"><span>к ${F(a)}: ${H.D} : ${a.d} = ${numIn('a', 'множитель к первой дроби')}</span><span>к ${F(b)}: ${H.D} : ${b.d} = ${numIn('b', 'множитель ко второй дроби')}</span></div>`;
+    if (step === 'num') html = `<div class="stepq">Шаг ${no}. ${op === '+' ? 'Сложи' : 'Вычти'} числители.</div><div class="inrow">${F2(a.n + ' · ' + H.s.ka + ' ' + op + ' ' + b.n + ' · ' + H.s.kb, H.D)} = <span class="frac fin">${numIn('v', 'числитель')}<span>${H.D}</span></span></div>`;
+    if (step === 'reduce') html = `<div class="stepq">Шаг ${no}. Сократи дробь.</div><div class="inrow">${F(rawF())} = ${fracIn()}</div>`;
+    if (step === 'whole') html = `<div class="stepq">Шаг ${no}. Выдели целую часть.</div><div class="inrow">${F(H.s.res)} = ${numIn('w', 'целая часть')} ${fracIn()}</div>`;
+  }
+  $('hStep').innerHTML = html;
+  let fbHtml = '';
+  if (fb && fb.hint) fbHtml = `<div class="fb info"><span class="tag">Подсказка</span>${fb.hint}</div>`;
+  else if (fb && fb.empty) fbHtml = `<div class="fb info">${fb.msg}</div>`;
+  else if (fb) fbHtml = `<div class="fb ${fb.ok ? 'ok' : 'bad'}"><span class="tag">${fb.ok ? 'Верно' : 'Ошибка'}</span>${fb.ok ? fb.msg.replace(/^Верно: /, '') : fb.msg}</div>`;
+  if (H.taskDone) fbHtml += `<div class="fb ${H.errs ? 'info' : 'ok'}"><span class="tag">${H.errs ? 'Задание решено с ошибками' : `Решено! +${H.gain}`}</span>${T(t)} = ${M(H.s.mixed)}${H.errs ? '. Дальше — такое же задание с другими числами.' : ''}</div>`;
+  $('hFb').innerHTML = fbHtml;
+  $('hCheck').hidden = H.wait; $('hHint').hidden = H.wait; $('hNext').hidden = !H.wait;
+  $('hNext').textContent = H.taskDone ? (H.n >= CONFIG.home.round ? 'Итоги →' : 'Следующее задание →') : 'Дальше →';
+  if (!PREVIEW) {
+    const first = $('hStep').querySelector('input');
+    if (first) first.focus(); else if (H.wait) $('hNext').focus();
+  }
+}
+const readInt = s => { const t = String(s).replace(/\s+/g, ''); return /^\d+$/.test(t) ? +t : null; };
+function homeCollect() {
+  const v = {};
+  $('hStep').querySelectorAll('input[data-k]').forEach(i => { v[i.dataset.k] = readInt(i.value); });
+  return v;
+}
+
+// ================= Управление =================
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-go],[data-act],[data-level]');
+  if (!el) return;
+  if (el.dataset.go) return show(el.dataset.go);
+  if (el.dataset.level) { H.level = +el.dataset.level; return homeSetup(); }
+  const act = el.dataset.act;
+  if (act === 'menu') { if (document.fullscreenElement) toggleFull(); show('start'); }
+  if (act === 'next') boardNext();
+  if (act === 'prev') boardPrev();
+  if (act === 'restart') boardGo(0, 0);
+  if (act === 'numbers') { boardNumbers(true); renderBoard(); }
+  if (act === 'theme') toggleTheme();
+  if (act === 'full') toggleFull();
+  if (act === 'help') $('help').hidden = false;
+  if (act === 'help-close') $('help').hidden = true;
+  if (act === 'again') homeStart();
+  if (act === 'nextlevel') { H.level++; homeStart(); }
+  if (act === 'setup') homeSetup();
+});
+$('help').addEventListener('click', e => { if (e.target === $('help')) $('help').hidden = true; });
+$('themeBtn').addEventListener('click', toggleTheme);
+$('hGo').addEventListener('click', () => { H.sub = $('hSub').checked; homeStart(); });
+$('hCheck').addEventListener('click', () => { const r = homeCheck(homeCollect()); if (r && r.empty) homeRender(r); });
+$('hHint').addEventListener('click', homeHint);
+$('hNext').addEventListener('click', homeContinue);
+$('hStep').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('hCheck').click(); } });
+$('pNew').addEventListener('click', () => { printNums = newNumbers(Math.max(1, Math.min(40, +$('pCount').value || CONFIG.print.variants))); renderPrint(); });
+$('pCount').addEventListener('change', () => $('pNew').click());
+$('pSpace').addEventListener('change', drawSheets);
+$('pTwo').addEventListener('change', drawSheets);
+$('pNums').addEventListener('change', () => {
+  const { nums, bad } = parseNums($('pNums').value);
+  $('pMsg').innerHTML = bad.length ? `<span class="err">Не понял номера: ${bad.join(', ')}. Номер — как на листе, например ${GEN_VERSION}-4817.</span>` : '';
+  if (nums.length) { printNums = nums.slice(0, 40); $('pCount').value = printNums.length; drawSheets(); }
+});
+$('pPrint').addEventListener('click', () => printNow('sheets'));
+$('pPrintKey').addEventListener('click', () => printNow('key'));
+addEventListener('afterprint', () => document.body.classList.remove('print-key', 'print-sheets'));
+
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input') && e.key !== 'Escape') return;
+  if (e.key === 'Escape') {
+    if (!$('help').hidden) { $('help').hidden = true; return; }
+    if (screen !== 'start') show('start');
+    return;
+  }
+  if (screen === 'home' && e.key === 'Enter' && H.wait) { e.preventDefault(); homeContinue(); return; }
+  if (screen !== 'board') return;
+  if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); boardNext(); }
+  else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); boardPrev(); }
+  else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') toggleFull();
+});
+
+// ================= Запуск =================
+(() => {
+  const th = store.get('theme');
+  if (th === 'dark' || th === 'light') document.documentElement.dataset.theme = th;
+  $('helpEx1').innerHTML = `${F({ n: 1, d: 4 })} = ${F2('1 · 3', '4 · 3')} = ${F({ n: 3, d: 12 })}`;
+  $('helpEx2').innerHTML = `${F({ n: 9, d: 12 })} = ${F({ n: 3, d: 4 })}`;
+  $('helpEx3').innerHTML = `${F({ n: 17, d: 12 })} = ${M({ w: 1, n: 5, d: 12 })}`;
+  if (PREVIEW) { show('board'); boardStartPreview(); }
+  else show(MODE || 'start');
+})();
+
+// Для автотестов и снимка превью
+window.APP = {
+  CONFIG, GEN_VERSION, SPECS, LEVELS, KINDS_V1, WORDS_V1,
+  gcd, lcm, solve, genTask, traps, toMixed, formKey, makeVariant, taskRnd, mulberry32, parseNums,
+  show, get screen() { return screen; },
+  board: { get steps() { return B.steps; }, get i() { return B.i; }, get phase() { return B.phase; },
+    next: boardNext, prev: boardPrev, go: boardGo, numbers: random => { boardNumbers(random); renderBoard(); }, poster: boardPoster },
+  print: { draw: drawSheets, set nums(v) { printNums = v; } },
+  home: { state: H, start: homeStart, check: homeCheck, hint: homeHint, next: homeContinue, get step() { return cur(); } },
+};
+</script>
+</body>
+</html>
