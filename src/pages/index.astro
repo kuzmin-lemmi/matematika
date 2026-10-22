@@ -35,23 +35,28 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   <section class="walkthrough" id="kak-rabotaet" aria-labelledby="walkthrough-title">
     <div class="wrap walkthrough-in">
       <div class="walkthrough-copy">
-        <p class="eyebrow">Маленький пример</p>
-        <h2 id="walkthrough-title">От вопроса —<br /> к пониманию</h2>
-        <p>Сначала вопрос классу. Затем наглядный шаг. В конце — запись решения.</p>
-        <p class="walkthrough-note">Попробуй разобрать сложение дробей по шагам.</p>
+        <p class="eyebrow">Режим «На доске»</p>
+        <h2 id="walkthrough-title">Так материал выглядит на&nbsp;проекторе</h2>
+        <p>Учитель задаёт вопрос, класс отвечает, кнопка «Далее» показывает следующий шаг. Чертёж меняется вместе с объяснением, а внизу собирается запись для тетради.</p>
+        <p class="walkthrough-note">Пройдите сложение дробей сами — кнопками или стрелками ← →.</p>
       </div>
-      <div class="notebook squared" aria-label="Пример пошагового разбора сложения дробей">
-        <div class="paper-heading"><span class="eyebrow">Сложение дробей</span><span class="example">Пример</span></div>
+      <div class="notebook squared" id="demo" data-step="0" tabindex="-1" role="group" aria-label="Пример: сложение дробей по шагам">
+        <div class="paper-heading"><span class="eyebrow">Сложение дробей · 6 класс</span><span class="step-label" id="demo-label">Вопрос классу</span></div>
         <div class="equation" aria-label="Две трети плюс одна четверть">
           <span class="fraction"><span>2</span><span>3</span></span><span>+</span><span class="fraction"><span>1</span><span>4</span></span><span>=</span><span id="demo-result">?</span>
         </div>
-        <div class="strips" aria-label="Восемь двенадцатых и три двенадцатых">
-          <div class="strip-row"><div class="strip">{Array.from({ length: 12 }, (_, i) => <span class:list={{ filled: i < 8 }} />)}</div><span>2/3</span></div>
-          <div class="strip-row"><div class="strip warm">{Array.from({ length: 12 }, (_, i) => <span class:list={{ filled: i < 3 }} />)}</div><span>1/4</span></div>
+        <div class="strips" aria-hidden="true">
+          <div class="strip-row"><div class="strip thirds">{Array.from({ length: 12 }, (_, i) => <span class:list={{ filled: i < 8 }} />)}</div><span class="strip-label" id="demo-a"><span class="fraction"><span>2</span><span>3</span></span></span></div>
+          <div class="strip-row"><div class="strip warm quarters">{Array.from({ length: 12 }, (_, i) => <span class:list={{ filled: i < 3 }} />)}</div><span class="strip-label" id="demo-b"><span class="fraction"><span>1</span><span>4</span></span></span></div>
+          <div class="strip-row sum"><div class="strip">{Array.from({ length: 12 }, (_, i) => <span class:list={{ filled: i < 11, 'warm-cell': i >= 8 && i < 11 }} />)}</div><span class="strip-label"><span class="fraction"><span>11</span><span>12</span></span></span></div>
         </div>
         <p class="question" id="demo-question" aria-live="polite">Какой знаменатель подойдёт обеим дробям?</p>
-        <div class="paper-footer"><span id="demo-caption">Вопрос классу</span><button class="btn primary" type="button" id="demo-next">Показать шаг <span aria-hidden="true">→</span></button></div>
-        <noscript><p>Общий знаменатель — 12. Две трети — 8/12, одна четверть — 3/12. Сумма — 11/12.</p></noscript>
+        <div class="record"><span class="record-title">Запись в тетради</span><div id="demo-record" aria-live="polite"></div></div>
+        <div class="paper-footer">
+          <button class="btn" type="button" id="demo-back" disabled><span aria-hidden="true">←</span> Назад</button>
+          <button class="btn primary" type="button" id="demo-next">Далее <span aria-hidden="true">→</span></button>
+        </div>
+        <noscript><p>НОК(3, 4) = 12. 2/3 + 1/4 = 8/12 + 3/12 = 11/12.</p></noscript>
       </div>
     </div>
   </section>
@@ -73,32 +78,51 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   {more.length > 0 && <section><div class="wrap"><h2>Курсы и программы</h2><div class="grid">{more.map(item => <ShelfCard item={item} />)}</div></div></section>}
 </Base>
 <script>
-  const next = document.getElementById('demo-next');
-  const question = document.getElementById('demo-question');
-  const result = document.getElementById('demo-result');
-  const caption = document.getElementById('demo-caption');
+  // Пример режима «На доске»: шаг меняет чертёж (через data-step), вопрос и запись для тетради
+  const demo = document.getElementById('demo');
+  const el = (id: string) => document.getElementById(id) as HTMLElement;
+  const label = el('demo-label'), question = el('demo-question'), record = el('demo-record'), result = el('demo-result');
+  const labelA = el('demo-a'), labelB = el('demo-b');
+  const back = el('demo-back') as HTMLButtonElement, next = el('demo-next');
+  const f = (a: number, b: number) => `<span class="fraction"><span>${a}</span><span>${b}</span></span>`;
+  const lcm = 'НОК(3, 4) = 12';
+  const sum = `${f(2, 3)} + ${f(1, 4)} = ${f(8, 12)} + ${f(3, 12)}`;
   const steps = [
-    ['Общий знаменатель — 12. Разделим обе полоски на двенадцать равных долей.', 'Общий знаменатель'],
-    ['2/3 = 8/12, а 1/4 = 3/12. Теперь доли одинакового размера.', 'Одинаковые доли'],
-    ['8/12 + 3/12 = 11/12. Складываем числители, знаменатель сохраняем.', 'Складываем доли'],
+    { label: 'Вопрос классу', text: 'Какой знаменатель подойдёт обеим дробям?', record: [] },
+    { label: 'Шаг 1 из 3', text: 'Подойдёт 12 — наименьшее общее кратное 3 и 4. Делим каждую треть на 4 части, а каждую четверть — на 3. Сколько двенадцатых закрашено?', record: [lcm] },
+    { label: 'Шаг 2 из 3', text: `Две трети — это ${f(8, 12)}, одна четверть — ${f(3, 12)}. Доли стали одного размера. Сколько двенадцатых вместе?`, record: [lcm, sum] },
+    { label: 'Шаг 3 из 3', text: 'Восемь двенадцатых и три двенадцатых — одиннадцать двенадцатых. Числители складываем, знаменатель оставляем.', record: [lcm, `${sum} = ${f(11, 12)}`] },
   ];
+  const last = steps.length - 1;
   let step = 0;
-  next?.addEventListener('click', () => {
-    if (!question || !result || !caption) return;
-    if (step === steps.length) {
-      step = 0;
-      question.textContent = 'Какой знаменатель подойдёт обеим дробям?';
-      caption.textContent = 'Вопрос классу';
-      result.textContent = '?';
-      next.innerHTML = 'Показать шаг <span aria-hidden="true">→</span>';
-      return;
-    }
-    [question.textContent, caption.textContent] = steps[step];
-    step++;
-    if (step === steps.length) {
-      result.innerHTML = '<span class="fraction"><span>11</span><span>12</span></span>';
-      next.textContent = 'Ещё раз ↺';
-    } else next.innerHTML = 'Следующий шаг <span aria-hidden="true">→</span>';
+  const show = (n: number) => {
+    if (!demo) return;
+    step = Math.max(0, Math.min(last, n));
+    const s = steps[step];
+    demo.dataset.step = String(step);
+    label.textContent = s.label;
+    question.innerHTML = s.text;
+    record.innerHTML = s.record.map(line => `<p>${line}</p>`).join('');
+    labelA.innerHTML = step >= 2 ? f(8, 12) : f(2, 3);
+    labelB.innerHTML = step >= 2 ? f(3, 12) : f(1, 4);
+    result.innerHTML = step === last ? f(11, 12) : '?';
+    back.disabled = step === 0;
+    next.innerHTML = step === last ? 'Ещё раз <span aria-hidden="true">↺</span>' : 'Далее <span aria-hidden="true">→</span>';
+  };
+  const forward = () => show(step === last ? 0 : step + 1);
+  next?.addEventListener('click', forward);
+  back?.addEventListener('click', () => show(step - 1));
+  // Стрелки работают, пока пример на экране; PageDown/PageUp (пульт) — когда фокус внутри примера
+  let visible = false;
+  if (demo) new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: .5 }).observe(demo);
+  document.addEventListener('keydown', e => {
+    if (e.altKey || e.ctrlKey || e.metaKey || (e.target as HTMLElement).closest?.('input, textarea, select, [contenteditable]')) return;
+    const inside = !!demo?.contains(document.activeElement);
+    const fwd = e.key === 'ArrowRight' || (inside && e.key === 'PageDown');
+    const bwd = e.key === 'ArrowLeft' || (inside && e.key === 'PageUp');
+    if (!(visible || inside) || !(fwd || bwd)) return;
+    e.preventDefault();
+    if (fwd) forward(); else show(step - 1);
   });
 </script>
 <style>
@@ -124,22 +148,36 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   .walkthrough-copy>p:not(.eyebrow){max-width:33ch;font-size:17px;color:var(--soft);line-height:1.6}
   .walkthrough-copy>p.walkthrough-note{font-size:14px;margin-top:22px}
   .notebook{padding:clamp(22px,3vw,36px);border:1px solid var(--line);border-radius:4px 22px 22px 4px;background-color:var(--surface);box-shadow:7px 8px 0 var(--line);transform:rotate(1deg)}
+  .notebook:focus{outline:none}
   .paper-heading,.paper-footer{display:flex;justify-content:space-between;gap:12px;align-items:center}
-  .example{color:var(--soft);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:2px 6px;background:var(--surface)}
-  .equation{display:flex;align-items:center;gap:18px;font-size:clamp(30px,3.6vw,46px);font-weight:500;margin:26px 0}
-  .fraction,.equation :global(.fraction){display:inline-flex;flex-direction:column;align-items:center;line-height:1.05;vertical-align:middle;min-width:.75em}
-  .fraction>span:last-child,.equation :global(.fraction>span:last-child){border-top:2px solid currentColor;width:100%;text-align:center;padding-top:4px;margin-top:4px}
-  .strip-row{display:grid;grid-template-columns:minmax(0,1fr) 28px;gap:12px;align-items:center;margin:10px 0}
-  .strip-row>span{font-size:12px;color:var(--soft)}
+  .step-label{color:var(--accent);font-size:12px;font-weight:700;border:1px solid var(--line);border-radius:4px;padding:3px 8px;background:var(--surface);white-space:nowrap}
+  .equation{display:flex;align-items:center;gap:18px;font-size:clamp(30px,3.6vw,46px);font-weight:500;margin:22px 0}
+  .notebook :global(.fraction){display:inline-flex;flex-direction:column;align-items:center;line-height:1.05;vertical-align:middle;min-width:.75em}
+  .notebook :global(.fraction>span:last-child){border-top:2px solid currentColor;width:100%;text-align:center;padding-top:3px;margin-top:3px}
+  .strip-row{display:grid;grid-template-columns:minmax(0,1fr) 34px;gap:12px;align-items:center;margin:10px 0}
+  .strip-label{font-size:13px;font-weight:600;color:var(--soft);text-align:center;transition:color .3s ease}
+  .strip-label :global(.fraction>span:last-child){border-top-width:1.5px;padding-top:1px;margin-top:1px}
   .strip{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));height:29px;border-left:1px solid var(--accent)}
-  .strip span{border:1px solid var(--accent);border-left:0;background:var(--surface)}
+  .strip span{border:1px solid var(--accent);border-left:0;background:var(--surface);transition:border-right-color .45s ease}
   .strip .filled{background:var(--accent)}
   .strip.warm{border-left-color:var(--warm)}
   .strip.warm span{border-color:var(--warm)}
-  .strip.warm .filled{background:var(--warm)}
-  .question{min-height:4.5em;font-size:16px;line-height:1.5;font-weight:600;margin:22px 0;color:var(--accent)}
-  .paper-footer>span{font-size:11px;color:var(--soft)}
-  .paper-footer button{font-size:13px;min-height:44px;cursor:pointer;flex-shrink:0}
+  .strip.warm .filled,.strip .warm-cell{background:var(--warm)}
+  .strip .filled{border-right-color:var(--surface)}
+  /* до первого шага видны только трети и четверти: лишние перегородки прозрачные */
+  .notebook[data-step="0"] .thirds span:not(:nth-child(4n)),.notebook[data-step="0"] .quarters span:not(:nth-child(3n)){border-right-color:transparent}
+  .notebook:not([data-step="0"]):not([data-step="1"]) .strip-label{color:var(--ink)}
+  .strip-row.sum{opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .4s ease,transform .4s ease,visibility .4s}
+  .notebook[data-step="3"] .strip-row.sum{opacity:1;visibility:visible;transform:none}
+  .question{min-height:6em;font-size:16px;line-height:1.5;font-weight:600;margin:18px 0 14px;color:var(--accent)}
+  .question :global(.fraction){font-size:14px;margin:0 2px}
+  .record{border-top:1.5px dashed var(--line);padding-top:10px;min-height:124px}
+  .record-title{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+  .record :global(p){margin:8px 0 0;font-size:18px;font-weight:500;color:var(--ink);display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+  .record :global(.fraction){font-size:16px}
+  .paper-footer{margin-top:16px}
+  .paper-footer button{font-size:14px;min-height:44px;cursor:pointer;flex-shrink:0}
+  .paper-footer button:disabled{opacity:.45;cursor:default}
   .section-heading{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:22px}
   .section-heading h2{font-size:25px;letter-spacing:-.035em;margin:7px 0 0}
   .text-link{font-size:14px;font-weight:600;text-decoration:none;white-space:nowrap;padding:8px 0}
@@ -167,6 +205,6 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   @media(prefers-color-scheme:dark){:global(:root:not([data-theme="light"])) .hero-art :global(img){filter:brightness(.72) saturate(.82)}}
   :global(:root[data-theme="dark"]) .hero-art :global(img){filter:brightness(.72) saturate(.82)}
   @media(max-width:800px){.intro-in{min-height:0;padding-top:38px;padding-bottom:330px}.intro-copy{width:100%;max-width:520px}h1{font-size:64px}.hero-art{inset:auto 0 0;height:320px;mask-image:linear-gradient(to bottom,transparent,#000 18%,#000 88%,transparent)}.hero-art :global(img){object-position:82% center}.hero-art::after{background:linear-gradient(to top,var(--bg),transparent 15%)}.walkthrough-in{grid-template-columns:1fr;gap:20px}.walkthrough{padding-top:28px}.walkthrough-copy>p:not(.eyebrow){max-width:42ch}.walkthrough-copy h2 br{display:none}.notebook{max-width:560px;width:100%;justify-self:center}.lesson-grid{grid-template-columns:1fr}.lesson h3{margin-top:12px}.lesson-bottom{margin-top:16px}.class-grid{grid-template-columns:1fr 1fr}.class-link:nth-child(odd){border-left:0}.class-link:last-child:nth-child(odd){grid-column:span 2}.class-link:nth-child(n+3){border-top:1px solid var(--line)}.new-in{grid-template-columns:1fr}.section-heading{align-items:start;flex-wrap:wrap;gap:12px}}
-  @media(max-width:380px){.paper-footer{align-items:flex-start;flex-direction:column}.paper-footer button{width:100%}.modes{gap:14px}.notebook{padding:20px}.class-link{padding:20px 8px;gap:10px}.class-link>span:last-child{display:none}}
-  @media(prefers-reduced-motion:reduce){.lesson{transition:none}}
+  @media(max-width:380px){.paper-footer button{flex:1;padding-inline:.6em}.modes{gap:14px}.notebook{padding:20px}.class-link{padding:20px 8px;gap:10px}.class-link>span:last-child{display:none}}
+  @media(prefers-reduced-motion:reduce){.lesson,.strip span,.strip-label,.strip-row.sum{transition:none}}
 </style>
