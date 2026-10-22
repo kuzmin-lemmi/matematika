@@ -4,13 +4,16 @@ import { Image } from 'astro:assets';
 import heroUnderstanding from '../assets/hero-understanding.png';
 import Preview from '../components/Preview.astro';
 import ShelfCard from '../components/ShelfCard.astro';
+import Rail from '../components/Rail.astro';
 import { getCollection } from 'astro:content';
 import { SITE, PARTS } from '../config';
-import { openPageHref, pageHref, klassHref, klassName, isReady, subjectLabel, gradeLabel } from '../lib';
+import { openPageHref, pageHref, klassHref, klassName, isReady } from '../lib';
 const base = import.meta.env.BASE_URL;
 const all = (await getCollection('items')).sort((a, b) => a.data.order - b.data.order);
 const lessons = all.filter(i => i.data.type === 'lesson');
 const more = all.filter(i => i.data.type !== 'lesson');
+// полки-слайдеры — по классу на полку, только для классов, где уже есть материалы (как в «Инфошаге»)
+const shelves = SITE.grades.map(g => ({ g, items: lessons.filter(i => i.data.grades.includes(g)) })).filter(s => s.items.length);
 const hero = all.filter(i => isReady(i.data) && i.data.added)
   .sort((a, b) => (b.data.added?.getTime() ?? 0) - (a.data.added?.getTime() ?? 0) || Number(b.data.featured) - Number(a.data.featured))[0];
 ---
@@ -61,19 +64,14 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
     </div>
   </section>
   {hero && <section class="new"><div class="wrap"><div class="new-in"><a class="new-preview" href={pageHref(hero.id)} aria-label={hero.data.title}><Preview item={hero} load="visible" /></a><div><p class="eyebrow">Новое</p><h2>{hero.data.title}</h2><p class="muted">{hero.data.summary}</p><a class="btn primary" href={openPageHref(hero)}>Открыть материал →</a></div></div></div></section>}
-  <section class="materials">
-    <div class="wrap">
-      <div class="section-heading"><div><p class="eyebrow">Доска · бумага · дом</p><h2>Материалы для урока</h2></div><a class="text-link" href={`${base}catalog/`}>Весь каталог <span aria-hidden="true">→</span></a></div>
-      <div class="lesson-grid">
-        {lessons.map(item => <article class="lesson">
-          <p class="eyebrow">{subjectLabel(item.data.subject)} · {gradeLabel(item.data.grades)}</p>
-          <h3><a href={pageHref(item.id)}>{item.data.title}</a></h3>
-          <p class="summary">{item.data.summary}</p>
-          <div class="lesson-bottom"><span class="status">{isReady(item.data) ? 'Три режима' : 'Скоро'}</span><a href={pageHref(item.id)} aria-label={`Подробнее: ${item.data.title}`}>Подробнее <span aria-hidden="true">↗</span></a></div>
-        </article>)}
+  {shelves.map(({ g, items }) => (
+    <section class="shelf">
+      <div class="wrap">
+        <div class="section-heading"><div><p class="eyebrow">{g <= 6 ? 'Математика' : 'Алгебра и геометрия'}</p><h2>{klassName(g)}</h2></div><a class="text-link" href={klassHref(g)}>Все уроки {g} класса <span aria-hidden="true">→</span></a></div>
+        <Rail label={`${klassName(g)}: материалы`}>{items.map(i => <ShelfCard item={i} />)}</Rail>
       </div>
-    </div>
-  </section>
+    </section>
+  ))}
   <section class="classes"><div class="wrap"><div class="section-heading"><div><p class="eyebrow">По школьной программе</p><h2>Выбери класс</h2></div><p class="books">Виленкин · Макарычев · Мерзляк</p></div><div class="class-grid">{SITE.grades.map(g => <a class="class-link" href={klassHref(g)}><b>{g}</b><span>{klassName(g)}<small>{g <= 6 ? 'Математика' : 'Алгебра и геометрия'}</small></span><span aria-hidden="true">↗</span></a>)}</div></div></section>
   {more.length > 0 && <section><div class="wrap"><h2>Курсы и программы</h2><div class="grid">{more.map(item => <ShelfCard item={item} />)}</div></div></section>}
 </Base>
@@ -181,15 +179,6 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   .section-heading{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:22px}
   .section-heading h2{font-size:25px;letter-spacing:-.035em;margin:7px 0 0}
   .text-link{font-size:14px;font-weight:600;text-decoration:none;white-space:nowrap;padding:8px 0}
-  .lesson-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
-  .lesson{display:flex;flex-direction:column;min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:24px;transition:border-color 160ms var(--ease-out)}
-  .lesson:hover{border-color:var(--accent)}
-  .lesson h3{font-size:21px;line-height:1.3;font-weight:600;margin:20px 0 12px;letter-spacing:-.025em}
-  .lesson h3 a{text-decoration:none}
-  .summary{margin:0;color:var(--soft);font-size:14px;line-height:1.6;flex:1}
-  .lesson-bottom{display:flex;gap:12px;justify-content:space-between;align-items:center;margin-top:26px;font-size:12px}
-  .lesson-bottom a{font-weight:600;text-decoration:none;padding:8px 0}
-  .status{color:var(--soft);background:var(--tint);padding:3px 8px;border-radius:4px}
   .books{color:var(--soft);font-size:13px;margin:0}
   .class-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
   .class-link{display:flex;align-items:center;gap:14px;padding:24px 16px;text-decoration:none;min-width:0}
@@ -204,7 +193,7 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   .new-in h2{margin-top:12px}
   @media(prefers-color-scheme:dark){:global(:root:not([data-theme="light"])) .hero-art :global(img){filter:brightness(.72) saturate(.82)}}
   :global(:root[data-theme="dark"]) .hero-art :global(img){filter:brightness(.72) saturate(.82)}
-  @media(max-width:800px){.intro-in{min-height:0;padding-top:38px;padding-bottom:20px}.intro-copy{width:100%;max-width:520px}h1{font-size:64px}.hero-art{display:none}.walkthrough-in{grid-template-columns:1fr;gap:20px}.walkthrough{padding-top:28px}.walkthrough-copy>p:not(.eyebrow){max-width:42ch}.walkthrough-copy h2 br{display:none}.notebook{max-width:560px;width:100%;justify-self:center;transform:none}.lesson-grid{grid-template-columns:1fr}.lesson h3{margin-top:12px}.lesson-bottom{margin-top:16px}.class-grid{grid-template-columns:1fr 1fr;gap:10px;border:0}.class-grid .class-link{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 14px}.class-link:last-child:nth-child(odd){grid-column:span 2}.new-in{grid-template-columns:1fr}.section-heading{align-items:start;flex-wrap:wrap;gap:12px}}
+  @media(max-width:800px){.intro-in{min-height:0;padding-top:38px;padding-bottom:20px}.intro-copy{width:100%;max-width:520px}h1{font-size:64px}.hero-art{display:none}.walkthrough-in{grid-template-columns:1fr;gap:20px}.walkthrough{padding-top:28px}.walkthrough-copy>p:not(.eyebrow){max-width:42ch}.walkthrough-copy h2 br{display:none}.notebook{max-width:560px;width:100%;justify-self:center;transform:none}.class-grid{grid-template-columns:1fr 1fr;gap:10px;border:0}.class-grid .class-link{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 14px}.class-link:last-child:nth-child(odd){grid-column:span 2}.new-in{grid-template-columns:1fr}.section-heading{align-items:start;flex-wrap:wrap;gap:12px}}
   @media(max-width:380px){.paper-footer button{flex:1;padding-inline:.6em}.modes{gap:14px}.notebook{padding:20px}.class-link{padding:20px 8px;gap:10px}.class-link>span:last-child{display:none}}
-  @media(prefers-reduced-motion:reduce){.lesson,.strip span,.strip-label,.strip-row.sum{transition:none}}
+  @media(prefers-reduced-motion:reduce){.strip span,.strip-label,.strip-row.sum{transition:none}}
 </style>
