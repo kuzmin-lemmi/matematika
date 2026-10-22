@@ -62,18 +62,27 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px}
 .icon{padding:.35em .6em;min-width:44px;min-height:44px}
 
 /* доска: на проекторе шрифт не мельче 28px */
-#board{display:grid;grid-template-rows:auto auto 1fr auto;height:100vh;height:100dvh;padding:12px clamp(12px,3vw,40px)}
-.bbar{display:flex;align-items:center;gap:12px;font-size:24px}
-.bbar .ttl{font-weight:700;flex:1}
-.bbar .cnt{color:var(--soft);font-weight:600}
-.btext{font-size:clamp(28px,2.5vw,38px);line-height:1.28;padding:4px 0 8px}
-.btext .q{font-weight:700}
+#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
+.bbar{display:flex;align-items:center;gap:8px;font-size:20px}
+.bbar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap}
+.bbar button{font-size:18px;min-height:44px;padding:.2em .7em;white-space:nowrap}
+@media (max-width:1150px){ .bbar .ttl{visibility:hidden} .bbar button .t{display:none} }
+/* на экране — то, что видит класс: короткий вопрос и ответ; объяснение — в подсказке учителю */
+.btext .q{font-size:clamp(30px,3vw,46px);font-weight:700;line-height:1.25}
+.btext .a{font-size:clamp(28px,2.7vw,42px);line-height:1.3;color:var(--accent);font-weight:600}
 .btext .a.hide{visibility:hidden}
+.brec{border-top:2px dashed var(--line);padding:6px 0 2px;min-height:calc(2 * 1.9em + 26px);font-size:clamp(26px,2.4vw,36px);line-height:1.9}
+.brec .rt{display:block;font-size:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);line-height:1.2}
+.bnote{position:fixed;right:clamp(12px,3vw,40px);bottom:96px;max-width:min(520px,90vw);background:var(--surface);border:2px solid var(--accent);
+  border-radius:var(--r);padding:12px 16px;font-size:20px;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:4}
 .bstage{min-height:0;display:flex;align-items:center;justify-content:center}
 .bstage svg{width:100%;height:100%}
-.bctl{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding-top:8px}
-.bctl button{font-size:24px;min-height:56px}
-#board.preview .bctl{visibility:hidden}
+.bctl{display:flex;gap:12px;justify-content:center;padding-top:8px}
+.bctl button{font-size:26px;min-height:60px;padding:.25em 1em}
+.bctl .main{min-width:10em}
+#board.preview .bctl,#board.preview .bbar button{visibility:hidden}
+#board.preview .bnote{display:none}
 svg .big{font:700 120px var(--font);fill:var(--ink);text-anchor:middle}
 svg .bar{fill:var(--a-soft);stroke:var(--a);stroke-width:4}
 
@@ -120,6 +129,7 @@ table.ans .tall td{height:12mm}
 .overlay .card{max-width:720px;max-height:90vh;overflow:auto}
 
 @media (prefers-reduced-motion: reduce){ *{animation:none !important;transition:none !important} }
+body.student [data-act="menu"],body.student #hLinks{display:none !important}
 @page{size:A4;margin:0}
 @media print{
   html,body{background:#fff !important;color:#000 !important;background-image:none !important;padding:0}
@@ -155,17 +165,20 @@ table.ans .tall td{height:12mm}
     <button class="icon" type="button" data-act="menu" aria-label="Меню (Esc)">☰</button>
     <span class="ttl">Название темы</span><!-- ЗАМЕНИ -->
     <span class="cnt" id="bCnt"></span>
+    <button type="button" data-act="restart" aria-label="Заново">↺<span class="t"> Заново</span></button>
+    <button type="button" data-act="numbers" aria-label="Другие числа">🎲<span class="t"> Другие числа</span></button>
+    <button type="button" data-act="notes" id="bNotesBtn" aria-pressed="false" aria-label="Подсказка учителю" title="Подсказку видно и на проекторе — включайте, когда нужно">💬<span class="t"> Учителю</span></button>
+    <button class="icon" type="button" data-act="theme" aria-label="Сменить тему">◐</button>
+    <button class="icon" type="button" data-act="full" aria-label="Во весь экран (F)">⛶</button>
   </div>
   <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
   <div class="bstage" id="bStage"></div>
+  <div class="brec"><span class="rt">Запись в тетради</span><div id="bRec"></div></div>
   <div class="bctl">
     <button type="button" data-act="prev">← Назад</button>
-    <button type="button" class="main" data-act="next" id="bNext">Показать</button>
-    <button type="button" data-act="restart">Заново</button>
-    <button type="button" data-act="numbers">Другие числа</button>
-    <button type="button" data-act="theme">◐ Тема</button>
-    <button type="button" data-act="full">⛶ Весь экран</button>
+    <button type="button" class="main" data-act="next" id="bNext">Показать ответ</button>
   </div>
+  <div class="bnote" id="bNote" hidden></div>
 </section>
 
 <section id="print" class="screen" hidden>
@@ -198,7 +211,6 @@ table.ans .tall td{height:12mm}
         <div class="inrow" id="hIn"></div>
         <div id="hFb"></div>
         <div class="hbtns">
-          <button type="button" class="main" id="hCheck">Проверить</button>
           <button type="button" id="hHint">Подсказка</button>
           <button type="button" class="main" id="hNext" hidden>Дальше →</button>
         </div>
@@ -231,6 +243,8 @@ const GEN_VERSION = 1;
 const P = new URLSearchParams(location.search);
 const MODE = ['board', 'print', 'home'].includes(P.get('mode')) ? P.get('mode') : null;
 const PREVIEW = P.get('preview') === '1';
+// Ссылка для учеников (?mode=home&student=1): только тренажёр — без меню, доски и раздатки
+const STUDENT = P.get('student') === '1';
 const $ = id => document.getElementById(id);
 const SLUG = 'slug-materiala';   // ЗАМЕНИ: ключ для localStorage
 const store = {
@@ -298,6 +312,7 @@ function makeVariant(num, version = GEN_VERSION) {
 // ================= Экраны =================
 let screen = null;
 function show(name) {
+  if (STUDENT && name !== 'home') return;
   boardStopPreview();
   screen = name;
   ['start', 'board', 'print', 'home'].forEach(s => { $(s).hidden = s !== name; });
@@ -317,18 +332,19 @@ async function toggleFull() {
 }
 
 // ================= 🖥 На доске: сценарий из шагов «вопрос → показ» =================
-const B = { ex: null, steps: [], i: 0, phase: 0, timer: 0 };
-// ЗАМЕНИ: шаги показа. q — вопрос классу, a — ответ после «Показать», draw(phase) — SVG.
+const B = { ex: null, steps: [], i: 0, phase: 0, timer: 0, notes: false };
+// ЗАМЕНИ: шаги показа. q — вопрос классу (одна фраза), a — короткий ответ после «Показать»,
+// note — что сказать словами (подсказка учителю), draw(phase) — SVG, rec(phase) — строки записи в тетради.
 function buildSteps(t) {
   const svg = inner => `<svg viewBox="0 0 980 300" role="img" aria-label="Чертёж">${inner}</svg>`;
   const u = t.a % 10 + t.b % 10;
   return [
-    { q: `Сколько будет ${t.a} + ${t.b}? Запишите в тетрадь.`, a: 'Проверим по разрядам.',
-      draw: () => svg(`<text class="big" x="490" y="190">${t.a} + ${t.b}</text>`) },
-    { q: `Сколько будет единиц: ${t.a % 10} + ${t.b % 10}?`, a: `${u} — это 1 десяток и ${u - 10} единиц.`,
-      draw: ph => svg(`<rect class="bar" x="100" y="120" width="${ph ? u * 40 : (t.a % 10) * 40}" height="60"/>`) },
-    { q: 'Сколько всего?', a: `${t.a} + ${t.b} = ${t.a + t.b}.`,
-      draw: ph => svg(`<text class="big" x="490" y="190">${ph ? t.a + t.b : '?'}</text>`) },
+    { q: `Сколько будет ${t.a} + ${t.b}?`, a: 'Проверим по разрядам.', note: 'Попросите записать ответ в тетрадь, не обсуждая.',
+      draw: () => svg(`<text class="big" x="490" y="190">${t.a} + ${t.b}</text>`), rec: () => [] },
+    { q: `Сколько единиц: ${t.a % 10} + ${t.b % 10}?`, a: `${u} = 1 десяток и ${u - 10}`, note: 'Десяток из единиц переходит в разряд десятков.',
+      draw: ph => svg(`<rect class="bar" x="100" y="120" width="${ph ? u * 40 : (t.a % 10) * 40}" height="60"/>`), rec: ph => ph ? [`${t.a % 10} + ${t.b % 10} = ${u}`] : [] },
+    { q: 'Сколько всего?', a: `${t.a} + ${t.b} = ${t.a + t.b}`, note: 'Сверьте с ответами в тетрадях.',
+      draw: ph => svg(`<text class="big" x="490" y="190">${ph ? t.a + t.b : '?'}</text>`), rec: ph => [`${t.a % 10} + ${t.b % 10} = ${u}`, ...(ph ? [`${t.a} + ${t.b} = ${t.a + t.b}`] : [])] },
   ];
 }
 function boardNumbers(random) {
@@ -344,7 +360,11 @@ function renderBoard() {
   $('bA').innerHTML = st.a;
   $('bA').classList.toggle('hide', B.phase === 0);
   $('bStage').innerHTML = st.draw(B.phase);
-  $('bNext').textContent = B.phase === 0 ? 'Показать' : 'Далее →';
+  $('bRec').innerHTML = st.rec(B.phase).map(l => `<div>${l}</div>`).join('');
+  $('bNote').innerHTML = `<b>Учителю.</b> ${st.note}`;
+  $('bNote').hidden = !B.notes;
+  $('bNotesBtn').setAttribute('aria-pressed', String(B.notes));
+  $('bNext').textContent = B.phase === 0 ? 'Показать ответ' : 'Далее →';
   $('bNext').disabled = B.i === B.steps.length - 1 && B.phase === 1;
 }
 function boardNext() { if (B.phase === 0) B.phase = 1; else if (B.i < B.steps.length - 1) { B.i++; B.phase = 0; } renderBoard(); }
@@ -381,13 +401,20 @@ function keyHTML(vs) {
   return `<div class="page key"><h2>Ключ учителя</h2><table class="key"><tr><th>Вариант</th>${vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('')}</tr>
     ${vs.map(v => `<tr><td><b>${v.label}</b></td>${v.answers.map(a => `<td>${a}</td>`).join('')}</tr>`).join('')}</table></div>`;
 }
+// номера запоминаются в браузере: напечатал листы, закрыл вкладку — ключ потом по тем же номерам
 function renderPrint() {
-  if (!printNums.length) { printNums = newNumbers(CONFIG.print.variants); $('pCount').value = printNums.length; }
+  if (!printNums.length) {
+    const saved = parseNums(store.get('printNums') || '').nums;
+    printNums = saved.length ? saved : newNumbers(CONFIG.print.variants);
+    $('pCount').value = printNums.length;
+    if (saved.length) $('pMsg').textContent = 'Открыты номера, с которыми вы работали в прошлый раз. Для другого класса нажмите «Новые номера».';
+  }
   $('pNums').value = printNums.map(n => GEN_VERSION + '-' + n).join(', ');
   drawSheets();
 }
 function drawSheets() {
   const vs = printNums.map(n => makeVariant(n));
+  store.set('printNums', printNums.join(','));
   $('pSheets').innerHTML = (vs.length ? keyHTML(vs) : '') + vs.map(v => `<div class="page">${sheetHTML(v)}</div>`).join('');
   return vs;
 }
@@ -453,11 +480,11 @@ function homeEnd() {
 function homeRender(fb) {
   $('hStats').innerHTML = `<span>Задание <b>${H.n}</b> из ${CONFIG.home.round}</span><span>Очки: <b>${H.score}</b></span><span>Серия: <b>${H.streak}</b></span>`;
   $('hTask').innerHTML = `${TYPES[H.task.type].text(H.task)} = ?`;
-  $('hIn').innerHTML = H.wait ? '' : '<input id="hAns" inputmode="numeric" autocomplete="off" aria-label="Ответ">';
+  $('hIn').innerHTML = H.wait ? '' : '<input id="hAns" inputmode="numeric" autocomplete="off" aria-label="Ответ"> <button type="button" class="main" id="hCheck">Проверить</button>';
   $('hFb').innerHTML = !fb ? '' : fb.hint ? `<div class="fb info"><span class="tag">Подсказка</span>${fb.hint}</div>`
     : fb.empty ? `<div class="fb info">${fb.msg}</div>`
     : `<div class="fb ${fb.ok ? 'ok' : 'bad'}"><span class="tag">${fb.ok ? 'Верно' : 'Ошибка'}</span>${fb.msg}</div>`;
-  $('hCheck').hidden = H.wait; $('hHint').hidden = H.wait; $('hNext').hidden = !H.wait;
+  $('hHint').hidden = H.wait; $('hNext').hidden = !H.wait;
   $('hHint').textContent = `Подсказка (−${CONFIG.home.hintPenalty})`;
   if (!PREVIEW) (H.wait ? $('hNext') : $('hAns')).focus();
 }
@@ -477,14 +504,16 @@ document.addEventListener('click', e => {
   if (act === 'numbers') { boardNumbers(true); renderBoard(); }
   if (act === 'theme') toggleTheme();
   if (act === 'full') toggleFull();
+  if (act === 'notes') { B.notes = !B.notes; renderBoard(); }
   if (act === 'help') $('help').hidden = false;
   if (act === 'help-close') $('help').hidden = true;
   if (act === 'again') homeStart();
 });
-$('hCheck').addEventListener('click', () => { const r = homeCheck(parseNum($('hAns')?.value ?? '')); if (r?.empty) homeRender(r); });
+function homeCheckClick() { const r = homeCheck(parseNum($('hAns')?.value ?? '')); if (r?.empty) homeRender(r); }
+$('hIn').addEventListener('click', e => { if (e.target.id === 'hCheck') homeCheckClick(); });
 $('hHint').addEventListener('click', homeHint);
 $('hNext').addEventListener('click', homeContinue);
-$('hIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('hCheck').click(); } });
+$('hIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); homeCheckClick(); } });
 $('pNew').addEventListener('click', () => { printNums = newNumbers(Math.max(1, Math.min(40, +$('pCount').value || CONFIG.print.variants))); renderPrint(); });
 $('pNums').addEventListener('change', () => {
   const { nums, bad } = parseNums($('pNums').value);
@@ -495,8 +524,8 @@ $('pPrint').addEventListener('click', () => printNow('sheets'));
 $('pPrintKey').addEventListener('click', () => printNow('key'));
 addEventListener('afterprint', () => document.body.classList.remove('print-key', 'print-sheets'));
 document.addEventListener('keydown', e => {
-  if (e.target.matches('input') && e.key !== 'Escape') return;
-  if (e.key === 'Escape') { if (!$('help').hidden) $('help').hidden = true; else if (screen !== 'start') show('start'); return; }
+  if (e.target.matches?.('input') && e.key !== 'Escape') return;
+  if (e.key === 'Escape') { if (!$('help').hidden) $('help').hidden = true; else if (screen !== 'start' && !STUDENT) show('start'); return; }
   if (screen === 'home' && e.key === 'Enter' && H.wait) { e.preventDefault(); homeContinue(); return; }
   if (screen !== 'board') return;
   if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); boardNext(); }
@@ -508,13 +537,14 @@ document.addEventListener('keydown', e => {
 (() => {
   const th = store.get('theme');
   if (th === 'dark' || th === 'light') document.documentElement.dataset.theme = th;
-  if (PREVIEW) { show('board'); boardStartPreview(); } else show(MODE || 'start');
+  if (STUDENT) document.body.classList.add('student');
+  if (PREVIEW) { show('board'); boardStartPreview(); } else show(STUDENT ? 'home' : MODE || 'start');
 })();
 
 // Для автотестов и снимка превью (npm run posters: AFTER → 'APP.board.poster()')
 window.APP = {
   CONFIG, GEN_VERSION, TYPES, generate, makeVariant, taskRnd, mulberry32, parseNums, parseNum,
-  show, get screen() { return screen; },
+  STUDENT, show, get screen() { return screen; },
   board: { get steps() { return B.steps; }, get i() { return B.i; }, get phase() { return B.phase; }, next: boardNext, prev: boardPrev, go: boardGo, poster: boardPoster },
   print: { draw: drawSheets, set nums(v) { printNums = v; } },
   home: { state: H, start: homeStart, check: homeCheck, hint: homeHint, next: homeContinue },

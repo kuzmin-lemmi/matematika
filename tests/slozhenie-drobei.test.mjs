@@ -131,7 +131,8 @@ test('доска: все шаги вперёд и назад без ошибок
     let guard = 0;
     while (!(B.i === n - 1 && B.phase === 1) && guard++ < 100) {
       B.next();
-      assert.ok(w.document.querySelector('#bStage svg'), 'полоски нарисованы');
+      const rows = B.steps[B.i].rows(B.phase);   // у шага с правилом полосок нет — на экране только правило и запись
+      assert.equal(!!w.document.querySelector('#bStage svg'), rows.length > 0, 'полоски нарисованы');
     }
     assert.equal(B.i, n - 1);
     while (!(B.i === 0 && B.phase === 0) && guard++ < 200) B.prev();
@@ -148,6 +149,15 @@ test('доска: первый пример 2/3 + 3/4 показывает ло�
   assert.match(text(), /57меньше,чем34/);
   w.APP.board.go(6, 1);
   assert.match(text(), /1712=1512/);
+  // запись в тетради собирает всю цепочку
+  const rec = w.document.getElementById('bRec').textContent.replace(/\s+/g, '');
+  assert.match(rec, /НОК\(3,4\)=12/);
+  assert.match(rec, /23\+34=812\+912=1712=1512/);
+  // подсказка учителю спрятана, пока её не включат
+  assert.equal(w.document.getElementById('bNote').hidden, true);
+  w.document.querySelector('[data-act="notes"]').click();
+  assert.equal(w.document.getElementById('bNote').hidden, false);
+  assert.ok(w.document.getElementById('bNote').textContent.length > 30);
 });
 
 // значения шага, посчитанные независимо (с наименьшим общим знаменателем)
@@ -252,13 +262,81 @@ test('тренажёр: неНОК как общий знаменатель пр
   h.check({ a: D / task.a.d, b: D / task.b.d }); h.next();
   const N = task.a.n * (D / task.a.d) + task.b.n * (D / task.b.d);
   h.check({ v: N });
-  assert.equal(h.step, 'num');
-  h.next();
   assert.equal(h.step, 'reduce', 'с произведением знаменателей ответ надо сократить');
   r = h.check({ n: N, d: D });
   assert.equal(r.cat, 'reduce');
   while (!h.state.taskDone) { h.next(); h.check(stepValues(h.step, task)); }
   assert.equal(key(w.APP.solve(task).mixed), key(e.mixed));
+});
+
+test('тренажёр: верный шаг засчитывается сам, на ошибке — остановка с разбором', t => {
+  const { window: w } = open(t, '?mode=home');
+  const h = w.APP.home, doc = w.document;
+  h.start({ level: 1, sub: false, seed: 21 });
+  const task = h.state.task;
+  assert.equal(h.step, 'den');
+  assert.ok(doc.querySelector('#hStep [data-act="check"]'), 'кнопка «Проверить» рядом с полем');
+  h.check(stepValues('den', task));
+  assert.equal(h.step, 'mult', 'сразу следующий шаг, без «Дальше»');
+  assert.equal(h.state.wait, false);
+  assert.ok(doc.querySelector('#hStep input'), 'поле следующего шага уже на экране');
+  assert.match(doc.getElementById('hStep').textContent, /✓/);
+  h.check({ a: 99, b: 99 });
+  assert.equal(h.state.wait, true, 'на ошибке ждём, пока ученик прочитает разбор');
+  assert.equal(doc.getElementById('hNext').hidden, false);
+});
+
+test('тренажёр: ссылка с уровнем сразу открывает задания', t => {
+  const { window: w, errors } = open(t, '?mode=home&level=3&sub=0');
+  const h = w.APP.home;
+  assert.equal(h.state.level, 2);
+  assert.equal(h.state.sub, false);
+  assert.equal(w.document.getElementById('hPlay').hidden, false);
+  assert.ok(h.state.task);
+  assert.deepEqual(errors, []);
+  // без уровня — выбор уровня, нажатие на карточку сразу начинает
+  const m = open(t, '?mode=home');
+  assert.equal(m.window.document.getElementById('hSetup').hidden, false);
+  m.window.document.querySelector('[data-level="1"]').click();
+  assert.equal(m.window.document.getElementById('hPlay').hidden, false);
+  assert.equal(m.window.APP.home.state.level, 1);
+});
+
+test('ссылка для учеников: только тренажёр, без выхода к доске и раздатке', t => {
+  for (const q of ['?mode=home&student=1', '?student=1', '?mode=print&student=1']) {
+    const { window: w, errors } = open(t, q);
+    const { APP, document: doc } = w;
+    assert.equal(APP.STUDENT, true, q);
+    assert.equal(APP.screen, 'home', `${q}: открыт тренажёр`);
+    APP.show('print'); APP.show('board'); APP.show('start');
+    assert.equal(APP.screen, 'home', `${q}: другие режимы недоступны`);
+    doc.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    assert.equal(APP.screen, 'home', `${q}: Esc не выводит в меню`);
+    doc.querySelector('#home [data-act="menu"]').click();
+    assert.equal(APP.screen, 'home', `${q}: кнопка меню не работает`);
+    assert.ok(doc.body.classList.contains('student'), 'меню и ссылки учителя спрятаны');
+    assert.deepEqual(errors, []);
+  }
+  // со ссылкой на уровень — сразу задания
+  const m = open(t, '?mode=home&level=2&student=1');
+  assert.equal(m.window.document.getElementById('hPlay').hidden, false);
+  assert.equal(m.window.APP.home.state.level, 1);
+  // без student=1 учитель свободно ходит между режимами
+  const teacher = open(t, '?mode=home');
+  teacher.window.APP.show('print');
+  assert.equal(teacher.window.APP.screen, 'print');
+});
+
+test('раздатка: номера вариантов запоминаются между открытиями', t => {
+  const m1 = open(t, '?mode=print');
+  const nums = m1.window.document.getElementById('pNums').value;
+  const shared = m1.window.localStorage.getItem('matshag:slozhenie-drobei:printNums');
+  assert.ok(shared, 'номера сохранены');
+  // повторное открытие режима в новом окне с тем же хранилищем
+  const m3 = loadMaterial(SLUG, { query: '?mode=print', beforeParse(win) { win.localStorage.setItem('matshag:slozhenie-drobei:printNums', shared); } });
+  t.after(m3.close);
+  assert.equal(m3.window.document.getElementById('pNums').value, nums);
+  assert.match(m3.window.document.getElementById('pMsg').textContent, /прошлый раз/);
 });
 
 test('подсказка снимает очки, но не ломает серию', t => {

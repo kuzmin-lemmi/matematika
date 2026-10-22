@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Preview from './Preview.astro';
+import StudentLink from './StudentLink.astro';
 import { TYPES, ACCESS, PARTS } from '../config';
 import { openPageHref, pageHref, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady } from '../lib';
 interface Props { item: CollectionEntry<'items'> }
@@ -31,6 +32,7 @@ const dl = ready ? downloadHref(d) : '';
           {d.type === 'course' ? 'К курсу' : 'Открыть'} {external ? '↗' : '▶'}
         </a>
       )}
+      <StudentLink item={item} />
       {dl && <a class="btn" href={dl} download={downloadName(d.url)}>⬇ Скачать</a>}
       <a class="btn" href={pageHref(item.id)}>Подробнее</a>
     </div>
@@ -62,7 +64,7 @@ const dl = ready ? downloadHref(d) : '';
   .sum{margin:0;color:var(--soft);font-size:15.5px;flex:1}
   .parts{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0;font-size:14.5px;font-weight:600}
   .act{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-  .act .btn{padding:.55em .95em;font-size:15px}
+  .act :global(.btn){padding:.55em .95em;font-size:15px}
   .act .btn.primary{background:var(--cb);border-color:var(--cb);color:#fff}
-  @media (pointer:coarse){ .act .btn{min-height:44px;justify-content:center} }
+  @media (pointer:coarse){ .act :global(.btn){min-height:44px;justify-content:center} }
 </style>

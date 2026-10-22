@@ -1,0 +1,33 @@
+---
+// Кнопка «Ссылка для дома»: копирует ссылку на закрытый тренажёр, её учитель отправляет в чат класса.
+// Ученик по ней попадает сразу в задания — без сайта, доски и раздатки.
+import { studentHref } from '../lib';
+interface Props { item: any; label?: string }
+const { item, label = '🔗 Ссылка для дома' } = Astro.props;
+const url = studentHref(item, Astro.site);
+---
+{url && (
+  <button type="button" class="btn student-link" data-url={url}
+    title="Скопировать ссылку для чата класса: ученик попадёт сразу в тренажёр, без сайта">{label}</button>
+)}
+
+<script>
+  document.addEventListener('click', async e => {
+    const b = (e.target as HTMLElement).closest?.('.student-link') as HTMLButtonElement | null;
+    if (!b) return;
+    const url = b.dataset.url ?? '';
+    b.dataset.label ??= b.textContent ?? '';
+    try {
+      await navigator.clipboard.writeText(url);
+      b.textContent = 'Скопировано ✓ Отправьте в чат класса';
+      setTimeout(() => { b.textContent = b.dataset.label ?? ''; }, 3000);
+    } catch {
+      // буфер обмена недоступен (старый браузер, не https) — показываем ссылку, чтобы скопировать руками
+      window.prompt('Скопируйте ссылку для учеников:', url);
+    }
+  });
+</script>
+
+<style>
+  .student-link{font:inherit;cursor:pointer}
+</style>
