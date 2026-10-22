@@ -47,12 +47,12 @@ cd matematika
 
 ```bash
 npm ci           # установить точные версии из package-lock.json
-npm run dev      # http://localhost:4321/matematika/
+npm run dev      # http://localhost:4321/
 npm run validate # TypeScript, автотесты и сборка
 npm run preview  # просмотр собранного сайта
 ```
 
-Сервер останавливается сочетанием `Ctrl+C`. В адресе обязательно оставлять `/matematika/`.
+Сервер останавливается сочетанием `Ctrl+C`.
 Секреты, `.env` и подключение внешних сервисов для локальной разработки не нужны.
 В Windows, если PowerShell запрещает запуск `npm.ps1`, используй `npm.cmd` вместо `npm`.
 
@@ -98,7 +98,7 @@ scripts/                 подготовка превью
 
 ## Публикация
 
-Сайт: [kuzmin-lemmi.github.io/matematika/](https://kuzmin-lemmi.github.io/matematika/).
+Сайт: [matshag.ru](https://matshag.ru/) (домен на Beget, хостинг — GitHub Pages).
 GitHub Pages включён с источником GitHub Actions. Для обновления сайта после отправки изменений:
 Actions → «Публикация на GitHub Pages» → Run workflow → ветка `main`.
 Дизайн и палитра описаны в [`DESIGN.md`](DESIGN.md).

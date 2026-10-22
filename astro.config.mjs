@@ -1,9 +1,9 @@
 import { defineConfig } from 'astro/config';
 
-// Пока своего домена нет, сайт живёт на GitHub Pages по адресу kuzmin-lemmi.github.io/matematika/.
-// Когда автор купит домен: site — 'https://домен.ru', base — '/' (или переменные окружения SITE_URL и BASE).
+// Сайт живёт на своём домене matshag.ru (GitHub Pages, домен куплен на Beget).
+// Для временной публикации по другому адресу — переменные окружения SITE_URL и BASE.
 export default defineConfig({
-  site: process.env.SITE_URL || 'https://kuzmin-lemmi.github.io',
-  base: process.env.BASE || '/matematika/',
+  site: process.env.SITE_URL || 'https://matshag.ru',
+  base: process.env.BASE || '/',
   trailingSlash: 'always',
 });

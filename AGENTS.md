@@ -54,13 +54,13 @@
 
 ```bash
 npm install
-npm run dev       # http://localhost:4321/matematika/
+npm run dev       # http://localhost:4321/
 npm run build     # обязательно перед завершением задачи — сборка должна пройти без ошибок
 npm run preview
 npm run posters <slug>   # картинка-превью материала (нужен Chrome или Edge)
 ```
 
-Адрес сайта задаётся в `astro.config.mjs` (`site`, `base`). Сейчас — `https://kuzmin-lemmi.github.io`, `base: '/matematika/'`.
+Адрес сайта задаётся в `astro.config.mjs` (`site`, `base`). Сейчас — `https://matshag.ru`, `base: '/'`.
 **Все внутренние ссылки строй через `import.meta.env.BASE_URL`** или функции из `src/lib.ts`
 (`openPageHref`, `pageHref`, `openHref`). Кнопка открытия материала — всегда `openPageHref` (ведёт на `/zapusk/<slug>/`).
 Ссылки вида `href="/catalog"` сломаются на GitHub Pages.
