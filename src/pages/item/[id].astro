@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
 import Preview from '../../components/Preview.astro';
+import StudentLink from '../../components/StudentLink.astro';
 import { TYPES, ACCESS, PARTS } from '../../config';
 import { openPageHref, ogImage, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady, isLocalFile } from '../../lib';
 
@@ -16,8 +17,6 @@ const external = /^https?:/.test(d.url);
 const ready = isReady(d);
 const local = isLocalFile(d.url);
 const dl = ready ? downloadHref(d) : '';
-// ссылка для учеников — сразу в тренажёр, её отправляют в чат класса
-const homeAbs = ready && local && d.parts.includes('home') ? new URL(openPageHref(item, 'home'), Astro.site).toString() : '';
 const rows = [
   ['Тип', TYPES[d.type].label],
   ['Предмет', subjectLabel(d.subject)],
@@ -45,7 +44,7 @@ const rows = [
             </a>
           )}
           {dl && <a class="btn" href={dl} download={downloadName(d.url)} title="Один HTML-файл: работает без интернета и с флешки">⬇ Скачать бесплатно</a>}
-          {homeAbs && <button class="btn" id="copy" data-url={homeAbs}>Скопировать ссылку для учеников</button>}
+          <StudentLink item={item} label="🔗 Ссылка для учеников (домашняя работа)" />
           {d.repo && <a class="btn" href={d.repo}>Исходный код ↗</a>}
         </div>
         {!ready && <p class="note">Материал готовится. Ниже — что в нём будет.</p>}
@@ -60,13 +59,6 @@ const rows = [
     </div>
   </section>
 </Base>
-<script>
-  const b = document.getElementById('copy') as HTMLButtonElement | null;
-  b?.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(b.dataset.url ?? ''); b.textContent = 'Ссылка скопирована ✓'; }
-    catch { b.textContent = b.dataset.url ?? ''; }
-  });
-</script>
 <style>
   .top{padding-top:28px}
   .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:40px;align-items:start}
@@ -74,7 +66,7 @@ const rows = [
   .badge{width:58px;height:58px;border-radius:10px;display:grid;place-items:center;font-size:30px;margin-bottom:18px;background:var(--tint)}
   .lead{font-size:clamp(17px,2vw,20px);color:var(--soft);max-width:60ch}
   .cta{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 28px}
-  .cta .btn{font:700 16px var(--body);cursor:pointer;color:var(--ink)}
+  .cta :global(.btn){font:700 16px var(--body);cursor:pointer;color:var(--ink)}
   .cta .btn.primary{background:var(--cb);border-color:var(--cb);color:#fff}
   .note{margin:-8px 0 20px;font-weight:600;color:var(--soft)}
   .facts{display:grid;grid-template-columns:max-content 1fr;gap:8px 20px;margin:0 0 28px;padding:18px 20px;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r)}

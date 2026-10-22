@@ -13,6 +13,12 @@ export const openPageHref = (item: { id: string; data: { url: string } }, mode?:
   isLocalFile(item.data.url)
     ? `${import.meta.env.BASE_URL}zapusk/${item.id}/${mode ? `?mode=${mode}` : ''}`
     : openHref(item.data.url);
+// Ссылка для учеников — в чат класса: тренажёр «Дома» на весь экран, закрытый (student=1):
+// без выхода на сайт и к доске и раздатке. Пусто, если у материала нет режима «Дома».
+export const studentHref = (item: { id: string; data: { url: string; access: string; parts: string[] } }, site?: URL) =>
+  isReady(item.data) && isLocalFile(item.data.url) && item.data.parts.includes('home')
+    ? new URL(`${openPageHref(item, 'home')}&student=1`, site).toString()
+    : '';
 export const klassHref = (g: number) => `${import.meta.env.BASE_URL}klass/${g}/`;
 export const klassName = (g: number) => `${g} класс`;
 export const gradeLabel = (g: number[]) => g.length ? g.map(x => `${x} класс`).join(', ') : '';

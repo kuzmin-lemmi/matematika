@@ -15,6 +15,16 @@ test('шаблон открывается во всех режимах без о
   }
 });
 
+test('шаблон: ссылка для учеников открывает только тренажёр', t => {
+  const m = loadHtml(html, { query: '?mode=home&student=1', slug: 'template' });
+  t.after(m.close);
+  const { APP } = m.window;
+  assert.equal(APP.screen, 'home');
+  APP.show('print'); APP.show('start');
+  assert.equal(APP.screen, 'home');
+  assert.deepEqual(m.errors, []);
+});
+
 test('шаблон: раздатка, доска и тренажёр связаны одним генератором', t => {
   const m = loadHtml(html, { query: '?mode=home', slug: 'template' });
   t.after(m.close);

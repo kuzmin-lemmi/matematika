@@ -2,6 +2,7 @@
 // Строка списка класса: превью слева, справа — описание материала и кнопки режимов
 import type { CollectionEntry } from 'astro:content';
 import Preview from './Preview.astro';
+import StudentLink from './StudentLink.astro';
 import { ACCESS, PARTS, TYPES } from '../config';
 import { openPageHref, pageHref, downloadHref, downloadName, colorVars, isReady, isLocalFile } from '../lib';
 interface Props { item: CollectionEntry<'items'>; n: number }
@@ -19,6 +20,7 @@ const dl = ready ? downloadHref(d) : '';
     {d.duration && <p class="facts">⏱ {d.duration}</p>}
     <div class="act">
       {ready && isLocalFile(d.url) && d.parts.map(p => <a class="btn part" href={openPageHref(item, p)}>{PARTS[p].icon} {PARTS[p].label}</a>)}
+      <StudentLink item={item} />
       {dl && <a class="btn" href={dl} download={downloadName(d.url)}>⬇ Скачать</a>}
       <a class="btn" href={pageHref(item.id)}>Подробнее</a>
       {d.access !== 'free' && <span class="chip">{ACCESS[d.access]}</span>}
@@ -38,8 +40,8 @@ const dl = ready ? downloadHref(d) : '';
   .sum{margin:0;color:var(--soft);font-size:15px}
   .facts{margin:0;color:var(--soft);font-size:14px}
   .act{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:4px}
-  .act .btn{padding:.5em .9em;font-size:14.5px}
-  @media (pointer:coarse){ .act .btn{min-height:44px;justify-content:center} }
+  .act :global(.btn){padding:.5em .9em;font-size:14.5px}
+  @media (pointer:coarse){ .act :global(.btn){min-height:44px;justify-content:center} }
   .part{background:var(--cb);border-color:var(--cb);color:#fff}
   @media (max-width:760px){ .row{grid-template-columns:1fr} }
 </style>

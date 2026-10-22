@@ -13,8 +13,8 @@
 :root{
   --bg:#F6F3EB; --surface:#FFFDF8; --ink:#203B31; --soft:#5C7065; --line:#D8DFD2; --grid:rgba(37,100,73,.09);
   --accent:#256449; --accent-ink:#FFFFFF;
-  --a:#B94C2D; --a-soft:#F4D8CC;          /* первая дробь — заливка */
-  --b:#2F6F8F; --b-soft:#D3E6EE;          /* вторая дробь — штриховка */
+  --a:#256449; --a-soft:#A8D5BA;          /* первая дробь — заливка, как в примере на главной */
+  --b:#B94C2D; --b-soft:#F6DDD3; --b-mid:#E0937A;   /* вторая дробь — штриховка */
   --n:#7D847C; --n-soft:#E6E8E2;          /* неверный ответ */
   --ok:#256449; --ok-soft:#E1EFE5; --bad:#B3261E; --bad-soft:#F8E1DE; --info-soft:#F1ECDD;
   --font:'Golos Text','Noto Sans Math','Cambria Math','Segoe UI Symbol','Segoe UI',system-ui,-apple-system,sans-serif;
@@ -25,7 +25,7 @@
   :root:not([data-theme="light"]){
     --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
     --accent:#99D7B4; --accent-ink:#153725;
-    --a:#FFAE8C; --a-soft:#9A5038; --b:#8FCBE3; --b-soft:#2D6378; --n:#C9D2C8; --n-soft:#3E5047;
+    --a:#99D7B4; --a-soft:#3F7A5C; --b:#FFAE8C; --b-soft:#5B3326; --b-mid:#C8735A; --n:#C9D2C8; --n-soft:#3E5047;
     --ok:#99D7B4; --ok-soft:#24402F; --bad:#FF9C8F; --bad-soft:#4A2622; --info-soft:#2E3A2F;
     color-scheme:dark;
   }
@@ -33,7 +33,7 @@
 :root[data-theme="dark"]{
   --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
   --accent:#99D7B4; --accent-ink:#153725;
-  --a:#FFAE8C; --a-soft:#9A5038; --b:#8FCBE3; --b-soft:#2D6378; --n:#C9D2C8; --n-soft:#3E5047;
+  --a:#99D7B4; --a-soft:#3F7A5C; --b:#FFAE8C; --b-soft:#5B3326; --b-mid:#C8735A; --n:#C9D2C8; --n-soft:#3E5047;
   --ok:#99D7B4; --ok-soft:#24402F; --bad:#FF9C8F; --bad-soft:#4A2622; --info-soft:#2E3A2F;
   color-scheme:dark;
 }
@@ -75,21 +75,30 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 .icon{padding:.35em .6em;min-width:44px;min-height:44px}
 
 /* доска */
-#board{display:grid;grid-template-rows:auto auto 1fr auto;height:100vh;height:100dvh;padding:12px clamp(12px,3vw,40px)}
-.bbar{display:flex;align-items:center;gap:12px;font-size:24px}
-.bbar .ttl{font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap}
-.btext{font-size:clamp(28px,2.5vw,38px);line-height:1.28;padding:4px 0 8px}
-.btext .q{font-weight:700}
-.btext .a{margin-top:.3em;color:var(--ink)}
-.btext .a ol{margin:.1em 0;padding-left:1.3em}
+#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
+.bbar{display:flex;align-items:center;gap:8px;font-size:20px}
+.bbar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap;margin-right:6px}
+.bbar button{font-size:18px;min-height:44px;padding:.2em .7em;white-space:nowrap}
+.btext{padding:4px 0}
+.btext .q{font-size:clamp(30px,3vw,46px);font-weight:700;line-height:1.25}
+.btext .a{font-size:clamp(28px,2.7vw,42px);line-height:1.3;margin-top:.15em;color:var(--accent);font-weight:600}
+.btext .a ol{margin:.1em 0;padding-left:1.3em;color:var(--ink)}
 .btext .a.hide{visibility:hidden}
 .bstage{min-height:0;display:flex;align-items:center;justify-content:center}
 .bstage svg{width:100%;height:100%;max-height:100%}
-.bctl{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding-top:8px}
-.bctl button{font-size:24px;min-height:56px;padding:.3em 1em}
-.bctl .main{min-width:9em}
-#board.preview .bctl{visibility:hidden}
+.brec{border-top:2px dashed var(--line);padding:6px 0 2px;min-height:calc(2 * 1.9em + 26px);font-size:clamp(26px,2.4vw,36px);line-height:1.9}
+.brec .rt{display:block;font-size:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);line-height:1.2}
+.brec .ln{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bctl{display:flex;gap:12px;justify-content:center;padding-top:8px}
+.bctl button{font-size:26px;min-height:60px;padding:.25em 1em}
+.bctl .main{min-width:10em}
+.bnote{position:fixed;right:clamp(12px,3vw,40px);bottom:96px;max-width:min(520px,90vw);background:var(--surface);border:2px solid var(--accent);
+  border-radius:var(--r);padding:12px 16px;font-size:20px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:4}
+.bnote b{display:block;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+#board.preview .bctl,#board.preview .bbar button{visibility:hidden}
+#board.preview .bnote{display:none}
+@media (max-width:1150px){ .bbar .ttl{visibility:hidden} .bbar button .t{display:none} }
 
 svg .cell{stroke:var(--ink);stroke-width:1.5}
 svg .cell.e{fill:var(--surface)}
@@ -98,19 +107,18 @@ svg .cell.fb{fill:url(#hb)}
 svg .cell.fn{fill:url(#hn)}
 svg .frame{fill:none;stroke:var(--ink);stroke-width:4}
 svg .frame.fa{stroke:var(--a)} svg .frame.fb{stroke:var(--b)} svg .frame.fn{stroke:var(--n)}
-svg .div{stroke:var(--ink);stroke-width:3.5}
-svg .sub{stroke:var(--ink);stroke-width:1.6;stroke-dasharray:6 5}
+svg .div{stroke:var(--ink);stroke-width:5}
+svg .sub{stroke:var(--ink);stroke-width:2;stroke-dasharray:7 5;opacity:.75}
 svg .sub.new{animation:draw .9s ease-out both}
 svg .hl{fill:none;stroke:var(--ink);stroke-width:7}
-svg .lbl text{font:700 32px var(--font);fill:var(--ink);text-anchor:middle}
+svg .lbl text{font:700 34px var(--font);fill:var(--ink);text-anchor:middle}
 svg .lbl line{stroke:var(--ink);stroke-width:3}
 svg .lbl.ca text{fill:var(--a)} svg .lbl.ca line{stroke:var(--a)}
 svg .lbl.cb text{fill:var(--b)} svg .lbl.cb line{stroke:var(--b)}
 svg .lbl.cn text{fill:var(--n)} svg .lbl.cn line{stroke:var(--n)}
-svg .tick{stroke:var(--ink);stroke-width:3}
-svg .ticktext{font:700 26px var(--font);fill:var(--soft);text-anchor:middle}
+svg .whole{font:700 44px var(--font);fill:var(--ink);text-anchor:middle}
 svg .row.new{animation:fade .6s ease-out both}
-@keyframes draw{from{opacity:0;stroke-dashoffset:40}to{opacity:1;stroke-dashoffset:0}}
+@keyframes draw{from{opacity:0;stroke-dashoffset:40}to{opacity:.75;stroke-dashoffset:0}}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion: reduce){ svg .sub.new, svg .row.new, .mode:hover{animation:none;transform:none} }
 
@@ -188,6 +196,26 @@ table.key td:first-child{font-weight:700;white-space:nowrap}
 .fb.bad{background:var(--bad-soft);border-left:6px solid var(--bad)}
 .fb.info{background:var(--info-soft);border-left:6px solid var(--soft)}
 .fb .tag{font-weight:700;display:block;margin-bottom:2px}
+.fb.slim{margin-top:0;margin-bottom:12px;padding:8px 14px;font-size:17px}
+.inrow .check{font-size:20px;min-height:52px}
+.level .lex{font-size:26px;font-weight:700;margin:4px 0}
+.linkbtn{font-size:15px;padding:.2em .6em;border-width:1.5px}
+#home.playing .hhead h2{font-size:18px;color:var(--soft)}
+#home.playing .wrap{padding-top:12px}
+/* телефон: шаг и «Проверить» должны быть в верхней половине — нижнюю закрывает клавиатура */
+@media (max-width:600px){
+  #home.playing .hhead{margin-bottom:6px;flex-wrap:nowrap}
+  #home.playing .hhead h2{display:none}
+  #home.playing .hhead{justify-content:space-between}
+  #home.playing .stats{font-size:15px;gap:2px 12px}
+  #home.playing .card{padding:12px 14px;margin-top:8px !important}
+  .taskx{margin:0 0 6px}
+  .done-steps{font-size:17px;gap:4px;margin-bottom:8px}
+  .stepq{font-size:19px;margin:4px 0 8px}
+  .inrow{font-size:23px;gap:8px 14px}
+  .fb.slim{font-size:15px;padding:6px 10px;margin-bottom:8px}
+  #home.playing .wrap{padding-bottom:50vh}   /* есть куда прокрутить, когда открыта клавиатура */
+}
 .work{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:10px}
 .work li{background:var(--bg);border-radius:10px;padding:10px 14px}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px;z-index:20}
@@ -196,6 +224,7 @@ table.key td:first-child{font-weight:700;white-space:nowrap}
 .overlay h4{margin:16px 0 4px}
 .overlay p{margin:4px 0}
 
+body.student [data-act="menu"],body.student #hLinks{display:none !important}
 @page{size:A4;margin:0}
 @media print{
   html,body{background:#fff !important;color:#000 !important;background-image:none !important;padding:0}
@@ -240,17 +269,20 @@ table.key td:first-child{font-weight:700;white-space:nowrap}
     <button class="icon" type="button" data-act="menu" title="Меню (Esc)" aria-label="Меню">☰</button>
     <span class="ttl">Сложение дробей с разными знаменателями</span>
     <span class="cnt" id="bCnt"></span>
+    <button type="button" data-act="restart" title="С первого шага" aria-label="Заново">↺<span class="t"> Заново</span></button>
+    <button type="button" data-act="numbers" title="Тот же показ с другими дробями" aria-label="Другие числа">🎲<span class="t"> Другие числа</span></button>
+    <button type="button" data-act="notes" id="bNotesBtn" aria-pressed="false" title="Что сказать на этом шаге. Подсказку видно и на проекторе — включайте, когда нужно" aria-label="Подсказка учителю">💬<span class="t"> Учителю</span></button>
+    <button class="icon" type="button" data-act="theme" title="Светлая или тёмная тема" aria-label="Сменить тему">◐</button>
+    <button class="icon" type="button" data-act="full" title="Во весь экран (F)" aria-label="Во весь экран">⛶</button>
   </div>
   <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
   <div class="bstage" id="bStage"></div>
+  <div class="brec"><span class="rt">Запись в тетради</span><div id="bRec"></div></div>
   <div class="bctl">
     <button type="button" data-act="prev" title="Назад (←, PageUp)">← Назад</button>
-    <button type="button" class="main" data-act="next" id="bNext" title="Далее (→, Пробел, PageDown)">Показать</button>
-    <button type="button" data-act="restart">Заново</button>
-    <button type="button" data-act="numbers">Другие числа</button>
-    <button type="button" data-act="theme" title="Светлая или тёмная тема">◐ Тема</button>
-    <button type="button" data-act="full" title="Во весь экран (F)">⛶ Весь экран</button>
+    <button type="button" class="main" data-act="next" id="bNext" title="Далее (→, Пробел, PageDown)">Показать ответ</button>
   </div>
+  <div class="bnote" id="bNote" hidden></div>
 </section>
 
 <!-- раздатка -->
@@ -290,10 +322,10 @@ table.key td:first-child{font-weight:700;white-space:nowrap}
       <button type="button" data-act="help">📖 Справка</button>
     </div>
     <div id="hSetup">
-      <p>Выбери уровень. Решаем по шагам: общий знаменатель → дополнительные множители → числитель → сокращение → целая часть.</p>
-      <div class="levels" id="hLevels"></div>
+      <p>Решаем по шагам: общий знаменатель → дополнительные множители → числитель → сокращение → целая часть. Выбери уровень — и начнём.</p>
       <label style="display:flex;gap:8px;align-items:center;font-size:20px"><input type="checkbox" id="hSub"> и вычитание тоже</label>
-      <div class="hbtns"><button type="button" class="main" id="hGo">Начать</button></div>
+      <div class="levels" id="hLevels"></div>
+      <p class="note" id="hLinks"></p>
     </div>
     <div id="hPlay" hidden>
       <div class="stats" id="hStats"></div>
@@ -303,7 +335,6 @@ table.key td:first-child{font-weight:700;white-space:nowrap}
         <div id="hStep"></div>
         <div id="hFb"></div>
         <div class="hbtns">
-          <button type="button" class="main" id="hCheck">Проверить</button>
           <button type="button" id="hHint">Подсказка (−<span id="hPen"></span>)</button>
           <button type="button" class="main" id="hNext" hidden>Дальше →</button>
         </div>
@@ -364,6 +395,8 @@ const MINUS = '−';
 const P = new URLSearchParams(location.search);
 const MODE = ['board', 'print', 'home'].includes(P.get('mode')) ? P.get('mode') : null;
 const PREVIEW = P.get('preview') === '1';
+// Ссылка для учеников (?mode=home&student=1): только тренажёр — без меню, доски и раздатки
+const STUDENT = P.get('student') === '1';
 const $ = id => document.getElementById(id);
 const store = {
   get(k) { try { return localStorage.getItem('matshag:slozhenie-drobei:' + k); } catch { return null; } },
@@ -410,9 +443,9 @@ const SPECS = {
   sub:     { den: 'shared',  op: MINUS, need: 'any',    title: 'Вычитание' },
 };
 const LEVELS = [
-  { den: 'mult',    title: 'Уровень 1', text: 'Один знаменатель делится на другой: 1/3 + 5/12' },
-  { den: 'coprime', title: 'Уровень 2', text: 'Взаимно простые знаменатели: 2/3 + 3/4' },
-  { den: 'common',  title: 'Уровень 3', text: 'У знаменателей общий делитель: 5/6 + 3/8' },
+  { den: 'mult',    title: 'Уровень 1', text: 'Один знаменатель делится на другой', ex: [[1, 3], [5, 12]] },
+  { den: 'coprime', title: 'Уровень 2', text: 'Взаимно простые знаменатели', ex: [[2, 3], [3, 4]] },
+  { den: 'common',  title: 'Уровень 3', text: 'У знаменателей есть общий делитель', ex: [[5, 6], [3, 8]] },
 ];
 
 // Решение с общим знаменателем D (по умолчанию — наименьшим)
@@ -514,6 +547,7 @@ const plural = (n, one, few, many) => {
 // ================= Экраны =================
 let screen = null;
 function show(name) {
+  if (STUDENT && name !== 'home') return;
   boardStopPreview();
   screen = name;
   ['start', 'board', 'print', 'home'].forEach(s => { $(s).hidden = s !== name; });
@@ -537,49 +571,61 @@ async function toggleFull() {
 }
 
 // ================= 🖥 На доске =================
-// Полоски: x0 — начало, U — длина единицы. Рядом с полоской подпись-дробь.
-const SV = { x0: 150, U: 400, rowH: 96, top: 14, h: 58 };
-const B = { e1: null, e2: null, steps: [], i: 0, phase: 0, timer: 0 };
+// На экране — то, что видит класс: короткий вопрос, ответ, полоски и запись в тетради.
+// Что сказать словами — в подсказке учителю (кнопка «💬 Учителю»).
+// Полоски: x0 — начало, U — длина единицы. Сумма больше 1 рисуется второй полоской под первой:
+// видно «1 целое и ещё 5/12», а полоски не приходится уменьшать.
+const SV = { x0: 150, U: 800, rowH: 84, top: 26, h: 54 };
+const B = { e1: null, e2: null, steps: [], i: 0, phase: 0, timer: 0, notes: false };
 
 function svgLabel(cx, cy, f, cls) {
   const w = Math.max(String(f.n).length, String(f.d).length) * 11 + 12;
   return `<g class="lbl ${cls}"><text x="${cx}" y="${cy - 9}">${f.n}</text>` +
-    `<line x1="${cx - w}" x2="${cx + w}" y1="${cy}" y2="${cy}"/><text x="${cx}" y="${cy + 33}">${f.d}</text></g>`;
+    `<line x1="${cx - w}" x2="${cx + w}" y1="${cy}" y2="${cy}"/><text x="${cx}" y="${cy + 34}">${f.d}</text></g>`;
 }
-// Ряд-полоска: cells — сколько ячеек, filled — сколько закрашено, k — во сколько раз раздроблена каждая доля
+// Ряд-полоска длиной в единицу: cells ячеек, закрашены filled (или parts — [сколько, цвет]),
+// from — с какой ячейки суммы начинается ряд, k — во сколько раз раздроблена каждая доля
 function stripRow(y, r) {
-  const { x0, U, h } = SV, units = r.units || 1, total = r.cells * units;
-  const cw = U / r.cells;
+  const { x0, U, h } = SV, cw = U / r.cells, from = r.from || 0, k = r.k || 1;
   let s = `<g class="row${r.appear ? ' new' : ''}">`;
-  for (let i = 0; i < total; i++) {
+  for (let i = 0; i < r.cells; i++) {
+    const gi = from + i;
     let cls = 'e';
-    if (r.parts) { let acc = 0; for (const [cnt, c] of r.parts) { if (i >= acc && i < acc + cnt) cls = 'f' + c; acc += cnt; } }
-    else if (i < r.filled) cls = 'f' + r.color;
+    if (r.parts) { let acc = 0; for (const [cnt, c] of r.parts) { if (gi >= acc && gi < acc + cnt) cls = 'f' + c; acc += cnt; } }
+    else if (gi < r.filled) cls = 'f' + r.color;
     s += `<rect class="cell ${cls}" x="${x0 + i * cw}" y="${y}" width="${cw}" height="${h}"/>`;
   }
-  const k = r.k || 1;
-  for (let i = 1; i < total; i++) {
+  for (let i = 1; i < r.cells; i++) {
     const x = x0 + i * cw;
-    if (i % k === 0) s += `<line class="div" x1="${x}" x2="${x}" y1="${y}" y2="${y + h}"/>`;
-    else s += `<line class="sub${r.anim ? ' new' : ''}" x1="${x}" x2="${x}" y1="${y}" y2="${y + h}"/>`;
+    s += i % k === 0 ? `<line class="div" x1="${x}" x2="${x}" y1="${y}" y2="${y + h}"/>`
+      : `<line class="sub${r.anim ? ' new' : ''}" x1="${x}" x2="${x}" y1="${y}" y2="${y + h}"/>`;
   }
-  for (let u = 0; u < units; u++) s += `<rect class="frame f${r.color || ''}" x="${x0 + u * U}" y="${y}" width="${U}" height="${h}"/>`;
+  s += `<rect class="frame f${r.color || ''}" x="${x0}" y="${y}" width="${U}" height="${h}"/>`;
   if (r.hl) s += `<rect class="hl" x="${x0}" y="${y - 6}" width="${cw * k}" height="${h + 12}" rx="4"/>`;
-  if (r.ticks) for (let u = 0; u <= units; u++) {
-    const x = x0 + u * U;
-    s += `<line class="tick" x1="${x}" x2="${x}" y1="${y + h}" y2="${y + h + 12}"/><text class="ticktext" x="${x}" y="${y + h + 38}">${u}</text>`;
-  }
-  s += svgLabel(70, y + h / 2 - 8, r.label, 'c' + (r.lc || r.color || ''));
+  if (r.whole) s += `<text class="whole" x="70" y="${y + h / 2 + 15}">${r.whole}</text>`;
+  else if (r.label) s += svgLabel(70, y + h / 2 - 8, r.label, 'c' + (r.lc ?? r.color ?? ''));
   return s + '</g>';
 }
-const rowF = (f, color, opt = {}) => ({ cells: f.d * (opt.k || 1), filled: f.n * (opt.k || 1), color, label: f, ...opt });
+// relabel — подпись уже в новых долях: 2/3 → 8/12
+const rowF = (f, color, opt = {}) => {
+  const k = opt.k || 1;
+  return { cells: f.d * k, filled: f.n * k, color, label: opt.relabel ? { n: f.n * k, d: f.d * k } : f, ...opt };
+};
+// сумма: по полоске на каждую единицу; whole — подписать первую полоску «1», вторую — остатком
+function sumRows(parts, L, { appear, whole } = {}) {
+  const total = parts.reduce((s, [c]) => s + c, 0), units = Math.ceil(total / L);
+  return Array.from({ length: units }, (_, u) => ({
+    cells: L, parts, from: u * L, appear, lc: '',
+    whole: whole && u < units - 1 ? String(1) : null,
+    label: u === 0 && !whole ? { n: total, d: L } : (whole && u === units - 1 ? { n: total - u * L, d: L } : null),
+  }));
+}
 
 function boardSVG(rows) {
-  const ticks = rows.some(r => r.ticks);
-  const H = SV.top + rows.length * SV.rowH + (ticks ? 30 : 0);
+  const H = SV.top * 2 + rows.length * SV.rowH - (SV.rowH - SV.h);
   return `<svg viewBox="0 0 980 ${H}" role="img" aria-label="Полоски дробей" preserveAspectRatio="xMidYMid meet">` +
     `<defs><pattern id="hb" patternUnits="userSpaceOnUse" width="14" height="14" patternTransform="rotate(45)">` +
-    `<rect width="14" height="14" style="fill:var(--b-soft)"/><line x1="3" y1="0" x2="3" y2="14" style="stroke:var(--b);stroke-width:5"/></pattern>` +
+    `<rect width="14" height="14" style="fill:var(--b-soft)"/><line x1="3" y1="0" x2="3" y2="14" style="stroke:var(--b-mid);stroke-width:6"/></pattern>` +
     `<pattern id="hn" patternUnits="userSpaceOnUse" width="12" height="12">` +
     `<rect width="12" height="12" style="fill:var(--n-soft)"/><circle cx="6" cy="6" r="2.2" style="fill:var(--n)"/></pattern></defs>` +
     rows.map((r, i) => stripRow(SV.top + i * SV.rowH, r)).join('') + '</svg>';
@@ -591,80 +637,98 @@ function buildSteps(e1, e2) {
   const nv = { n: a.n + b.n, d: a.d + b.d };
   const big = cmp(a, b) > 0 ? a : b, small = big === a ? b : a;
   const half = { n: 1, d: 2 };
+  const one = d => F({ n: 1, d });
   const ab = (split, o = {}) => [
-    rowF(a, 'a', split ? { k: s.ka, anim: o.anim } : { hl: o.hl }),
-    rowF(b, 'b', split ? { k: s.kb, anim: o.anim } : { hl: o.hl }),
+    rowF(a, 'a', split ? { k: s.ka, anim: o.anim, relabel: o.relabel } : { hl: o.hl }),
+    rowF(b, 'b', split ? { k: s.kb, anim: o.anim, relabel: o.relabel } : { hl: o.hl }),
   ];
-  const sumRow = (appear, ticks) => ({ cells: L, parts: [[n1, 'a'], [n2, 'b']], units: Math.ceil(N / L), label: { n: N, d: L }, lc: '', appear, ticks });
-  const cut = (d, k) => `каждую долю ${F({ n: 1, d })} — на ${k} ${plural(k, 'часть', 'части', 'частей')}`;
-  const tail = (X, g) => {     // сокращение и целая часть
-    let t = '';
-    if (g > 1) t += ` = ${F(X)}`;
-    if (X.n > X.d) t += ` = ${M(toMixed(X))}`;
-    return t;
-  };
+  const parts = [[n1, 'a'], [n2, 'b']];
+  const cut = (d, k) => k === 1 ? `${one(d)} не режем` : `${one(d)} — на ${k} ${plural(k, 'часть', 'части', 'частей')}`;
+  const tail = (X, g) => (g > 1 ? ` = ${F(X)}` : '') + (X.n > X.d ? ` = ${M(toMixed(X))}` : '');
+  // запись в тетради: НОК и цепочка равенств, которая растёт по шагам
+  const recL = `НОК(${a.d}, ${b.d}) = ${L}`;
+  const c1 = `${F(a)} + ${F(b)} = ${F({ n: n1, d: L })} + ${F({ n: n2, d: L })}`;
+  const c2 = `${c1} = ${F({ n: N, d: L })}`;
+  const c3 = c2 + tail(s.res, s.g);
   const steps = [];
   steps.push({
-    q: `Сколько будет ${F(a)} + ${F(b)}? Запишите ответ в тетрадь.`,
-    a: `Часто пишут: ${F(a)} + ${F(b)} = ${F(nv)} — складывают числители и знаменатели. Проверим полосками.`,
-    rows: () => ab(false),
+    q: `Сколько будет ${F(a)} + ${F(b)}?`,
+    a: `Часто отвечают: ${F(nv)}. Проверим!`,
+    note: `Попросите записать ответ в тетрадь, не обсуждая. Многие сложат числители и знаменатели — так получается ${F(nv)}.`,
+    rows: () => ab(false), rec: () => [],
   });
   steps.push({
-    q: `Может ли сумма быть равна ${F(nv)}? Сравните ${F(nv)} со слагаемыми.`,
-    a: `${F(nv)} меньше, чем ${F(big)}, а сумма больше каждого слагаемого. Значит, ${F(nv)} — неверно.` +
-      (cmp(a, half) > 0 && cmp(b, half) > 0 ? ' Обе дроби больше половины — вместе они больше целого.' : ''),
-    rows: ph => ph ? [...ab(false), rowF(nv, 'n', { appear: true })] : ab(false),
+    q: `Может ли сумма быть равна ${F(nv)}?`,
+    a: `Нет: ${F(nv)} меньше, чем ${F(big)}, а мы прибавляли.`,
+    note: `Сумма больше каждого слагаемого, а ${F(nv)} меньше одного из них — значит, так складывать нельзя.` +
+      (cmp(a, half) > 0 && cmp(b, half) > 0 ? ' Ещё довод: обе дроби больше половины, вместе они больше целого.' : ''),
+    rows: ph => ph ? [...ab(false), rowF(nv, 'n', { appear: true })] : ab(false), rec: () => [],
   });
   steps.push({
     q: 'Почему нельзя сразу сложить доли?',
-    a: `Доля первой полоски — ${F({ n: 1, d: a.d })}, второй — ${F({ n: 1, d: b.d })}. Доли разного размера, а складывать можно только одинаковые.`,
-    rows: ph => ab(false, { hl: ph === 1 }),
+    a: `Доли ${one(a.d)} и ${one(b.d)} — разного размера.`,
+    note: 'Покажите выделенные доли: они разной длины. Складывать можно только одинаковые доли — как яблоки с яблоками.',
+    rows: ph => ab(false, { hl: ph === 1 }), rec: () => [],
   });
   steps.push({
-    q: 'На сколько частей разрезать каждую долю, чтобы все доли стали одинаковыми?',
-    a: `Разрежем ${cut(a.d, s.ka)}, ${cut(b.d, s.kb)}. Все доли стали ${F({ n: 1, d: L })}: ${L} делится и на ${a.d}, и на ${b.d}. НОК(${a.d}, ${b.d}) = ${L} — наименьший общий знаменатель.`,
-    rows: ph => ab(ph === 1, { anim: true }),
+    q: 'Как сделать все доли одинаковыми?',
+    a: `${cut(a.d, s.ka)}, ${cut(b.d, s.kb)}. Все доли — ${one(L)}.`,
+    note: `${L} делится и на ${a.d}, и на ${b.d}, меньше такого числа нет: НОК(${a.d}, ${b.d}) = ${L} — наименьший общий знаменатель.`,
+    rows: ph => ab(ph === 1, { anim: true }), rec: ph => ph ? [recL] : [],
   });
   steps.push({
-    q: `Сколько долей ${F({ n: 1, d: L })} в ${F(a)}? А в ${F(b)}?`,
-    a: `${F(a)} = ${F2(a.n + '·' + s.ka, a.d + '·' + s.ka)} = ${F({ n: n1, d: L })}, ${F(b)} = ${F2(b.n + '·' + s.kb, b.d + '·' + s.kb)} = ${F({ n: n2, d: L })}. ${s.ka} и ${s.kb} — дополнительные множители.`,
-    rows: () => ab(true),
+    q: `Сколько долей ${one(L)} в ${F(a)}? А в ${F(b)}?`,
+    a: `${F(a)} = ${F({ n: n1, d: L })}, ${F(b)} = ${F({ n: n2, d: L })}`,
+    note: `Дополнительные множители — ${s.ka} и ${s.kb}: ${F(a)} = ${F2(a.n + '·' + s.ka, a.d + '·' + s.ka)}, ${F(b)} = ${F2(b.n + '·' + s.kb, b.d + '·' + s.kb)}. Числитель и знаменатель умножаем на одно и то же число.`,
+    rows: ph => ab(true, { relabel: ph === 1 }), rec: ph => ph ? [recL, c1] : [recL],
   });
   steps.push({
-    q: `Сколько долей ${F({ n: 1, d: L })} получится вместе?`,
-    a: `${n1} + ${n2} = ${N}, значит ${F(a)} + ${F(b)} = ${F({ n: n1, d: L })} + ${F({ n: n2, d: L })} = ${F({ n: N, d: L })}.`,
-    rows: ph => ph ? [...ab(true), sumRow(true, true)] : ab(true),
+    q: `Сколько долей ${one(L)} вместе?`,
+    a: `${n1} + ${n2} = ${N}, всего ${F({ n: N, d: L })}`,
+    note: 'Числители складываем, знаменатель оставляем: доли уже одинаковые.',
+    rows: ph => ph ? [...ab(true, { relabel: true }), ...sumRows(parts, L, { appear: true })] : ab(true, { relabel: true }),
+    rec: ph => [recL, ph ? c2 : c1],
   });
   if (s.g > 1 || N > L) {
+    const improper = s.res.n > s.res.d;
     steps.push({
-      q: N > L ? `${F({ n: N, d: L })} — больше целого. Как записать ответ?` : `Можно ли записать ${F({ n: N, d: L })} проще?`,
-      a: `${F({ n: N, d: L })}${tail(s.res, s.g)}` + (s.g > 1 ? ` — сократили на ${s.g}` : '') +
-        (s.res.n > s.res.d ? `${s.g > 1 ? ',' : ' —'} выделили целую часть: ${s.res.n} : ${s.res.d} = ${s.mixed.w} (ост. ${s.mixed.n})` : '') + '.',
-      rows: () => [...ab(true), sumRow(false, true)],
+      q: improper ? `${F({ n: N, d: L })} — больше целого. Как записать ответ?` : `Можно ли записать ${F({ n: N, d: L })} проще?`,
+      a: `${F({ n: N, d: L })}${tail(s.res, s.g)}`,
+      note: (s.g > 1 ? `Числитель и знаменатель делятся на ${s.g} — сокращаем. ` : '') +
+        (improper ? `Целая часть: ${s.res.n} : ${s.res.d} = ${s.mixed.w} (ост. ${s.mixed.n}). На полосках — одно целое и ещё ${F({ n: s.mixed.n, d: s.mixed.d })}.` : ''),
+      rows: ph => [...ab(true, { relabel: true }), ...sumRows(parts, L, { whole: ph === 1 && N > L })],
+      rec: ph => [recL, ph ? c3 : c2],
     });
   }
   steps.push({
-    q: 'Как сложить дроби с разными знаменателями? Сформулируйте правило.',
-    a: '<ol><li>Привести дроби к наименьшему общему знаменателю.</li><li>Сложить числители, знаменатель оставить.</li><li>Сократить, выделить целую часть.</li></ol>',
-    rows: () => [...ab(true), sumRow(false, true)],
+    q: 'Как сложить дроби с разными знаменателями?',
+    a: '<ol><li>Привести к наименьшему общему знаменателю.</li><li>Сложить числители, знаменатель оставить.</li><li>Сократить, выделить целую часть.</li></ol>',
+    note: 'Пусть класс сам сформулирует правило по записи в тетради, потом откройте его.',
+    rows: () => [], rec: () => [recL, c3],
   });
   // второй пример: произведение знаменателей или НОК
   const [c, d] = e2, s2 = solve({ a: c, b: d, op: '+' }), L2 = s2.L;
-  const ab2 = split => [rowF(c, 'a', split ? { k: s2.ka, anim: true } : {}), rowF(d, 'b', split ? { k: s2.kb, anim: true } : {})];
+  const m1 = c.n * s2.ka, m2 = d.n * s2.kb;
+  const ab2 = split => [rowF(c, 'a', split ? { k: s2.ka, anim: true, relabel: true } : {}), rowF(d, 'b', split ? { k: s2.kb, anim: true, relabel: true } : {})];
   steps.push({
-    q: `${F(c)} + ${F(d)}. Какой общий знаменатель взять: ${c.d * d.d} = ${c.d} · ${d.d} или ${L2}?`,
-    a: `Подходят оба: делятся и на ${c.d}, и на ${d.d}. Но ${L2} меньше — числа меньше: ${F(c)} + ${F(d)} = ${F({ n: c.n * s2.ka, d: L2 })} + ${F({ n: d.n * s2.kb, d: L2 })} = ${F({ n: s2.N, d: L2 })}${tail(s2.res, s2.g)}.`,
-    rows: ph => ph ? [...ab2(true), { cells: L2, parts: [[c.n * s2.ka, 'a'], [d.n * s2.kb, 'b']], units: Math.ceil(s2.N / L2), label: { n: s2.N, d: L2 }, appear: true, ticks: true }] : ab2(false),
+    q: `${F(c)} + ${F(d)}. Общий знаменатель ${c.d * d.d} или ${L2}?`,
+    a: `Подходят оба, но ${L2} меньше — числа проще.`,
+    note: `${c.d * d.d} = ${c.d} · ${d.d} всегда делится на оба знаменателя, но наименьший общий знаменатель — НОК(${c.d}, ${d.d}) = ${L2}. С ним меньше вычислений и не придётся сокращать в конце.`,
+    rows: ph => ph ? [...ab2(true), ...sumRows([[m1, 'a'], [m2, 'b']], L2, { appear: true })] : ab2(false),
+    rec: ph => ph ? [`НОК(${c.d}, ${d.d}) = ${L2}`, `${F(c)} + ${F(d)} = ${F({ n: m1, d: L2 })} + ${F({ n: m2, d: L2 })} = ${F({ n: s2.N, d: L2 })}${tail(s2.res, s2.g)}`] : [],
   });
   // вычитание на первом примере
   const x = big.n * (L / big.d), y = small.n * (L / small.d), sd = solve({ a: big, b: small, op: MINUS });
+  const cb = big === a ? 'a' : 'b', cs = small === a ? 'a' : 'b';
   steps.push({
-    q: `А как найти разность ${F(big)} ${MINUS} ${F(small)}?`,
-    a: `Так же: общий знаменатель, потом вычитаем числители: ${F(big)} ${MINUS} ${F(small)} = ${F({ n: x, d: L })} ${MINUS} ${F({ n: y, d: L })} = ${F({ n: x - y, d: L })}${tail(sd.res, sd.g)}.`,
+    q: `А как найти ${F(big)} ${MINUS} ${F(small)}?`,
+    a: `Так же: ${F({ n: x, d: L })} ${MINUS} ${F({ n: y, d: L })} = ${F({ n: x - y, d: L })}${tail(sd.res, sd.g)}`,
+    note: 'Приводим к общему знаменателю и вычитаем числители, знаменатель оставляем.',
     rows: ph => {
-      const r = [rowF(big, big === a ? 'a' : 'b', { k: L / big.d }), rowF(small, small === a ? 'a' : 'b', { k: L / small.d })];
-      return ph ? [...r, { cells: L, filled: x - y, color: big === a ? 'a' : 'b', label: { n: x - y, d: L }, appear: true }] : r;
+      const r = [rowF(big, cb, { k: L / big.d, relabel: true }), rowF(small, cs, { k: L / small.d, relabel: true })];
+      return ph ? [...r, { cells: L, filled: x - y, color: cb, label: { n: x - y, d: L }, appear: true }] : r;
     },
+    rec: ph => ph ? [`${F(big)} ${MINUS} ${F(small)} = ${F({ n: x, d: L })} ${MINUS} ${F({ n: y, d: L })} = ${F({ n: x - y, d: L })}${tail(sd.res, sd.g)}`] : [],
   });
   return steps;
 }
@@ -689,10 +753,14 @@ function renderBoard() {
   $('bQ').innerHTML = st.q;
   $('bA').innerHTML = st.a;
   $('bA').classList.toggle('hide', B.phase === 0);
-  $('bStage').innerHTML = boardSVG(st.rows(B.phase));
-  const last = B.i === B.steps.length - 1 && B.phase === 1;
-  $('bNext').textContent = B.phase === 0 ? 'Показать' : 'Далее →';
-  $('bNext').disabled = last;
+  const rows = st.rows(B.phase);
+  $('bStage').innerHTML = rows.length ? boardSVG(rows) : '';
+  $('bRec').innerHTML = st.rec(B.phase).map(l => `<div class="ln">${l}</div>`).join('');
+  $('bNote').innerHTML = `<b>Учителю</b>${st.note}`;
+  $('bNote').hidden = !B.notes;
+  $('bNotesBtn').setAttribute('aria-pressed', String(B.notes));
+  $('bNext').textContent = B.phase === 0 ? 'Показать ответ' : 'Далее →';
+  $('bNext').disabled = B.i === B.steps.length - 1 && B.phase === 1;
 }
 function boardNext() {
   if (B.phase === 0) B.phase = 1;
@@ -705,6 +773,7 @@ function boardPrev() {
   renderBoard();
 }
 function boardGo(i, phase = 0) { B.i = Math.max(0, Math.min(i, B.steps.length - 1)); B.phase = phase ? 1 : 0; renderBoard(); }
+function boardNotes() { B.notes = !B.notes; store.set('notes', B.notes ? 1 : 0); renderBoard(); }
 // превью на сайте: доска сама идёт по первым шагам — полоски дробятся и складываются
 function boardStartPreview() {
   $('board').classList.add('preview');
@@ -754,11 +823,16 @@ function keyHTML(vs) {
     ${vs.map(v => `<tr><td>${v.label}</td>${v.answers.map(m => `<td>${M(m)}</td>`).join('')}<td><b>${v.word}</b></td></tr>`).join('')}
     </table><p style="font-size:10pt">Слово сложилось — все ответы верны. Ключ всегда можно восстановить по номеру варианта в режиме «Раздатка».</p></div>`;
 }
+// Номера и настройки запоминаются в браузере: напечатал листы, закрыл вкладку — ключ потом
+// печатается по тем же номерам. Без localStorage номера просто будут новыми.
 function renderPrint() {
   if (!printNums.length) {
-    printNums = newNumbers(CONFIG.print.variants);
+    const saved = parseNums(store.get('printNums') || '').nums;
+    printNums = saved.length ? saved : newNumbers(CONFIG.print.variants);
     $('pCount').value = printNums.length;
-    $('pSpace').checked = CONFIG.print.space;
+    $('pSpace').checked = store.get('printSpace') ? store.get('printSpace') === '1' : CONFIG.print.space;
+    $('pTwo').checked = store.get('printTwo') === '1';
+    if (saved.length) $('pMsg').textContent = 'Открыты номера, с которыми вы работали в прошлый раз. Для другого класса нажмите «Новые номера».';
   }
   $('pNums').value = printNums.map(n => GEN_VERSION + '-' + n).join(', ');
   drawSheets();
@@ -766,6 +840,9 @@ function renderPrint() {
 function drawSheets() {
   const vs = printNums.map(n => makeVariant(n));
   const space = $('pSpace').checked, two = $('pTwo').checked && !space;
+  store.set('printNums', printNums.join(','));
+  store.set('printSpace', space ? 1 : 0);
+  store.set('printTwo', $('pTwo').checked ? 1 : 0);
   $('pTwo').disabled = space;
   let html = '';
   if (two) for (let i = 0; i < vs.length; i += 2)
@@ -797,14 +874,31 @@ function homeSetup() {
   $('hSetup').hidden = false; $('hPlay').hidden = true; $('hEnd').hidden = true;
   $('hLevels').innerHTML = LEVELS.map((L, i) => {
     const best = +store.get('best' + i) || 0;
-    return `<button type="button" class="level" data-level="${i}" aria-pressed="${i === H.level}"><b>${L.title}</b>${L.text}<small>Рекорд: ${best}</small></button>`;
+    const ex = T({ a: { n: L.ex[0][0], d: L.ex[0][1] }, b: { n: L.ex[1][0], d: L.ex[1][1] }, op: '+' });
+    return `<button type="button" class="level" data-level="${i}"><b>${L.title} →</b>${L.text}<span class="lex">${ex}</span><small>Рекорд: ${best}</small></button>`;
   }).join('');
   $('hSub').checked = H.sub;
+  $('home').classList.remove('playing');
+  // учителю: ссылка сразу на уровень, чтобы отправить её в чат класса
+  $('hLinks').innerHTML = 'Учителю — ссылка сразу на уровень: ' + LEVELS.map((L, i) =>
+    `<button type="button" class="linkbtn" data-copy="${i + 1}">уровень ${i + 1}</button>`).join(' ') + ' <span id="hCopied"></span>';
+}
+function levelLink(n) {
+  let loc = location;
+  try { if (window.top !== window && window.top.location.origin === location.origin) loc = window.top.location; } catch {}
+  return `${loc.origin}${loc.pathname}?mode=home&level=${n}${$('hSub').checked ? '' : '&sub=0'}&student=1`;
+}
+async function copyLevelLink(n) {
+  const url = levelLink(n);
+  let ok = false;
+  try { await navigator.clipboard.writeText(url); ok = true; } catch {}
+  $('hCopied').innerHTML = ok ? `Скопировано: ${url}` : `Скопируйте ссылку: <b>${url}</b>`;
 }
 function homeStart({ level = H.level, sub = H.sub, seed } = {}) {
   Object.assign(H, { level, sub, n: 0, score: 0, streak: 0, clean: 0, cats: {}, repeat: null, finished: false, history: [],
     rnd: mulberry32(seed ?? ((Math.random() * 4294967296) >>> 0)) });
   $('hSetup').hidden = true; $('hEnd').hidden = true; $('hPlay').hidden = false;
+  $('home').classList.add('playing');
   homeNewTask();
 }
 function homeNewTask() {
@@ -836,7 +930,7 @@ function homeCheck(values) {
     const v = values.v, L = lcm(a.d, b.d);
     if (v > 0 && v % a.d === 0 && v % b.d === 0) {
       H.D = v;
-      r = v === L ? { ok: true, msg: `Верно: ${L} делится и на ${a.d}, и на ${b.d}, меньше такого числа нет.` }
+      r = v === L ? { ok: true, msg: L === Math.max(a.d, b.d) ? `Верно: ${L} делится на ${Math.min(a.d, b.d)} — общим знаменателем подходит сам ${L}.` : `Верно: ${L} делится и на ${a.d}, и на ${b.d}, меньше такого числа нет.` }
         : { ok: true, msg: `Подходит: ${v} делится и на ${a.d}, и на ${b.d}. Но наименьший общий знаменатель — ${L}: с ним числа меньше.` };
     } else {
       H.D = L;
@@ -884,6 +978,7 @@ function homeCheck(values) {
 function homeAfterCheck(r) {
   const lastStep = H.si === H.steps.length - 1;
   if (lastStep) homeFinishTask();
+  else if (r.ok) { H.si++; H.wait = false; H.hintLevel = 0; }
   homeRender(r);
 }
 function homeFinishTask() {
@@ -974,14 +1069,17 @@ function homeRender(fb) {
     if (step === 'reduce') html = `<div class="stepq">Шаг ${no}. Сократи дробь.</div><div class="inrow">${F(rawF())} = ${fracIn()}</div>`;
     if (step === 'whole') html = `<div class="stepq">Шаг ${no}. Выдели целую часть.</div><div class="inrow">${F(H.s.res)} = ${numIn('w', 'целая часть')} ${fracIn()}</div>`;
   }
-  $('hStep').innerHTML = html;
+  if (html) html = html.replace(/<\/div>$/, ' <button type="button" class="main check" data-act="check">Проверить</button></div>');
+  // верный прошлый шаг — короткой строкой над новым шагом
+  const slim = fb && fb.ok && !H.taskDone;
+  $('hStep').innerHTML = (slim ? `<div class="fb ok slim">✓ ${fb.msg}</div>` : '') + html;
   let fbHtml = '';
   if (fb && fb.hint) fbHtml = `<div class="fb info"><span class="tag">Подсказка</span>${fb.hint}</div>`;
   else if (fb && fb.empty) fbHtml = `<div class="fb info">${fb.msg}</div>`;
-  else if (fb) fbHtml = `<div class="fb ${fb.ok ? 'ok' : 'bad'}"><span class="tag">${fb.ok ? 'Верно' : 'Ошибка'}</span>${fb.ok ? fb.msg.replace(/^Верно: /, '') : fb.msg}</div>`;
+  else if (fb && !slim) fbHtml = `<div class="fb ${fb.ok ? 'ok' : 'bad'}"><span class="tag">${fb.ok ? 'Верно' : 'Ошибка'}</span>${fb.ok ? fb.msg.replace(/^Верно: /, '') : fb.msg}</div>`;
   if (H.taskDone) fbHtml += `<div class="fb ${H.errs ? 'info' : 'ok'}"><span class="tag">${H.errs ? 'Задание решено с ошибками' : `Решено! +${H.gain}`}</span>${T(t)} = ${M(H.s.mixed)}${H.errs ? '. Дальше — такое же задание с другими числами.' : ''}</div>`;
   $('hFb').innerHTML = fbHtml;
-  $('hCheck').hidden = H.wait; $('hHint').hidden = H.wait; $('hNext').hidden = !H.wait;
+  $('hHint').hidden = H.wait; $('hNext').hidden = !H.wait;
   $('hNext').textContent = H.taskDone ? (H.n >= CONFIG.home.round ? 'Итоги →' : 'Следующее задание →') : 'Дальше →';
   if (!PREVIEW) {
     const first = $('hStep').querySelector('input');
@@ -1000,7 +1098,8 @@ document.addEventListener('click', e => {
   const el = e.target.closest('[data-go],[data-act],[data-level]');
   if (!el) return;
   if (el.dataset.go) return show(el.dataset.go);
-  if (el.dataset.level) { H.level = +el.dataset.level; return homeSetup(); }
+  if (el.dataset.level) { H.level = +el.dataset.level; H.sub = $('hSub').checked; return homeStart(); }
+  if (el.dataset.copy) return copyLevelLink(+el.dataset.copy);
   const act = el.dataset.act;
   if (act === 'menu') { if (document.fullscreenElement) toggleFull(); show('start'); }
   if (act === 'next') boardNext();
@@ -1009,6 +1108,8 @@ document.addEventListener('click', e => {
   if (act === 'numbers') { boardNumbers(true); renderBoard(); }
   if (act === 'theme') toggleTheme();
   if (act === 'full') toggleFull();
+  if (act === 'notes') boardNotes();
+  if (act === 'check') homeCheckClick();
   if (act === 'help') $('help').hidden = false;
   if (act === 'help-close') $('help').hidden = true;
   if (act === 'again') homeStart();
@@ -1017,12 +1118,15 @@ document.addEventListener('click', e => {
 });
 $('help').addEventListener('click', e => { if (e.target === $('help')) $('help').hidden = true; });
 $('themeBtn').addEventListener('click', toggleTheme);
-$('hGo').addEventListener('click', () => { H.sub = $('hSub').checked; homeStart(); });
-$('hCheck').addEventListener('click', () => { const r = homeCheck(homeCollect()); if (r && r.empty) homeRender(r); });
+function homeCheckClick() { const r = homeCheck(homeCollect()); if (r && r.empty) homeRender(r); }
 $('hHint').addEventListener('click', homeHint);
 $('hNext').addEventListener('click', homeContinue);
-$('hStep').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('hCheck').click(); } });
-$('pNew').addEventListener('click', () => { printNums = newNumbers(Math.max(1, Math.min(40, +$('pCount').value || CONFIG.print.variants))); renderPrint(); });
+// открылась клавиатура телефона — подтягиваем «Проверить» в видимую часть экрана
+window.visualViewport?.addEventListener('resize', () => {
+  if (screen === 'home' && !PREVIEW) $('hStep').querySelector('.check')?.scrollIntoView({ block: 'nearest' });
+});
+$('hStep').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); homeCheckClick(); } });
+$('pNew').addEventListener('click', () => { $('pMsg').textContent = ''; printNums = newNumbers(Math.max(1, Math.min(40, +$('pCount').value || CONFIG.print.variants))); renderPrint(); });
 $('pCount').addEventListener('change', () => $('pNew').click());
 $('pSpace').addEventListener('change', drawSheets);
 $('pTwo').addEventListener('change', drawSheets);
@@ -1036,10 +1140,10 @@ $('pPrintKey').addEventListener('click', () => printNow('key'));
 addEventListener('afterprint', () => document.body.classList.remove('print-key', 'print-sheets'));
 
 document.addEventListener('keydown', e => {
-  if (e.target.matches('input') && e.key !== 'Escape') return;
+  if (e.target.matches?.('input') && e.key !== 'Escape') return;
   if (e.key === 'Escape') {
     if (!$('help').hidden) { $('help').hidden = true; return; }
-    if (screen !== 'start') show('start');
+    if (screen !== 'start' && !STUDENT) show('start');
     return;
   }
   if (screen === 'home' && e.key === 'Enter' && H.wait) { e.preventDefault(); homeContinue(); return; }
@@ -1053,18 +1157,24 @@ document.addEventListener('keydown', e => {
 (() => {
   const th = store.get('theme');
   if (th === 'dark' || th === 'light') document.documentElement.dataset.theme = th;
+  B.notes = store.get('notes') === '1';
   $('helpEx1').innerHTML = `${F({ n: 1, d: 4 })} = ${F2('1 · 3', '4 · 3')} = ${F({ n: 3, d: 12 })}`;
   $('helpEx2').innerHTML = `${F({ n: 9, d: 12 })} = ${F({ n: 3, d: 4 })}`;
   $('helpEx3').innerHTML = `${F({ n: 17, d: 12 })} = ${M({ w: 1, n: 5, d: 12 })}`;
+  const lvl = +P.get('level');
+  if (STUDENT) { document.body.classList.add('student'); H.sub = P.get('sub') !== '0'; }
   if (PREVIEW) { show('board'); boardStartPreview(); }
-  else show(MODE || 'start');
+  else if ((MODE === 'home' || STUDENT) && lvl >= 1 && lvl <= LEVELS.length) {
+    H.level = lvl - 1; H.sub = P.get('sub') !== '0';
+    show('home'); homeStart();
+  } else show(STUDENT ? 'home' : MODE || 'start');
 })();
 
 // Для автотестов и снимка превью
 window.APP = {
   CONFIG, GEN_VERSION, SPECS, LEVELS, KINDS_V1, WORDS_V1,
   gcd, lcm, solve, genTask, traps, toMixed, formKey, makeVariant, taskRnd, mulberry32, parseNums,
-  show, get screen() { return screen; },
+  STUDENT, show, get screen() { return screen; },
   board: { get steps() { return B.steps; }, get i() { return B.i; }, get phase() { return B.phase; },
     next: boardNext, prev: boardPrev, go: boardGo, numbers: random => { boardNumbers(random); renderBoard(); }, poster: boardPoster },
   print: { draw: drawSheets, set nums(v) { printNums = v; } },
