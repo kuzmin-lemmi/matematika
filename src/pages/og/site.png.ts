@@ -13,7 +13,7 @@ export const GET: APIRoute = async () => {
       <text x="72" y="250" font-size="62" font-weight="700">Покажи.</text>
       <text x="72" y="325" font-size="62" font-weight="700">Дай решить.</text>
       <text x="72" y="400" font-size="62" font-weight="700" fill="#256449">Разбери.</text>
-      <text x="74" y="492" font-size="28" fill="#5C7065">Математика для урока · 5–8 классы</text>
+      <text x="74" y="492" font-size="28" fill="#5C7065">Математика для урока · 5–9 классы</text>
       <text x="74" y="548" font-size="26" fill="#5C7065">На доске / На бумаге / Дома</text>
     </g>
     <g stroke="#256449" stroke-width="5" fill="none"><path d="M835 170H945V280H835ZM971 170H1081V280H971ZM835 306H945V416H835Z"/><path d="M971 306H1081V416H971Z" fill="#256449"/></g>

@@ -16,7 +16,7 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   <section class="intro">
     <div class="wrap intro-in">
       <div class="intro-copy">
-        <p class="eyebrow">Математика для урока · 5–8 классы</p>
+        <p class="eyebrow">Математика для урока · 5–9 классы</p>
         <h1>Покажи.<br />Дай решить.<br /><span>Разбери.</span></h1>
         <p class="lead">Одна тема — на доске,<br />на бумаге и дома.</p>
         <div class="modes" aria-label="Режимы материалов">
@@ -125,7 +125,7 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   .lesson-bottom a{font-weight:600;text-decoration:none;padding:8px 0}
   .status{color:var(--soft);background:var(--tint);padding:3px 8px;border-radius:4px}
   .books{color:var(--soft);font-size:13px;margin:0}
-  .class-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .class-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
   .class-link{display:flex;align-items:center;gap:14px;padding:24px 16px;text-decoration:none;min-width:0}
   .class-link+.class-link{border-left:1px solid var(--line)}
   .class-link b{font:400 42px/1 Georgia,serif;color:var(--accent)}
@@ -136,7 +136,7 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   .new-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:center;padding:24px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
   .new-preview{border-radius:8px;overflow:hidden}
   .new-in h2{margin-top:12px}
-  @media(max-width:800px){.intro-in{grid-template-columns:1fr;gap:36px}.intro{padding-top:36px}.notebook{max-width:560px;width:100%;justify-self:center}.intro-copy{max-width:560px;width:100%;justify-self:center}.lesson-grid{grid-template-columns:1fr}.lesson h3{margin-top:12px}.lesson-bottom{margin-top:16px}.class-grid{grid-template-columns:1fr 1fr}.class-link:nth-child(3){border-left:0}.class-link:nth-child(n+3){border-top:1px solid var(--line)}.new-in{grid-template-columns:1fr}.section-heading{align-items:start;flex-wrap:wrap;gap:12px}}
+  @media(max-width:800px){.intro-in{grid-template-columns:1fr;gap:36px}.intro{padding-top:36px}.notebook{max-width:560px;width:100%;justify-self:center}.intro-copy{max-width:560px;width:100%;justify-self:center}.lesson-grid{grid-template-columns:1fr}.lesson h3{margin-top:12px}.lesson-bottom{margin-top:16px}.class-grid{grid-template-columns:1fr 1fr}.class-link:nth-child(odd){border-left:0}.class-link:last-child:nth-child(odd){grid-column:span 2}.class-link:nth-child(n+3){border-top:1px solid var(--line)}.new-in{grid-template-columns:1fr}.section-heading{align-items:start;flex-wrap:wrap;gap:12px}}
   @media(max-width:380px){.paper-footer{align-items:flex-start;flex-direction:column}.paper-footer button{width:100%}.modes{gap:14px}.notebook{padding:20px}.class-link{padding:20px 8px;gap:10px}.class-link>span:last-child{display:none}}
   @media(prefers-reduced-motion:reduce){.lesson{transition:none}}
 </style>

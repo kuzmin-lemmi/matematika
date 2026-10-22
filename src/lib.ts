@@ -17,7 +17,7 @@ export const klassHref = (g: number) => `${import.meta.env.BASE_URL}klass/${g}/`
 export const klassName = (g: number) => `${g} класс`;
 export const gradeLabel = (g: number[]) => g.length ? g.map(x => `${x} класс`).join(', ') : '';
 export const subjectLabel = (s?: keyof typeof SUBJECTS) => s ? SUBJECTS[s].label : '';
-// Предметы класса по программе: 5–6 — математика, 7–8 — алгебра и геометрия
+// Предметы класса по программе: 5–6 — математика, 7–9 — алгебра и геометрия
 export const gradeSubjects = (g: number): (keyof typeof SUBJECTS)[] => g <= 6 ? ['math'] : ['algebra', 'geometry'];
 // Скачивание одним HTML-файлом — только для опубликованных бесплатных материалов, лежащих на сайте
 export const downloadHref = (d: { url: string; access: string }) =>

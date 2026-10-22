@@ -21,7 +21,7 @@ const items = defineCollection({
     duration: z.string().optional(),          // «5–10 минут на доске»
     tags: z.array(z.string()).default([]),
     repo: z.string().optional(),
-    order: z.number().default(1000),          // 5 класс — 100–199, 6 — 200–299, 7 — 300–399, 8 — 400–499, курсы — 900+
+    order: z.number().default(1000),          // 5 класс — 100–199, 6 — 200–299, 7 — 300–399, 8 — 400–499, 9 — 500–599, курсы — 900+
     video: z.string().optional(),             // ролик: 'posts/<slug>.mp4' (без звука, 15–30 с)
     poster: z.string().optional(),            // картинка из материала: 'posts/<slug>.jpg' (npm run posters)
     featured: z.boolean().default(false),     // при равных датах added — показать в блоке «Новое» первым

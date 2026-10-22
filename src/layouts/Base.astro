@@ -53,7 +53,7 @@ const path = Astro.url.pathname;
   <main id="main" tabindex="-1"><slot /></main>
   <footer>
     <div class="wrap foot">
-      <span class="brand"><Logo size={28} /><b>{SITE.short}</b> · материалы по математике для 5–8 классов · © {new Date().getFullYear()} {SITE.author}</span>
+      <span class="brand"><Logo size={28} /><b>{SITE.short}</b><span class="dot" aria-hidden="true">·</span><span>материалы по математике для 5–9 классов · © {new Date().getFullYear()} {SITE.author}</span></span>
       <span class="links">
         <a href={SITE.github}>GitHub</a>
         {SITE.vk && <a href={SITE.vk}>ВКонтакте</a>}
@@ -159,5 +159,6 @@ const path = Astro.url.pathname;
   .brand{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
   .brand b{color:var(--ink)}
   .brand svg{color:var(--accent)}
+  @media (max-width:600px){ .brand .dot{display:none} .brand>span:last-child{flex-basis:100%} }
   .links{display:flex;gap:16px;align-items:center}
 </style>
