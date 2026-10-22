@@ -1,5 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
+import { Image } from 'astro:assets';
+import heroUnderstanding from '../assets/hero-understanding.png';
 import Preview from '../components/Preview.astro';
 import ShelfCard from '../components/ShelfCard.astro';
 import { getCollection } from 'astro:content';
@@ -14,14 +16,29 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
 ---
 <Base>
   <section class="intro">
+    <div class="hero-art" aria-hidden="true">
+      <Image src={heroUnderstanding} alt="" widths={[640, 960, 1440, 1920]} sizes="100vw" format="webp" quality={82} loading="eager" fetchpriority="high" />
+    </div>
     <div class="wrap intro-in">
       <div class="intro-copy">
-        <p class="eyebrow">Математика для урока · 5–9 классы</p>
-        <h1>Покажи.<br />Дай решить.<br /><span>Разбери.</span></h1>
-        <p class="lead">Одна тема — на доске,<br />на бумаге и дома.</p>
+        <p class="eyebrow">Материалы для 5–9 классов</p>
+        <h1>{SITE.name}</h1>
+        <p class="lead">Покажи. Дай решить.<br /><span>Разбери.</span></p>
+        <p class="intro-description">Одна тема — на доске,<br />на бумаге и дома.</p>
+        <a class="btn primary hero-cta" href={`${base}catalog/`}>К материалам <span aria-hidden="true">→</span></a>
         <div class="modes" aria-label="Режимы материалов">
           {Object.entries(PARTS).map(([key, part]) => <a href={`${base}catalog/?part=${key}`}>{part.label} <span aria-hidden="true">↗</span></a>)}
         </div>
+      </div>
+    </div>
+  </section>
+  <section class="walkthrough" id="kak-rabotaet" aria-labelledby="walkthrough-title">
+    <div class="wrap walkthrough-in">
+      <div class="walkthrough-copy">
+        <p class="eyebrow">Маленький пример</p>
+        <h2 id="walkthrough-title">От вопроса —<br /> к пониманию</h2>
+        <p>Сначала вопрос классу. Затем наглядный шаг. В конце — запись решения.</p>
+        <p class="walkthrough-note">Попробуй разобрать сложение дробей по шагам.</p>
       </div>
       <div class="notebook squared" aria-label="Пример пошагового разбора сложения дробей">
         <div class="paper-heading"><span class="eyebrow">Сложение дробей</span><span class="example">Пример</span></div>
@@ -86,15 +103,26 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
 </script>
 <style>
   .eyebrow{margin:0;font-size:11px;line-height:1.5;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
-  .intro{padding:clamp(40px,7vw,84px) 0 50px}
-  .intro-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,6vw,90px);align-items:center}
-  h1{font-size:clamp(46px,6.5vw,80px);line-height:1.02;letter-spacing:-.055em;margin:17px 0 22px;font-weight:700}
-  h1 span{color:var(--accent)}
-  .lead{font-size:clamp(18px,2.1vw,23px);line-height:1.45;color:var(--soft);margin:0}
-  .modes{display:flex;gap:20px;flex-wrap:wrap;margin-top:28px}
+  .intro{position:relative;isolation:isolate;overflow:hidden;padding:0;background:var(--bg)}
+  .intro-in{position:relative;z-index:1;display:flex;align-items:center;min-height:560px;padding-top:58px;padding-bottom:58px}
+  .intro-copy{width:min(100%,490px)}
+  .hero-art{position:absolute;inset:0;max-width:1600px;margin:auto;pointer-events:none;mask-image:linear-gradient(to right,transparent 8%,#000 42%,#000 96%,transparent)}
+  .hero-art::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,var(--bg) 10%,transparent 62%),linear-gradient(to top,var(--bg),transparent 12%)}
+  .hero-art :global(img){display:block;width:100%;height:100%;object-fit:cover;object-position:center 53%}
+  h1{font-size:clamp(58px,7vw,88px);line-height:1;letter-spacing:-.055em;margin:19px 0 20px;font-weight:800}
+  .lead{font-size:clamp(24px,2.6vw,32px);line-height:1.2;font-weight:700;letter-spacing:-.03em;margin:0}
+  .lead span{color:var(--accent)}
+  .intro-description{font-size:17px;line-height:1.55;color:var(--soft);margin:20px 0 23px}
+  .hero-cta{min-height:46px;font-size:15px}
+  .modes{display:flex;gap:20px;flex-wrap:wrap;margin-top:20px}
   .modes a{display:inline-flex;align-items:center;gap:8px;min-height:36px;text-decoration:none;font-size:13px;font-weight:600;border-bottom:2px solid var(--line)}
   .modes a:hover{border-color:var(--accent)}
   .modes a span{color:var(--soft)}
+  .walkthrough{padding-top:54px;padding-bottom:40px}
+  .walkthrough-in{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(30px,6vw,90px);align-items:center}
+  .walkthrough-copy h2{font-size:clamp(30px,3.2vw,42px);line-height:1.12;font-weight:700;letter-spacing:-.04em;margin:14px 0 20px}
+  .walkthrough-copy>p:not(.eyebrow){max-width:33ch;font-size:17px;color:var(--soft);line-height:1.6}
+  .walkthrough-copy>p.walkthrough-note{font-size:14px;margin-top:22px}
   .notebook{padding:clamp(22px,3vw,36px);border:1px solid var(--line);border-radius:4px 22px 22px 4px;background-color:var(--surface);box-shadow:7px 8px 0 var(--line);transform:rotate(1deg)}
   .paper-heading,.paper-footer{display:flex;justify-content:space-between;gap:12px;align-items:center}
   .example{color:var(--soft);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:2px 6px;background:var(--surface)}
@@ -136,7 +164,9 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   .new-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:center;padding:24px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
   .new-preview{border-radius:8px;overflow:hidden}
   .new-in h2{margin-top:12px}
-  @media(max-width:800px){.intro-in{grid-template-columns:1fr;gap:36px}.intro{padding-top:36px}.notebook{max-width:560px;width:100%;justify-self:center}.intro-copy{max-width:560px;width:100%;justify-self:center}.lesson-grid{grid-template-columns:1fr}.lesson h3{margin-top:12px}.lesson-bottom{margin-top:16px}.class-grid{grid-template-columns:1fr 1fr}.class-link:nth-child(odd){border-left:0}.class-link:last-child:nth-child(odd){grid-column:span 2}.class-link:nth-child(n+3){border-top:1px solid var(--line)}.new-in{grid-template-columns:1fr}.section-heading{align-items:start;flex-wrap:wrap;gap:12px}}
+  @media(prefers-color-scheme:dark){:global(:root:not([data-theme="light"])) .hero-art :global(img){filter:brightness(.72) saturate(.82)}}
+  :global(:root[data-theme="dark"]) .hero-art :global(img){filter:brightness(.72) saturate(.82)}
+  @media(max-width:800px){.intro-in{min-height:0;padding-top:38px;padding-bottom:330px}.intro-copy{width:100%;max-width:520px}h1{font-size:64px}.hero-art{inset:auto 0 0;height:320px;mask-image:linear-gradient(to bottom,transparent,#000 18%,#000 88%,transparent)}.hero-art :global(img){object-position:82% center}.hero-art::after{background:linear-gradient(to top,var(--bg),transparent 15%)}.walkthrough-in{grid-template-columns:1fr;gap:20px}.walkthrough{padding-top:28px}.walkthrough-copy>p:not(.eyebrow){max-width:42ch}.walkthrough-copy h2 br{display:none}.notebook{max-width:560px;width:100%;justify-self:center}.lesson-grid{grid-template-columns:1fr}.lesson h3{margin-top:12px}.lesson-bottom{margin-top:16px}.class-grid{grid-template-columns:1fr 1fr}.class-link:nth-child(odd){border-left:0}.class-link:last-child:nth-child(odd){grid-column:span 2}.class-link:nth-child(n+3){border-top:1px solid var(--line)}.new-in{grid-template-columns:1fr}.section-heading{align-items:start;flex-wrap:wrap;gap:12px}}
   @media(max-width:380px){.paper-footer{align-items:flex-start;flex-direction:column}.paper-footer button{width:100%}.modes{gap:14px}.notebook{padding:20px}.class-link{padding:20px 8px;gap:10px}.class-link>span:last-child{display:none}}
   @media(prefers-reduced-motion:reduce){.lesson{transition:none}}
 </style>
