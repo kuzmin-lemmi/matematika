@@ -24,7 +24,7 @@ export const downloadHref = (d: { url: string; access: string }) =>
   d.access === 'free' && isLocalFile(d.url) ? openHref(d.url) : '';
 export const downloadName = (url: string) => url.split('/').pop() ?? url;
 // Цвет материала → читаемые варианты (контраст ≥ 4.6:1, WCAG AA с запасом):
-// --cb — для кнопок с белым текстом и текста на светлой теме (затемняем), --cd — для текста на тёмной теме (осветляем)
+// --cb — для кнопок и текста на светлой бумаге (затемняем), --cd — для текста на тёмном листе (осветляем)
 const channel = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
 const luminance = ([r, g, b]: number[]) => 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
 const contrast = (a: number[], b: number[]) => {
@@ -42,6 +42,6 @@ const shift = (hex: string, against: number[]) => {
   return toHex(to);
 };
 export const colorVars = (hex: string) =>
-  `--c:${hex};--cb:${shift(hex, [255, 255, 255])};--cd:${shift(hex, [15, 33, 71])}`;
+  `--c:${hex};--cb:${shift(hex, [255, 253, 248])};--cd:${shift(hex, [32, 51, 43])}`;
 // Картинка превью ссылки — карточка с названием материала, собранная при сборке (src/pages/og/[id].png.ts)
 export const ogImage = (item: { id: string }) => `og/${item.id}.png`;

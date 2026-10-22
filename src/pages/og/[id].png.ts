@@ -40,7 +40,7 @@ export const GET: APIRoute = async ({ props }) => {
   const ty = title.length > 1 ? 250 : 300;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F4F9FF"/><stop offset="1" stop-color="#DDEBFB"/></linearGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F6F3EB"/><stop offset="1" stop-color="#E8EEDF"/></linearGradient>
     <radialGradient id="g" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
   </defs>
   <rect width="1200" height="630" fill="url(#bg)"/>
@@ -48,13 +48,13 @@ export const GET: APIRoute = async ({ props }) => {
   <circle cx="1060" cy="330" r="300" fill="url(#g)"/>
   <circle cx="1060" cy="330" r="210" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="18"/>
   <circle cx="1060" cy="330" r="120" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="14"/>
-  <path d="M0 560H140L180 520H360" fill="none" stroke="#1F5FCC" stroke-opacity=".35" stroke-width="4"/>
-  <circle cx="366" cy="520" r="8" fill="#1F5FCC" fill-opacity=".45"/>
+  <path d="M0 560H140L180 520H360" fill="none" stroke="#256449" stroke-opacity=".35" stroke-width="4"/>
+  <circle cx="366" cy="520" r="8" fill="#256449" fill-opacity=".45"/>
   <image x="70" y="56" width="84" height="84" href="data:image/svg+xml;base64,${logo}"/>
-  <text x="170" y="114" font-family="${FONT}" font-size="40" font-weight="800" fill="#0B1F4D">${esc(SITE.name)}</text>
-  ${title.map((l, i) => `<text x="70" y="${ty + i * 86}" font-family="${FONT}" font-size="${fs}" font-weight="800" fill="#0B1F4D">${esc(l)}</text>`).join('')}
-  ${topic.map((l, i) => `<text x="72" y="${ty + (title.length - 1) * 86 + 70 + i * 42}" font-family="${FONT}" font-size="32" font-weight="600" fill="#4E5F85">${esc(l)}</text>`).join('')}
-  <rect x="70" y="490" width="${Math.ceil(tag.length * 30 * EM_TAG) + 56}" height="64" rx="32" fill="${d.color}"/>
+  <text x="170" y="114" font-family="${FONT}" font-size="40" font-weight="800" fill="#203B31">${esc(SITE.name)}</text>
+  ${title.map((l, i) => `<text x="70" y="${ty + i * 86}" font-family="${FONT}" font-size="${fs}" font-weight="800" fill="#203B31">${esc(l)}</text>`).join('')}
+  ${topic.map((l, i) => `<text x="72" y="${ty + (title.length - 1) * 86 + 70 + i * 42}" font-family="${FONT}" font-size="32" font-weight="600" fill="#5C7065">${esc(l)}</text>`).join('')}
+  <rect x="70" y="490" width="${Math.ceil(tag.length * 30 * EM_TAG) + 56}" height="64" rx="32" fill="#256449"/>
   <text x="98" y="532" font-family="${FONT}" font-size="30" font-weight="700" fill="#fff">${esc(tag)}</text>
 </svg>`;
   const png = await sharp(Buffer.from(svg)).png({ compressionLevel: 9, palette: true }).toBuffer();

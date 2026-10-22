@@ -26,7 +26,7 @@ const path = Astro.url.pathname;
   <a class="skip" href="#main">Перейти к содержимому</a>
   <header class="top">
     <div class="wrap bar">
-      <a class="logo" href={base}><Logo size={38} /><span>{SITE.short}</span></a>
+      <a class="logo" href={base} aria-label={`${SITE.name} — на главную`}><Logo size={36} /><span>{SITE.short}<small>Математика для урока</small></span></a>
       <nav id="nav" aria-label="Разделы">
         <div class="grades">
           {SITE.grades.map(g => (
@@ -106,12 +106,14 @@ const path = Astro.url.pathname;
   .skip:focus{top:calc(8px + env(safe-area-inset-top,0px))}
   main:focus{outline:none}
   .top{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
-  .bar{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:16px;height:80px}
   .logo{display:flex;align-items:center;gap:10px;text-decoration:none;font:800 21px var(--display);letter-spacing:-.02em}
   .logo svg{flex:none}
+  .logo{color:var(--accent);letter-spacing:-.04em}
+  .logo small{display:block;color:var(--soft);font:400 11px/1.4 var(--body);letter-spacing:0;margin-top:2px;white-space:nowrap}
   nav{display:flex;gap:4px;align-items:center}
   nav .grades,nav .rest{display:flex;gap:4px;flex-wrap:wrap}
-  nav a{text-decoration:none;font-weight:600;padding:.4em .75em;border-radius:10px;color:var(--soft);transition:color 160ms var(--ease-out),background-color 160ms var(--ease-out)}
+  nav a{text-decoration:none;font-weight:600;font-size:14px;padding:.4em .65em;border-radius:6px;color:var(--soft);transition:color 160ms var(--ease-out),background-color 160ms var(--ease-out)}
   @media (hover:hover) and (pointer:fine){ nav a:hover{color:var(--ink);background:var(--tint)} }
   nav a[aria-current]{color:var(--accent);background:var(--tint)}
   .tools{display:flex;align-items:center;gap:8px}
@@ -156,5 +158,6 @@ const path = Astro.url.pathname;
   .foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:var(--soft);font-size:15px}
   .brand{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
   .brand b{color:var(--ink)}
+  .brand svg{color:var(--accent)}
   .links{display:flex;gap:16px;align-items:center}
 </style>

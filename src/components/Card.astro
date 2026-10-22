@@ -1,7 +1,9 @@
 ---
+import type { CollectionEntry } from 'astro:content';
 import Preview from './Preview.astro';
 import { TYPES, ACCESS, PARTS } from '../config';
 import { openPageHref, pageHref, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady } from '../lib';
+interface Props { item: CollectionEntry<'items'> }
 const { item } = Astro.props;
 const d = item.data;
 const external = /^https?:/.test(d.url);
@@ -40,7 +42,7 @@ const dl = ready ? downloadHref(d) : '';
   .card{position:relative;isolation:isolate;display:flex;flex-direction:column;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r);
     transition:transform 120ms var(--ease-out)}
   .card::before{content:"";position:absolute;inset:-1.5px;z-index:-1;border-radius:inherit;pointer-events:none;opacity:0;
-    box-shadow:0 14px 34px color-mix(in srgb,var(--c) 22%,transparent);transition:opacity 120ms var(--ease-out)}
+    box-shadow:0 6px 18px color-mix(in srgb,var(--ink) 7%,transparent);transition:opacity 120ms var(--ease-out)}
   @media (hover:hover) and (pointer:fine){
     .card:hover{transform:translateY(-3px);transition-duration:180ms}
     .card:hover::before{opacity:1;transition-duration:180ms}

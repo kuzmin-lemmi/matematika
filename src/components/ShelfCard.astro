@@ -1,8 +1,10 @@
 ---
 // Карточка на полке витрины: превью оживает при наведении
+import type { CollectionEntry } from 'astro:content';
 import Preview from './Preview.astro';
 import { ACCESS, PARTS } from '../config';
 import { openPageHref, pageHref, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady } from '../lib';
+interface Props { item: CollectionEntry<'items'> }
 const { item } = Astro.props;
 const d = item.data;
 const external = /^https?:/.test(d.url);
@@ -38,7 +40,7 @@ const dl = ready ? downloadHref(d) : '';
   .sc{position:relative;isolation:isolate;display:flex;flex-direction:column;min-width:0;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;
     transition:border-color 120ms var(--ease-out)}
   .sc::before{content:"";position:absolute;inset:-1.5px;z-index:-1;border-radius:inherit;pointer-events:none;opacity:0;
-    box-shadow:0 10px 26px color-mix(in srgb,var(--c) 24%,transparent);transition:opacity 120ms var(--ease-out)}
+    box-shadow:0 6px 18px color-mix(in srgb,var(--ink) 7%,transparent);transition:opacity 120ms var(--ease-out)}
   @media (hover:hover) and (pointer:fine){
     .sc:hover{border-color:var(--c);transition-duration:180ms}
     .sc:hover::before{opacity:1;transition-duration:180ms}

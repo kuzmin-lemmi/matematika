@@ -1,4 +1,4 @@
-# AGENTS.md — правила работы над проектом «Математика на уроке» (рабочее название)
+# AGENTS.md — правила работы над проектом «Матшаг»
 
 Этот файл читают ИИ-агенты (Claude Code, opencode, Codex, Zed и др.) перед любой работой в репозитории.
 Пиши ответы, комментарии в коде, тексты интерфейса и сообщения коммитов **на русском языке**.
@@ -75,7 +75,7 @@ src/
   lib.ts                 openPageHref, pageHref, openHref, downloadHref, ogImage, gradeLabel, subjectLabel, gradeSubjects
   layouts/Base.astro     шапка, подвал
   components/Meta.astro  заголовок, описание, превью ссылки (og:image)
-  components/Logo.astro  временный знак (треугольник в окружности)
+  components/Logo.astro  знак из четырёх клеток, одна заполнена
   components/Card.astro, ShelfCard.astro, LessonRow.astro   карточки в каталоге, на полке и в списке класса
   components/Preview.astro  превью: картинка, ролик или сам материал (?mode=board&preview=1)
   components/Rail.astro  полка-слайдер на главной

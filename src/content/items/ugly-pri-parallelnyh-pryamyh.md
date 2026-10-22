@@ -5,7 +5,7 @@ subject: geometry
 parts: [board, print, home]
 summary: "Живой чертёж секущей для доски, задачи на готовых чертежах с личными вариантами и тренажёр с разбором ошибок."
 emoji: 📐
-color: "#2F6FD6"
+color: "#3D7563"
 url: materials/ugly-pri-parallelnyh-pryamyh.html
 access: soon
 grades: [7]

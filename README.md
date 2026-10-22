@@ -1,6 +1,6 @@
-# Математика на уроке
+# Матшаг
 
-*Рабочее название — автор выберет своё.*
+Математика для урока. Одна тема — на доске, на бумаге и дома.
 
 Интерактивные материалы для учителей математики 5–8 классов: **5–6 класс — Виленкин, 7–8 класс — алгебра
 Макарычева и геометрия Мерзляка.**
@@ -34,14 +34,53 @@
 
 ## Запуск на своём компьютере
 
-Нужен Node.js 22 или новее.
+Нужен Node.js 22 (от 22.13) или 24 и новее, npm от 9.6.5. Версия для разработки и CI указана
+в `.nvmrc`. Для nvm-windows используй `nvm install 22` и `nvm use 22`;
+для nvm в Linux/macOS — `nvm install` и `nvm use`.
+
+При первом запуске из новой папки:
 
 ```bash
-npm install
+git clone https://github.com/kuzmin-lemmi/matematika.git
+cd matematika
+```
+
+```bash
+npm ci           # установить точные версии из package-lock.json
 npm run dev      # http://localhost:4321/matematika/
-npm run build    # проверка сборки — должна проходить без ошибок
+npm run validate # TypeScript, автотесты и сборка
 npm run preview  # просмотр собранного сайта
 ```
+
+Сервер останавливается сочетанием `Ctrl+C`. В адресе обязательно оставлять `/matematika/`.
+Секреты, `.env` и подключение внешних сервисов для локальной разработки не нужны.
+В Windows, если PowerShell запрещает запуск `npm.ps1`, используй `npm.cmd` вместо `npm`.
+
+Отдельные проверки: `npm run check`, `npm test`, `npm run build`.
+GitHub Actions выполняет `npm run validate` при push в `main` и в pull request; публикация остаётся ручной.
+`@astrojs/check`, TypeScript и `@types/node` нужны для проверки типов, `jsdom` — для автотестов HTML-материалов.
+
+## Тесты материалов
+
+Основа готова в `tests/helpers.mjs`: загрузчик выполняет встроенные скрипты, передаёт параметры адреса,
+собирает ошибки и не загружает внешние ресурсы. Пока тесты проверяют сам загрузчик; тесты заданий добавляются
+вместе с первым пилотом. Пример файла `tests/slozhenie-drobei.test.mjs` после появления материала:
+
+```js
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { loadMaterial } from './helpers.mjs';
+
+test('доска запускается без ошибок', t => {
+  const material = loadMaterial('slozhenie-drobei', { query: '?mode=board' });
+  t.after(material.close);
+  assert.ok(material.window.APP);
+  assert.deepEqual(material.errors, []);
+});
+```
+
+`window.APP` — интерфейс материала для тестов. Всегда закрывай окно через `t.after(material.close)`,
+чтобы остановить таймеры. Требования к проверке генератора, ключей и шагов доски — в `AGENTS.md` и `docs/TECH.md`.
 
 ## Структура
 
@@ -59,6 +98,7 @@ scripts/                 подготовка превью
 
 ## Публикация
 
-Сайт будет жить на GitHub Pages (`kuzmin-lemmi.github.io/matematika/`), пока не выбран домен.
-Сборка запускается вручную (Actions → «Публикация на GitHub Pages» → Run workflow) после того,
-как в настройках включено **Settings → Pages → Source: GitHub Actions**.
+Сайт: [kuzmin-lemmi.github.io/matematika/](https://kuzmin-lemmi.github.io/matematika/).
+GitHub Pages включён с источником GitHub Actions. Для обновления сайта после отправки изменений:
+Actions → «Публикация на GitHub Pages» → Run workflow → ветка `main`.
+Дизайн и палитра описаны в [`DESIGN.md`](DESIGN.md).

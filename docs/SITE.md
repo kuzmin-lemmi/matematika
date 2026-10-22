@@ -4,7 +4,7 @@
 
 ## Сейчас
 
-- Astro 7, статическая сборка, GitHub Pages (пока не включён: сборка вручную, см. `docs/ROADMAP.md`, этап 4).
+- «Матшаг»: Astro 7, статическая сборка, GitHub Pages. Публикация запускается вручную через Actions.
 - Коллекция `items` (`src/content/items/*.md`) — все продукты: материалы к урокам, позже курсы и программы.
 - У материала: предмет `subject` (math, algebra, geometry), классы `grades`, режимы `parts` (board, print, home), доступ `access`.
 - Страницы:

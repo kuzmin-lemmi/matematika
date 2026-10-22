@@ -168,7 +168,9 @@ function angleArc(V, A, B, r) {
 
 ## Автотесты (node:test + jsdom)
 
-`jsdom` — dev-зависимость, тесты лежат в `tests/`, запуск — `node --test tests/`.
+`jsdom` — dev-зависимость, тесты лежат в `tests/`, запуск — `npm test`.
+Общий загрузчик — `tests/helpers.mjs`: `loadMaterial(slug, { query })` возвращает `window`, массив ошибок `errors`
+и `close`. Закрывай окно через `t.after(material.close)`. Пример использования — в `README.md`.
 
 ```js
 import { test } from 'node:test';

@@ -1,38 +1,37 @@
-/* Временная палитра (взята у «Инфошага»): своя — когда автор выберет название и оформление.
-   --grid — линии «тетради в клетку» для фона блоков */
+/* Матшаг: бумага, зелёные чернила и терракотовые выделения. */
 :root{
-  --bg:#F2F7FD; --surface:#FFFFFF; --ink:#0B1F4D; --soft:#4E5F85; --line:#D6E3F3; --accent:#1F5FCC; --accent-ink:#FFFFFF;
-  --warm:#E8A317; --tint:#E3F0FD; --grid:rgba(31,95,204,.09);
+  --bg:#F6F3EB; --surface:#FFFDF8; --ink:#203B31; --soft:#5C7065; --line:#D8DFD2; --accent:#256449; --accent-ink:#FFFFFF;
+  --warm:#B94C2D; --tint:#E8EEDF; --grid:rgba(37,100,73,.10);
   --display:'Golos Text','Segoe UI',system-ui,-apple-system,sans-serif;
   --body:'Golos Text','Segoe UI',system-ui,-apple-system,sans-serif;
-  --r:18px;
+  --r:12px;
   --ease-out:cubic-bezier(.23,1,.32,1);
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){ --bg:#081430; --surface:#0F2147; --ink:#EAF2FF; --soft:#9DB0D6; --line:#22386A; --accent:#5AA8FF; --accent-ink:#06122B; --warm:#FFC94D; --tint:#0D1C40; --grid:rgba(90,168,255,.10); color-scheme:dark; }
+  :root:not([data-theme="light"]){ --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --accent:#99D7B4; --accent-ink:#153725; --warm:#FFAE8C; --tint:#2A4033; --grid:rgba(153,215,180,.10); color-scheme:dark; }
 }
-:root[data-theme="dark"]{ --bg:#081430; --surface:#0F2147; --ink:#EAF2FF; --soft:#9DB0D6; --line:#22386A; --accent:#5AA8FF; --accent-ink:#06122B; --warm:#FFC94D; --tint:#0D1C40; --grid:rgba(90,168,255,.10); color-scheme:dark; }
+:root[data-theme="dark"]{ --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --accent:#99D7B4; --accent-ink:#153725; --warm:#FFAE8C; --tint:#2A4033; --grid:rgba(153,215,180,.10); color-scheme:dark; }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-padding-top:80px}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--body)}
 a{color:inherit}
 img,svg{max-width:100%}
-.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 max(clamp(20px,4vw,40px),env(safe-area-inset-left),env(safe-area-inset-right))}
 h1,h2,h3{font-family:var(--display);line-height:1.12;margin:0 0 .5em;letter-spacing:-.02em}
 h1{font-size:clamp(26px,3.6vw,42px);font-weight:800}
 h2{font-size:clamp(20px,2.2vw,26px);font-weight:800}
 h3{font-size:clamp(16px,1.5vw,19px);font-weight:800}
 .muted{color:var(--soft)}
-.btn{display:inline-flex;align-items:center;gap:.5em;border-radius:12px;padding:.7em 1.15em;font-weight:700;text-decoration:none;border:1.5px solid var(--line);background:var(--surface);
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;border-radius:8px;padding:.7em 1.15em;font-weight:600;text-decoration:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);
   transition:filter 160ms var(--ease-out),transform 160ms var(--ease-out)}
 .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 @media (hover:hover) and (pointer:fine){ .btn:hover{filter:brightness(1.05)} }
 .btn:active{transform:scale(.97)}
 @media (prefers-reduced-motion:reduce){ .btn{transition:filter 160ms linear} .btn:active{transform:none} }
-.chip{display:inline-block;border:1.5px solid var(--line);border-radius:999px;padding:.2em .7em;font-size:14px;font-weight:600;color:var(--soft);background:var(--surface)}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:.2em .6em;font-size:13px;font-weight:600;color:var(--soft);background:var(--surface)}
 .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
-.squared{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+.squared{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px}
 section{padding:clamp(24px,3.5vw,40px) 0}
 :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 /* цвет материала для текста: --cb/--cd считает colorVars() в lib.ts, чтобы контраст был не ниже 4.5:1 в обеих темах */

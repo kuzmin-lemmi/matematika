@@ -5,7 +5,7 @@ subject: algebra
 parts: [board, print, home]
 summary: "Квадрат суммы как площадь квадрата на доске, варианты с ключами для печати и тренажёр с ловушкой (a + b)² = a² + b²."
 emoji: 🟪
-color: "#7A4FD0"
+color: "#8A6B3F"
 url: materials/formuly-sokrashchennogo-umnozheniya.html
 access: soon
 grades: [7]

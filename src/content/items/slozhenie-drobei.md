@@ -5,7 +5,7 @@ subject: math
 parts: [board, print, home]
 summary: "Полоски дробей на доске, раздатка с самопроверкой по кодовому слову и тренажёр, который объясняет, почему 2/3 + 3/4 ≠ 5/7."
 emoji: 🍰
-color: "#E07A1F"
+color: "#B94C2D"
 url: materials/slozhenie-drobei.html
 access: soon
 grades: [6]

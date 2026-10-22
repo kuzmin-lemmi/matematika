@@ -1,8 +1,10 @@
 ---
 // Строка списка класса: превью слева, справа — описание материала и кнопки режимов
+import type { CollectionEntry } from 'astro:content';
 import Preview from './Preview.astro';
 import { ACCESS, PARTS, TYPES } from '../config';
 import { openPageHref, pageHref, downloadHref, downloadName, colorVars, isReady, isLocalFile } from '../lib';
+interface Props { item: CollectionEntry<'items'>; n: number }
 const { item, n } = Astro.props;
 const d = item.data;
 const ready = isReady(d);
