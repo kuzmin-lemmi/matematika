@@ -24,7 +24,7 @@ const grades = [...new Set(all.flatMap(i => i.data.grades))].sort((a, b) => a - 
           {Object.entries(PARTS).map(([k, p]) => <button data-v={k}>{p.icon} {p.label}</button>)}
         </div>
         <label class="sr" for="q">Поиск по каталогу</label>
-        <input id="q" type="search" placeholder="Поиск: тема или слово, например «дроби» или «угол»" />
+        <input id="q" type="search" placeholder="Поиск: «дроби», «угол»…" aria-label="Поиск по теме или слову" />
       </div>
       <p id="empty" class="muted" role="status" aria-live="polite"></p>
       <div class="grid" id="list">{all.map(i => <Card item={i} />)}</div>

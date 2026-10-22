@@ -17,7 +17,7 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
 <Base>
   <section class="intro">
     <div class="hero-art" aria-hidden="true">
-      <Image src={heroUnderstanding} alt="" widths={[640, 960, 1440, 1920]} sizes="100vw" format="webp" quality={82} loading="eager" fetchpriority="high" />
+      <Image src={heroUnderstanding} alt="" widths={[640, 960, 1440, 1920]} sizes="(max-width: 800px) 1px, 100vw" format="webp" quality={82} loading="eager" fetchpriority="high" />
     </div>
     <div class="wrap intro-in">
       <div class="intro-copy">
@@ -204,7 +204,7 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   .new-in h2{margin-top:12px}
   @media(prefers-color-scheme:dark){:global(:root:not([data-theme="light"])) .hero-art :global(img){filter:brightness(.72) saturate(.82)}}
   :global(:root[data-theme="dark"]) .hero-art :global(img){filter:brightness(.72) saturate(.82)}
-  @media(max-width:800px){.intro-in{min-height:0;padding-top:38px;padding-bottom:330px}.intro-copy{width:100%;max-width:520px}h1{font-size:64px}.hero-art{inset:auto 0 0;height:320px;mask-image:linear-gradient(to bottom,transparent,#000 18%,#000 88%,transparent)}.hero-art :global(img){object-position:82% center}.hero-art::after{background:linear-gradient(to top,var(--bg),transparent 15%)}.walkthrough-in{grid-template-columns:1fr;gap:20px}.walkthrough{padding-top:28px}.walkthrough-copy>p:not(.eyebrow){max-width:42ch}.walkthrough-copy h2 br{display:none}.notebook{max-width:560px;width:100%;justify-self:center}.lesson-grid{grid-template-columns:1fr}.lesson h3{margin-top:12px}.lesson-bottom{margin-top:16px}.class-grid{grid-template-columns:1fr 1fr}.class-link:nth-child(odd){border-left:0}.class-link:last-child:nth-child(odd){grid-column:span 2}.class-link:nth-child(n+3){border-top:1px solid var(--line)}.new-in{grid-template-columns:1fr}.section-heading{align-items:start;flex-wrap:wrap;gap:12px}}
+  @media(max-width:800px){.intro-in{min-height:0;padding-top:38px;padding-bottom:20px}.intro-copy{width:100%;max-width:520px}h1{font-size:64px}.hero-art{display:none}.walkthrough-in{grid-template-columns:1fr;gap:20px}.walkthrough{padding-top:28px}.walkthrough-copy>p:not(.eyebrow){max-width:42ch}.walkthrough-copy h2 br{display:none}.notebook{max-width:560px;width:100%;justify-self:center;transform:none}.lesson-grid{grid-template-columns:1fr}.lesson h3{margin-top:12px}.lesson-bottom{margin-top:16px}.class-grid{grid-template-columns:1fr 1fr;gap:10px;border:0}.class-grid .class-link{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 14px}.class-link:last-child:nth-child(odd){grid-column:span 2}.new-in{grid-template-columns:1fr}.section-heading{align-items:start;flex-wrap:wrap;gap:12px}}
   @media(max-width:380px){.paper-footer button{flex:1;padding-inline:.6em}.modes{gap:14px}.notebook{padding:20px}.class-link{padding:20px 8px;gap:10px}.class-link>span:last-child{display:none}}
   @media(prefers-reduced-motion:reduce){.lesson,.strip span,.strip-label,.strip-row.sum{transition:none}}
 </style>
