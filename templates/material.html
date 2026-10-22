@@ -58,6 +58,10 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px}
 .mode{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;padding:22px;border-radius:var(--r);min-height:150px}
 .mode b{font-size:26px}
 .mode span{font-weight:400;color:var(--soft)}
+.tosite{position:fixed;top:calc(12px + env(safe-area-inset-top));left:calc(12px + env(safe-area-inset-left));z-index:5;
+  display:inline-flex;align-items:center;min-height:44px;padding:.35em .9em;border:2px solid var(--line);border-radius:12px;
+  background:var(--surface);color:var(--ink);font-weight:600;text-decoration:none}
+.tosite:hover{border-color:var(--accent)}
 .topright{position:fixed;top:calc(12px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right))}
 .icon{padding:.35em .6em;min-width:44px;min-height:44px}
 
@@ -147,6 +151,7 @@ body.student [data-act="menu"],body.student #hLinks{display:none !important}
 <body>
 
 <section id="start" class="screen" hidden>
+  <a class="tosite no-print" id="toSite" target="_top" hidden>← Назад на сайт</a>
   <div class="topright no-print"><button class="icon" type="button" data-act="theme" aria-label="Сменить тему">◐</button></div>
   <div class="wrap">
     <p class="kicker">5 класс · Виленкин и др. · Математика</p><!-- ЗАМЕНИ -->
@@ -307,6 +312,18 @@ function makeVariant(num, version = GEN_VERSION) {
     tasks.push(t);
   });
   return { num, label: version + '-' + num, tasks, answers: tasks.map(t => TYPES[t.type].answer(t)) };
+}
+
+// Ссылка «← Назад на сайт» на стартовом экране: материал открыт с сайта (/zapusk/<slug>/ или /materials/<slug>.html)
+// ведёт на страницу материала /item/<slug>/. Скачанный файл и ссылка для учеников её не показывают.
+function siteHref() {
+  if (STUDENT || location.protocol === 'file:') return '';
+  let top = location;
+  try { if (window.top !== window && window.top.location.origin === location.origin) top = window.top.location; } catch {}
+  const z = top.pathname.match(/^(.*\/)zapusk\/([a-z0-9-]+)\/?$/);
+  if (z) return `${top.origin}${z[1]}item/${z[2]}/`;
+  const m = location.pathname.match(/^(.*\/)materials\/([a-z0-9-]+)\.html$/);
+  return m ? `${location.origin}${m[1]}item/${m[2]}/` : '';
 }
 
 // ================= Экраны =================
@@ -538,6 +555,8 @@ document.addEventListener('keydown', e => {
   const th = store.get('theme');
   if (th === 'dark' || th === 'light') document.documentElement.dataset.theme = th;
   if (STUDENT) document.body.classList.add('student');
+  const back = siteHref();
+  if (back) { $('toSite').href = back; $('toSite').hidden = false; }
   if (PREVIEW) { show('board'); boardStartPreview(); } else show(STUDENT ? 'home' : MODE || 'start');
 })();
 

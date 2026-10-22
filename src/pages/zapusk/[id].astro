@@ -34,7 +34,10 @@ const src = openHref(d.url);
     // адрес материала — с параметрами страницы (?mode=…), фокус сразу в материал, чтобы работала клавиатура
     const f = document.getElementById('m') as HTMLIFrameElement;
     f.addEventListener('load', () => { try { f.contentWindow?.focus(); } catch {} });
-    f.src = (f.dataset.src ?? '') + location.search + location.hash;
+    // location.replace, а не src: так загрузка материала не добавляет запись в историю
+    // и кнопка «Назад» браузера сразу возвращает на сайт
+    const url = (f.dataset.src ?? '') + location.search + location.hash;
+    try { f.contentWindow!.location.replace(url); } catch { f.src = url; }
   </script>
 </body>
 </html>

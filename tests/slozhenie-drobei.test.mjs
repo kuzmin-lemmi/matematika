@@ -327,6 +327,17 @@ test('ссылка для учеников: только тренажёр, бе�
   assert.equal(teacher.window.APP.screen, 'print');
 });
 
+test('стартовый экран: ссылка «Назад на сайт» ведёт на страницу материала', t => {
+  const { window: w } = open(t, '');
+  const a = w.document.getElementById('toSite');
+  assert.equal(a.hidden, false);
+  assert.equal(a.getAttribute('href'), 'https://example.test/item/slozhenie-drobei/');
+  assert.equal(a.target, '_top', 'уходит из обёртки /zapusk/ целиком');
+  // у ученика ссылки на сайт нет
+  const s = open(t, '?student=1');
+  assert.equal(s.window.document.getElementById('toSite').hidden, true);
+});
+
 test('раздатка: номера вариантов запоминаются между открытиями', t => {
   const m1 = open(t, '?mode=print');
   const nums = m1.window.document.getElementById('pNums').value;
