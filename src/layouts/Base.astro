@@ -43,7 +43,7 @@ const path = Astro.url.pathname;
         <button class="theme" id="theme" type="button" aria-label="Тёмная тема" aria-pressed="false">
           <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.75" /><path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor" /></svg>
         </button>
-        <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="nav">
+        <button class="burger" id="burger" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav">
           <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path class="l1" d="M3 6h14" /><path class="l2" d="M3 10h14" /><path class="l3" d="M3 14h14" /></svg>
           <span>Меню</span>
         </button>
@@ -70,6 +70,7 @@ const path = Astro.url.pathname;
     const setOpen = (open: boolean) => {
       header.classList.toggle('open', open);
       burger.setAttribute('aria-expanded', String(open));
+      burger.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
       burger.querySelector('span')!.textContent = open ? 'Закрыть' : 'Меню';
     };
     burger.addEventListener('click', () => setOpen(!header.classList.contains('open')));
