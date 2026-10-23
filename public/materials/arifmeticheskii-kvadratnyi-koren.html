@@ -1,0 +1,1595 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Арифметический квадратный корень — Матшаг</title>
+<meta name="description" content="Арифметический квадратный корень: показ на доске, раздатка с кодовым словом и тренажёр с разбором ошибок. Определение, вычисление, уравнение x² = a, оценка корня. 8 класс.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- знаки, которых может не быть в Golos Text (∠ △ ∥ ⊥ π ≠ ∞ □ ≥ ≤ ±), — подмножество Noto Sans Math -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%E2%88%A0%E2%96%B3%E2%88%A5%E2%8A%A5%CF%80%E2%89%A0%E2%88%9E%E2%96%A1%E2%89%A5%E2%89%A4%C2%B1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F3EB; --surface:#FFFDF8; --ink:#203B31; --soft:#5C7065; --line:#D8DFD2; --grid:rgba(37,100,73,.09);
+  --accent:#256449; --accent-ink:#FFFFFF;
+  --a:#256449; --a-soft:#A8D5BA;          /* квадрат, площадь которого известна */
+  --b:#B94C2D; --b-soft:#F6DDD3;          /* выделение: искомая сторона, ловушка */
+  --ok:#256449; --ok-soft:#E1EFE5; --bad:#B3261E; --bad-soft:#F8E1DE; --info-soft:#F1ECDD;
+  --font:'Golos Text','Noto Sans Math','Cambria Math','Segoe UI Symbol','Segoe UI',system-ui,-apple-system,sans-serif;
+  --r:14px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
+    --accent:#99D7B4; --accent-ink:#153725;
+    --a:#99D7B4; --a-soft:#3F7A5C; --b:#FFAE8C; --b-soft:#5B3326;
+    --ok:#99D7B4; --ok-soft:#24402F; --bad:#FF9C8F; --bad-soft:#4A2622; --info-soft:#2E3A2F;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
+  --accent:#99D7B4; --accent-ink:#153725;
+  --a:#99D7B4; --a-soft:#3F7A5C; --b:#FFAE8C; --b-soft:#5B3326;
+  --ok:#99D7B4; --ok-soft:#24402F; --bad:#FF9C8F; --bad-soft:#4A2622; --info-soft:#2E3A2F;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:400 18px/1.45 var(--font);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:.5em 1em;font-weight:600}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+[hidden]{display:none !important}
+.screen{min-height:100vh;min-height:100dvh}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 48px}
+
+/* дроби этажом и знак корня с чертой над подкоренным выражением */
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.1;margin:0 .12em;text-align:center}
+.frac > :last-child{border-top:.08em solid currentColor;padding:0 .15em;align-self:stretch}
+.mixed,.nw{white-space:nowrap}
+.mixed > .w{vertical-align:middle}
+.rt{white-space:nowrap}
+.rt > .rs{display:inline-block;transform:scale(1,1.12);transform-origin:50% 75%}
+.rt > .rad{display:inline-block;line-height:1;border-top:.07em solid currentColor;padding:.04em .1em 0 .02em;margin-left:-.03em}
+.rt.tall{display:inline-flex;align-items:stretch;vertical-align:middle}
+.rt.tall > .rs{display:flex;align-items:center;font-size:1.9em;line-height:1;font-weight:400;margin-right:-.06em;transform:none}
+.rt.tall > .rad{margin:.18em 0 0;display:flex;align-items:center;line-height:1.1;padding-top:0}
+.cmpbox{display:inline-block;min-width:1.4em;border:2px dashed currentColor;border-radius:8px;text-align:center;margin:0 .2em;padding:0 .1em}
+
+/* стартовый экран */
+#start .wrap{max-width:880px;padding-top:48px}
+.kicker{color:var(--soft);font-weight:600;margin:0 0 6px}
+h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing:-.01em}
+.lead{font-size:20px;color:var(--soft);margin:0 0 32px;max-width:40em}
+.modes{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.mode{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;padding:22px;border-radius:var(--r);min-height:170px}
+.mode b{font-size:26px}
+.mode span{font-weight:400;color:var(--soft)}
+.mode:hover{transform:translateY(-2px)}
+.tosite{position:fixed;top:calc(12px + env(safe-area-inset-top));left:calc(12px + env(safe-area-inset-left));z-index:5;
+  display:inline-flex;align-items:center;min-height:44px;padding:.35em .9em;border:2px solid var(--line);border-radius:12px;
+  background:var(--surface);color:var(--ink);font-weight:600;text-decoration:none}
+.tosite:hover{border-color:var(--accent)}
+.topright{position:fixed;top:calc(12px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));display:flex;gap:8px;z-index:5}
+.icon{padding:.35em .6em;min-width:44px;min-height:44px}
+
+/* доска: на проекторе шрифт не мельче 28px */
+#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
+.bbar{display:flex;align-items:center;gap:8px;font-size:20px}
+.bbar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap;margin-right:6px}
+.bbar button{font-size:18px;min-height:44px;padding:.2em .7em;white-space:nowrap}
+.btext{padding:4px 0}
+.btext .q{font-size:clamp(30px,3vw,46px);font-weight:700;line-height:1.3}
+.btext .a{font-size:clamp(28px,2.7vw,42px);line-height:1.35;margin-top:.15em;color:var(--accent);font-weight:600}
+.btext .a ul{margin:.1em 0;padding-left:1.2em;color:var(--ink)}
+.btext .a.hide{visibility:hidden}
+.bstage{min-height:0;display:flex;align-items:center;justify-content:center}
+.bstage svg{width:100%;height:100%;max-height:100%}
+.brec{border-top:2px dashed var(--line);padding:6px 0 2px;min-height:calc(2 * 1.9em + 26px);font-size:clamp(26px,2.4vw,36px);line-height:1.9}
+.brec .rt-h{display:block;font-size:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);line-height:1.2}
+.brec .ln{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bctl{display:flex;gap:12px;justify-content:center;padding-top:8px}
+.bctl button{font-size:26px;min-height:60px;padding:.25em 1em}
+.bctl .main{min-width:10em}
+.bnote{position:fixed;right:clamp(12px,3vw,40px);bottom:96px;max-width:min(520px,90vw);background:var(--surface);border:2px solid var(--accent);
+  border-radius:var(--r);padding:12px 16px;font-size:20px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:4}
+.bnote b{display:block;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+#board.preview .bctl,#board.preview .bbar button{visibility:hidden}
+#board.preview .bnote{display:none}
+@media (max-width:1150px){ .bbar .ttl{visibility:hidden} .bbar button .t{display:none} }
+
+svg text{font-family:var(--font);fill:var(--ink)}
+svg .lab{font-size:38px;font-weight:700}
+svg .lab.s{font-size:30px;font-weight:600}
+svg .lab.acc{fill:var(--accent)}
+svg .lab.warm{fill:var(--b)}
+svg .lab.soft{fill:var(--soft)}
+svg .ov{text-decoration:overline}
+svg .ge{fill:var(--surface)}
+svg .gs{fill:var(--a-soft)}
+svg .gw{fill:var(--b-soft)}
+svg .gl{stroke:var(--ink);stroke-width:1.3;opacity:.45}
+svg .gk{stroke:var(--ink);stroke-width:4;opacity:1}
+svg .gf{fill:none;stroke:var(--ink);stroke-width:4}
+svg .gx{fill:none;stroke:var(--b);stroke-width:6;stroke-dasharray:14 8}
+svg .br{fill:none;stroke:var(--ink);stroke-width:3}
+svg .br.warm{stroke:var(--b)}
+svg .axis{stroke:var(--ink);stroke-width:3}
+svg .tick{stroke:var(--ink);stroke-width:2.5}
+svg .curve{fill:none;stroke:var(--a);stroke-width:6}
+svg .hline{stroke:var(--b);stroke-width:4;stroke-dasharray:12 8}
+svg .seg{stroke:var(--b);stroke-width:12;stroke-linecap:round}
+svg .link{stroke:var(--soft);stroke-width:2;stroke-dasharray:6 6}
+svg .dot{fill:var(--b);stroke:var(--surface);stroke-width:3}
+svg .lbl text{font-size:32px;font-weight:700}
+svg .lbl line{stroke:var(--ink);stroke-width:3}
+svg .lbl.warm text{fill:var(--b)} svg .lbl.warm line{stroke:var(--b)}
+svg .new{animation:fade .6s ease-out both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){ svg .new, .mode:hover{animation:none;transform:none} }
+
+/* раздатка: панель */
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;margin-bottom:24px}
+.panel .row{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.panel label{display:inline-flex;gap:8px;align-items:center}
+.panel input[type=text]{width:100%;min-width:0;padding:.4em .6em;border:2px solid var(--line);border-radius:10px;background:var(--bg)}
+.panel input[type=number]{width:5em;padding:.3em .5em;border:2px solid var(--line);border-radius:10px;background:var(--bg)}
+.note{color:var(--soft);font-size:16px;margin:0}
+.err{color:var(--bad);font-weight:600}
+.sheets{display:grid;gap:24px;justify-items:center;overflow-x:auto}
+
+/* лист A4: на экране — как на бумаге */
+.page{width:210mm;min-height:297mm;padding:12mm;background:#fff;color:#000;box-shadow:0 2px 16px rgba(0,0,0,.18);font-size:12pt;line-height:1.35}
+.page.half .sheet{height:136mm;overflow:hidden;gap:1mm}
+.page.half .sheet + .sheet{border-top:1px dashed #888;padding-top:3mm}
+.half .sheet h2{display:none}
+.half .shead{font-size:10pt}
+.half .tasks{gap:.5mm 4mm}
+.half .task{font-size:12pt;line-height:1.25}
+.half .instr{font-size:8.5pt;line-height:1.15}
+.half .sub-h{display:none}
+.half .bank{font-size:10pt;gap:.8mm}
+.half .bank .bk{min-width:11mm}
+.half .bank .bk > :first-child{padding:0 1mm}
+.half table.ans{font-size:10pt}
+.half table.ans td,.half table.ans th{padding:.4mm 1mm}
+.half table.ans .tall td{height:7mm}
+.half .word{font-size:10pt}
+.sheet{display:flex;flex-direction:column;gap:3mm}
+.shead{display:grid;grid-template-columns:1fr 22mm 28mm auto;gap:4mm;font-size:11pt;align-items:end}
+.shead span{border-bottom:1px solid #000;padding-bottom:1mm;white-space:nowrap}
+.shead .vn{border:1.5px solid #000;padding:1mm 2mm;font-weight:700}
+.sheet h2{font-size:14pt;margin:1mm 0 0}
+.sheet .instr{margin:0;font-size:10.5pt}
+.tasks{display:grid;grid-template-columns:1fr 1fr;gap:3mm 6mm;margin:0;padding:0;list-style:none}
+.task{break-inside:avoid;font-size:14pt}
+.task .no{font-weight:700;margin-right:2mm}
+.cells{height:24mm;margin-top:1.5mm;border:1px solid #bbb;
+  background-image:linear-gradient(#cfcfcf .3mm,transparent .3mm),linear-gradient(90deg,#cfcfcf .3mm,transparent .3mm);
+  background-size:5mm 5mm;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+.compact .cells{display:none}
+.bank{display:flex;flex-wrap:wrap;gap:1.5mm;font-size:12pt}
+.bank .bk{border:1px solid #000;min-width:13mm;text-align:center;display:flex;flex-direction:column}
+.bank .bk > :first-child{padding:1mm 1.5mm;flex:1;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.bank .bk > :last-child{border-top:1px solid #000;font-weight:700;padding:.5mm}
+.sub-h{font-weight:700;font-size:11pt;margin:1mm 0 0}
+table.ans{border-collapse:collapse;width:100%;font-size:11pt;table-layout:fixed}
+table.ans td,table.ans th{border:1px solid #000;padding:1mm;text-align:center}
+table.ans th:first-child{width:18mm;text-align:left}
+table.ans .tall td{height:13mm}
+.word{font-size:11pt}
+.key h2{font-size:15pt;margin:0 0 3mm}
+table.key{border-collapse:collapse;width:100%;font-size:10.5pt}
+table.key td,table.key th{border:1px solid #000;padding:1mm 1.2mm;text-align:center;white-space:nowrap}
+table.key td:first-child{font-weight:700}
+
+/* тренажёр */
+.hhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:16px}
+.hhead h2{margin:0;font-size:26px;flex:1;min-width:12em}
+.levels{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin:16px 0}
+.level{text-align:left;padding:16px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.level small{font-weight:400;color:var(--soft)}
+.level .lex{font-size:24px;font-weight:700;margin:4px 0}
+.stats{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--soft);font-weight:600}
+.stats b{color:var(--ink)}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:clamp(16px,3vw,28px)}
+.taskx{font-size:clamp(26px,5vw,40px);font-weight:700;margin:4px 0 16px;text-align:center;line-height:1.35}
+.inrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 14px;font-size:26px}
+.inrow input{width:3.4em;padding:.15em .2em;text-align:center;border:2px solid var(--line);border-radius:10px;background:var(--bg);font-weight:700}
+.inrow input.wide{width:5.5em}
+.inrow .frac input{width:2.6em;margin:2px 0}
+.inrow .frac.fin > :last-child{border-top:3px solid currentColor;padding-top:4px}
+.inrow .check{font-size:20px;min-height:52px}
+.choice{font-size:26px;min-width:3.2em;min-height:60px}
+.cnts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px}
+.cnts button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
+.sqrtbtn{font-size:24px;min-width:52px;min-height:52px;padding:0 .4em}
+.hbtns{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.fb{margin-top:16px;padding:14px 16px;border-radius:12px;font-size:19px;line-height:1.6}
+.fb.ok{background:var(--ok-soft);border-left:6px solid var(--ok)}
+.fb.bad{background:var(--bad-soft);border-left:6px solid var(--bad)}
+.fb.info{background:var(--info-soft);border-left:6px solid var(--soft)}
+.fb .tag{font-weight:700;display:block;margin-bottom:2px}
+.hnote{color:var(--soft);font-size:16px;text-align:center;margin:10px 0 0}
+.linkbtn{font-size:15px;padding:.2em .6em;border-width:1.5px}
+#home.playing .hhead h2{font-size:18px;color:var(--soft)}
+#home.playing .wrap{padding-top:12px}
+/* телефон: задание и «Проверить» — в верхней половине, нижнюю закрывает клавиатура */
+@media (max-width:600px){
+  #home.playing .hhead{margin-bottom:6px;flex-wrap:nowrap;justify-content:space-between}
+  #home.playing .hhead h2{display:none}
+  #home.playing .stats{font-size:15px;gap:2px 12px}
+  #home.playing .card{padding:12px 14px;margin-top:8px !important}
+  .taskx{margin:0 0 8px}
+  .inrow{font-size:23px;gap:8px 12px}
+  #home.playing .wrap{padding-bottom:50vh}
+}
+.work{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:10px}
+.work li{background:var(--bg);border-radius:10px;padding:10px 14px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px;z-index:20}
+.overlay .card{max-width:720px;max-height:90vh;overflow:auto}
+.overlay h3{margin:0 0 8px;font-size:24px}
+.overlay h4{margin:16px 0 4px}
+.overlay p{margin:4px 0}
+
+body.student [data-act="menu"],body.student #hLinks{display:none !important}
+@page{size:A4;margin:0}
+@media print{
+  html,body{background:#fff !important;color:#000 !important;background-image:none !important;padding:0}
+  .no-print,.screen:not(#print),.topright{display:none !important}
+  #print .wrap{max-width:none;padding:0}
+  .sheets{display:block;overflow:visible}
+  .page{box-shadow:none;margin:0;break-after:page;min-height:auto;height:297mm;overflow:hidden}
+  .page.key{height:auto;overflow:visible}
+  table.key tr{break-inside:avoid}
+  .page:last-child{break-after:auto}
+  body.print-key .page:not(.key){display:none}
+  body.print-sheets .page.key{display:none}
+}
+@media (max-width:600px){
+  .bbar{font-size:18px}
+  .bctl button{font-size:18px;min-height:48px}
+}
+</style>
+</head>
+<body>
+
+<!-- стартовый экран -->
+<section id="start" class="screen" hidden>
+  <a class="tosite no-print" id="toSite" target="_top" hidden>← Назад на сайт</a>
+  <div class="topright no-print">
+    <button class="icon" id="themeBtn" type="button" title="Светлая или тёмная тема" aria-label="Сменить тему">◐</button>
+  </div>
+  <div class="wrap">
+    <p class="kicker">8 класс · Макарычев и др. · Алгебра</p>
+    <h1>Арифметический квадратный корень</h1>
+    <p class="lead">Одна тема в трёх режимах: показ на доске, раздатка с кодовым словом и тренажёр, который объясняет каждую ошибку.</p>
+    <div class="modes">
+      <button class="mode" type="button" data-go="board"><b>🖥 На доске</b><span>Корень — сторона квадрата с данной площадью. Ловушки «√16 = ±4» и «√0,09 = 0,03», оценка √2, уравнение x² = a.</span></button>
+      <button class="mode" type="button" data-go="print"><b>🖨 Раздатка</b><span>У каждого свой вариант, верные ответы складываются в слово. Ключ — по номеру варианта.</span></button>
+      <button class="mode" type="button" data-go="home"><b>🏠 Тренировка</b><span>Вычисление корней, уравнение x² = a, оценка и сравнение. Разбор каждой ошибки.</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- доска -->
+<section id="board" class="screen" hidden>
+  <div class="bbar">
+    <button class="icon" type="button" data-act="menu" title="Меню (Esc)" aria-label="Меню">☰</button>
+    <span class="ttl">Арифметический квадратный корень</span>
+    <span class="cnt" id="bCnt"></span>
+    <button type="button" data-act="restart" title="С первого шага" aria-label="Заново">↺<span class="t"> Заново</span></button>
+    <button type="button" data-act="numbers" title="Тот же показ с другими числами" aria-label="Другие числа">🎲<span class="t"> Другие числа</span></button>
+    <button type="button" data-act="notes" id="bNotesBtn" aria-pressed="false" title="Что сказать на этом шаге. Подсказку видно и на проекторе — включайте, когда нужно" aria-label="Подсказка учителю">💬<span class="t"> Учителю</span></button>
+    <button class="icon" type="button" data-act="theme" title="Светлая или тёмная тема" aria-label="Сменить тему">◐</button>
+    <button class="icon" type="button" data-act="full" title="Во весь экран (F)" aria-label="Во весь экран">⛶</button>
+  </div>
+  <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
+  <div class="bstage" id="bStage"></div>
+  <div class="brec"><span class="rt-h">Запись в тетради</span><div id="bRec"></div></div>
+  <div class="bctl">
+    <button type="button" data-act="prev" title="Назад (←, PageUp)">← Назад</button>
+    <button type="button" class="main" data-act="next" id="bNext" title="Далее (→, Пробел, PageDown)">Показать ответ</button>
+  </div>
+  <div class="bnote" id="bNote" hidden></div>
+</section>
+
+<!-- раздатка -->
+<section id="print" class="screen" hidden>
+  <div class="wrap">
+    <div class="hhead no-print">
+      <button class="icon" type="button" data-act="menu" aria-label="Меню">☰</button>
+      <h2>Раздатка: арифметический квадратный корень</h2>
+    </div>
+    <div class="panel no-print">
+      <div class="row">
+        <label>Вариантов <input type="number" id="pCount" min="1" max="40"></label>
+        <button type="button" id="pNew">Новые номера</button>
+        <label><input type="checkbox" id="pSpace"> место для решения (сетка)</label>
+        <label><input type="checkbox" id="pTwo"> два варианта на листе</label>
+      </div>
+      <label style="display:grid;gap:4px">Номера вариантов (можно вписать свои — ключ восстановится по номеру)
+        <input type="text" id="pNums" autocomplete="off" spellcheck="false">
+      </label>
+      <p class="note" id="pMsg"></p>
+      <div class="row">
+        <button type="button" class="main" id="pPrint">🖨 Печать листов</button>
+        <button type="button" id="pPrintKey">🔑 Печать ключа</button>
+      </div>
+      <p class="note">В каждом варианте 8 заданий: корень из десятичной дроби, из смешанного числа, значение выражения, квадрат корня, два уравнения x² = a, оценка корня целыми числами и сравнение. Печать — A4, поля браузера — «по умолчанию» или «нет».</p>
+    </div>
+    <div class="sheets" id="pSheets"></div>
+  </div>
+</section>
+
+<!-- тренажёр -->
+<section id="home" class="screen" hidden>
+  <div class="wrap">
+    <div class="hhead">
+      <button class="icon" type="button" data-act="menu" aria-label="Меню">☰</button>
+      <h2>Тренировка: квадратный корень</h2>
+      <button type="button" data-act="help">📖 Справка</button>
+    </div>
+    <div id="hSetup">
+      <p>Выбери раздел — и начнём. В каждом 10 заданий, после ошибки — разбор и такое же задание с другими числами.</p>
+      <div class="levels" id="hLevels"></div>
+      <p class="note" id="hLinks"></p>
+    </div>
+    <div id="hPlay" hidden>
+      <div class="stats" id="hStats"></div>
+      <div class="card" style="margin-top:12px">
+        <div class="taskx" id="hTask"></div>
+        <div id="hStep"></div>
+        <div id="hFb"></div>
+        <div class="hbtns">
+          <button type="button" id="hHint">Подсказка (−<span id="hPen"></span>)</button>
+          <button type="button" class="main" id="hNext" hidden>Дальше →</button>
+        </div>
+      </div>
+    </div>
+    <div id="hEnd" hidden></div>
+  </div>
+</section>
+
+<div class="overlay" id="help" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="helpT">
+    <h3 id="helpT">Справка: арифметический квадратный корень</h3>
+    <h4>Определение</h4>
+    <p>Арифметическим квадратным корнем из числа <i>a</i> называется неотрицательное число, квадрат которого равен <i>a</i>. Обозначение: <span id="helpRa"></span>.</p>
+    <p id="helpEx1"></p>
+    <h4>Когда корень имеет смысл</h4>
+    <p>Квадрат любого числа неотрицателен, поэтому <span id="helpRa2"></span> имеет смысл только при <i>a</i> ≥ 0. При этом <span id="helpRa3"></span> ≥ 0 и <span id="helpSq"></span>.</p>
+    <h4>Десятичные дроби и смешанные числа</h4>
+    <p>В квадрате десятичной дроби знаков после запятой вдвое больше: 0,3² = 0,09, поэтому <span id="helpEx2"></span>. Смешанное число сначала переведи в неправильную дробь: <span id="helpEx3"></span>.</p>
+    <h4>Уравнение <i>x</i>² = <i>a</i></h4>
+    <p>При <i>a</i> &gt; 0 — два корня: <i>x</i> = ±<span id="helpRa4"></span>; при <i>a</i> = 0 — один корень <i>x</i> = 0; при <i>a</i> &lt; 0 корней нет.</p>
+    <h4>Оценка корня</h4>
+    <p>Найди соседние квадраты: 8² = 64 &lt; 73 &lt; 81 = 9², значит 8 &lt; <span id="helpEx4"></span> &lt; 9. Чтобы сравнить корень с числом, сравни их квадраты.</p>
+    <div class="hbtns"><button type="button" class="main" data-act="help-close">Понятно</button></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ================= Параметры: учитель может поменять их за минуту =================
+const CONFIG = {
+  maxRoot: 20,              // таблица квадратов в заданиях: до 20²
+  board: {
+    side: 5,                // первый пример: квадрат площадью 25
+    trap: 4,                // ловушка «√16 = ±4» и график x² = 16
+    neg: 9,                 // «существует ли √(−9)»
+    dec: 6,                 // площадь 0,36 — сторона 0,6 (в десятых)
+    frac: [5, 3],           // √(2 7/9) = 5/3: сторона 5 клеток, единица — 3 клетки
+    approx: 2,              // оценка √2 между целыми, десятыми и сотыми
+    triple: [3, 4, 5],      // ловушка √(9 + 16) ≠ 3 + 4
+    previewDelay: 1700,     // превью на сайте: пауза между шагами, мс
+  },
+  print: {
+    variants: 25,           // сколько вариантов печатать по умолчанию
+    traps: 2,               // сколько ответов-ловушек на задание в таблице букв
+    space: true,            // сетка для решения под каждым заданием
+  },
+  home: {
+    round: 10,              // заданий в тренировке
+    points: [10, 15, 15, 15],   // очки за задание по разделам
+    hintPenalty: 3,         // штраф за подсказку
+    maxMultiplier: 3,       // множитель за серию: +1 за каждые 3 задания подряд без ошибок
+  },
+};
+// Версия генератора — первая часть номера варианта «1-4817». Изменил генератор или состав
+// заданий раздатки — увеличь версию и оставь старую ветку, пока на неё есть напечатанные листы.
+const GEN_VERSION = 1;
+const MINUS = '−';
+
+const P = new URLSearchParams(location.search);
+const MODE = ['board', 'print', 'home'].includes(P.get('mode')) ? P.get('mode') : null;
+const PREVIEW = P.get('preview') === '1';
+// Ссылка для учеников (?mode=home&student=1): только тренажёр — без меню, доски и раздатки
+const STUDENT = P.get('student') === '1';
+const $ = id => document.getElementById(id);
+const store = {
+  get(k) { try { return localStorage.getItem('matshag:arifmeticheskii-kvadratnyi-koren:' + k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem('matshag:arifmeticheskii-kvadratnyi-koren:' + k, String(v)); } catch {} },
+};
+
+// ================= Точная арифметика: числа — несократимые дроби {n, d} =================
+const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b, a % b]; return a; };
+const Q = (n, d = 1) => { if (d < 0) { n = -n; d = -d; } const g = gcd(n, d) || 1; return { n: n / g, d: d / g }; };
+const qadd = (x, y) => Q(x.n * y.d + y.n * x.d, x.d * y.d);
+const qsub = (x, y) => Q(x.n * y.d - y.n * x.d, x.d * y.d);
+const qmul = (x, y) => Q(x.n * y.n, x.d * y.d);
+const qeq = (x, y) => !!x && !!y && x.n === y.n && x.d === y.d;
+const qneg = x => Q(-x.n, x.d);
+const isqrt = n => { if (n < 0) return null; const r = Math.round(Math.sqrt(n)); return r * r === n ? r : null; };
+const qsqrt = x => { const a = isqrt(x.n), b = isqrt(x.d); return a == null || b == null ? null : Q(a, b); };
+const floorSqrt = n => { let r = Math.floor(Math.sqrt(n)); while (r * r > n) r--; while ((r + 1) * (r + 1) <= n) r++; return r; };
+const toMixed = f => { const w = Math.floor(f.n / f.d); return { w, n: f.n - w * f.d, d: f.d }; };
+// конечная десятичная запись с запятой или null
+function decStr(x) {
+  for (let k = 0; k <= 8; k++) {
+    const m = x.n * 10 ** k;
+    if (m % x.d !== 0) continue;
+    const v = Math.abs(m / x.d), s = String(v).padStart(k + 1, '0');
+    return (x.n < 0 ? MINUS : '') + (k ? s.slice(0, -k) + ',' + s.slice(-k) : s);
+  }
+  return null;
+}
+
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const int = (rnd, a, b) => a + Math.floor(rnd() * (b - a + 1));
+const pick = (rnd, arr) => arr[Math.floor(rnd() * arr.length)];
+function shuffle(rnd, arr) {
+  const r = arr.slice();
+  for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
+  return r;
+}
+const taskRnd = (n, i) => mulberry32(GEN_VERSION * 1000003 + n * 7919 + i * 104729 + 1);
+const plural = (n, one, few, many) => {
+  const m10 = n % 10, m100 = n % 100;
+  return m10 === 1 && m100 !== 11 ? one : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? few : many;
+};
+
+// ================= Запись =================
+const F = f => `<span class="frac"><span>${f.n}</span><span>${f.d}</span></span>`;
+const M = m => m.w ? `<span class="mixed"><span class="w">${m.w}</span>${m.n ? F(m) : ''}</span>` : F(m);
+// корень: √ и черта над подкоренным выражением; tall — под корнем дробь
+const RT = (inner, tall) => `<span class="rt${tall ? ' tall' : ''}"><span class="rs">√</span><span class="rad">${inner}</span></span>`;
+const X = '<i>x</i>';
+const esc = s => String(s).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// число: style 'dec' — десятичной дробью, если она конечная; 'frac' — обыкновенной (смешанной)
+function htmlQ(x, style = 'dec') {
+  if (x.d === 1) return (x.n < 0 ? MINUS : '') + Math.abs(x.n);
+  const s = style === 'dec' && decStr(x);
+  if (s) return s;
+  const a = { n: Math.abs(x.n), d: x.d };
+  return (x.n < 0 ? MINUS : '') + (a.n > a.d ? M(toMixed(a)) : F(a));
+}
+function keyQ(x, style = 'dec') {
+  if (x.d === 1) return (x.n < 0 ? MINUS : '') + Math.abs(x.n);
+  const s = style === 'dec' && decStr(x);
+  if (s) return s;
+  const a = { n: Math.abs(x.n), d: x.d }, m = toMixed(a);
+  return (x.n < 0 ? MINUS : '') + (m.w ? m.w + ' ' : '') + m.n + '/' + m.d;
+}
+const sq2 = x => htmlQ(qmul(x, x));   // квадрат числа для проверки в объяснениях
+// десятичная дробь с одной-двумя цифрами после запятой — для подкоренных выражений
+const D = x => decStr(x) || htmlQ(x, 'frac');
+
+// Значение корня уравнения: {q} — рациональное число, {m, s} — s·√m, m не квадрат
+const V = {
+  q: q => ({ q }),
+  html: (v, style) => v.q ? htmlQ(v.q, style) : (v.s < 0 ? MINUS : '') + RT(v.m),
+  key: (v, style) => v.q ? keyQ(v.q, style) : (v.s < 0 ? MINUS : '') + '√' + v.m,
+  eq: (a, b) => a.q && b.q ? qeq(a.q, b.q) : !a.q && !b.q && a.m === b.m && a.s === b.s,
+};
+function eqRoots(a) {
+  if (a.n < 0) return [];
+  if (a.n === 0) return [V.q(Q(0))];
+  const s = qsqrt(a);
+  if (s) return [V.q(s), V.q(qneg(s))];
+  return [{ m: a.n, s: 1 }, { m: a.n, s: -1 }];   // a — целое, не квадрат
+}
+const eqKey = (R, style) => !R.length ? 'нет корней' : R.length === 1 ? V.key(R[0], style) : '±' + V.key(R[0], style);
+const eqHTML = (R, style) => `<span class="nw">${!R.length ? 'корней нет' : R.length === 1 ? `${X} = ${V.html(R[0], style)}` : `${X} = ±${V.html(R[0], style)}`}</span>`;
+
+// Ввод: «0,3», «12», «−5», «5/3», «1 2/3»
+function parseQ(s) {
+  const t = String(s).trim().replace(/[−–]/g, '-').replace(/\s+/g, ' ');
+  let m = t.match(/^(-)?(\d+) (\d+)\/(\d+)$/);
+  if (m) return +m[4] ? Q((m[1] ? -1 : 1) * (+m[2] * +m[4] + +m[3]), +m[4]) : null;
+  m = t.match(/^(-)?(\d+)\/(\d+)$/);
+  if (m) return +m[3] ? Q((m[1] ? -1 : 1) * +m[2], +m[3]) : null;
+  m = t.replace(/ /g, '').replace('.', ',').match(/^(-)?(\d*)(?:,(\d+))?$/);
+  if (!m || (!m[2] && !m[3])) return null;
+  const fr = m[3] || '', k = fr.length;
+  return Q((m[1] ? -1 : 1) * (+(m[2] || 0) * 10 ** k + +(fr || 0)), 10 ** k);
+}
+// корень уравнения: число или «√7», «−√7», «2√3»
+function parseVal(s) {
+  const t = String(s).trim().replace(/[−–]/g, '-').replace(/\s+/g, '');
+  const m = t.match(/^([+-])?(\d+)?√(\d+)$/);
+  if (!m) { const q = parseQ(s); return q ? V.q(q) : null; }
+  const k = +(m[2] || 1), sign = m[1] === '-' ? -1 : 1, under = k * k * +m[3];
+  const r = isqrt(under);
+  return r != null ? V.q(Q(sign * r)) : { m: under, s: sign };
+}
+
+// ================= Типы заданий =================
+// input: num — число, frac — дробь, choice — выбор, eq — корни уравнения, est — два числа.
+// text — запись задания, ask — вопрос в тренажёре, ans — ответ, same — верен ли ответ,
+// wrong — объяснение ошибки {cat, msg}, ok — короткое объяснение верного ответа,
+// key/keyHTML — ответ для ключа и таблицы букв, traps — ответы-ловушки, hints — две подсказки.
+const bad = (cat, msg) => ({ cat, msg });
+const yesNo = [['yes', 'Имеет смысл'], ['no', 'Не имеет смысла']];
+
+const TYPES = {
+  table: {
+    input: 'num', title: 'Корень из числа',
+    gen: rnd => ({ k: int(rnd, 2, CONFIG.maxRoot) }),
+    text: t => RT(t.k * t.k),
+    ans: t => Q(t.k),
+    ok: t => `${RT(t.k * t.k)} = ${t.k}, так как ${t.k} ≥ 0 и ${t.k}² = ${t.k * t.k}.`,
+    wrong(t, v) {
+      const a = t.k * t.k;
+      if (qeq(v, Q(-t.k))) return bad('sign', `Арифметический корень не бывает отрицательным: ${RT(a)} = ${t.k}. Число ${MINUS}${t.k} в квадрате тоже даёт ${a}, но это второй корень уравнения ${X}² = ${a}, а не значение ${RT(a)}.`);
+      if (qeq(v, Q(a, 2))) return bad('calc', `Корень — это не половина числа: ${htmlQ(v)}² = ${sq2(v)}. Ищем число, квадрат которого равен ${a}: ${t.k}² = ${a}, значит ${RT(a)} = ${t.k}.`);
+      return bad('calc', `Проверим возведением в квадрат: ${htmlQ(v)}² = ${sq2(v)}, а под корнем ${a}. ${t.k}² = ${a}, значит ${RT(a)} = ${t.k}.`);
+    },
+    hints: t => [`Какое неотрицательное число в квадрате даёт ${t.k * t.k}? Вспомни таблицу квадратов.`,
+      `${t.k - 1}² = ${(t.k - 1) ** 2}, ${t.k + 1}² = ${(t.k + 1) ** 2}. Ответ — между ${t.k - 1} и ${t.k + 1}.`],
+  },
+  dec: {
+    input: 'num', title: 'Корень из десятичной дроби',
+    // root = k / 10^m, под корнем root²: 0,09, 1,44, 0,0049
+    gen: rnd => ({ k: int(rnd, 1, 19), m: rnd() < 0.55 ? 1 : 2 }),
+    bad: t => t.k % 10 === 0,
+    root: t => Q(t.k, 10 ** t.m),
+    text: t => RT(D(qmul(TYPES.dec.root(t), TYPES.dec.root(t)))),
+    ans: t => TYPES.dec.root(t),
+    ok: t => { const r = TYPES.dec.root(t); return `${TYPES.dec.text(t)} = ${D(r)}, так как ${D(r)}² = ${sq2(r)}.`; },
+    wrong(t, v) {
+      const r = TYPES.dec.root(t), a = qmul(r, r), s = qmul(v, v);
+      if (qeq(v, qneg(r))) return bad('sign', `Арифметический корень не бывает отрицательным: ${RT(D(a))} = ${D(r)}.`);
+      if (qeq(s, qmul(a, Q(100))) || qeq(s, qmul(a, Q(1, 100))))
+        return bad('decimal', `Запятая не на месте: ${htmlQ(v)}² = ${sq2(v)}, а не ${D(a)}. В квадрате десятичной дроби знаков после запятой вдвое больше: ${D(r)}² = ${D(a)}, значит ${RT(D(a))} = ${D(r)}.`);
+      return bad('calc', `Проверим возведением в квадрат: ${htmlQ(v)}² = ${sq2(v)}, а под корнем ${D(a)}. ${D(r)}² = ${D(a)}, значит ${RT(D(a))} = ${D(r)}.`);
+    },
+    key: t => keyQ(TYPES.dec.root(t)),
+    traps: t => { const r = TYPES.dec.root(t); return [qmul(r, Q(1, 10)), qmul(r, Q(10))].map(x => ({ key: keyQ(x), html: htmlQ(x) })); },
+    hints: t => {
+      const a = qmul(TYPES.dec.root(t), TYPES.dec.root(t)), digits = 2 * t.m;
+      return [`Сколько знаков после запятой у ${D(a)}? У корня их вдвое меньше: ${t.m}.`,
+        `Без запятой под корнем ${t.k * t.k}, а ${RT(t.k * t.k)} = ${t.k}. Теперь отдели запятой ${t.m} ${plural(t.m, 'знак', 'знака', 'знаков')} (под корнем их ${digits}).`];
+    },
+  },
+  fraction: {
+    input: 'frac', title: 'Корень из дроби',
+    // simple: √(p²/q²); mixed: √ из смешанного числа r²/q²
+    gen: (rnd, form) => {
+      const mixed = form ? form === 'mixed' : rnd() < 0.5;
+      if (mixed) { const q = int(rnd, 2, 6); return { mixed, q, p: int(rnd, q + 1, 3 * q) }; }
+      return { mixed, q: int(rnd, 2, 12), p: int(rnd, 1, 15) };
+    },
+    bad: t => gcd(t.p, t.q) !== 1 || (!t.mixed && t.p >= t.q && t.p > 2 * t.q),
+    under: t => Q(t.p * t.p, t.q * t.q),
+    text: t => { const a = TYPES.fraction.under(t); return RT(t.mixed ? M(toMixed(a)) : F(a), true); },
+    ans: t => Q(t.p, t.q),
+    ok: t => { const a = TYPES.fraction.under(t), r = Q(t.p, t.q);
+      return `${t.mixed ? `${M(toMixed(a))} = ${F(a)}, ` : ''}${RT(F(a), true)} = ${htmlQ(r, 'frac')}, так как ${F(r)}² = ${F(a)}.`; },
+    wrong(t, v) {
+      const a = TYPES.fraction.under(t), r = Q(t.p, t.q);
+      const conv = t.mixed ? `Сначала переведём в неправильную дробь: ${M(toMixed(a))} = ${F(a)}. ` : '';
+      const tail = `${F(r)}² = ${F(a)}, значит ${RT(F(a), true)} = ${htmlQ(r, 'frac')}.`;
+      if (qeq(v, qneg(r))) return bad('sign', `Арифметический корень не бывает отрицательным. ${tail}`);
+      const sep = TYPES.fraction.sep(t);
+      if (sep && qeq(v, sep)) {
+        const m = toMixed(a);
+        return bad('frac', `Ты извлёк корень отдельно из целой части и из дроби. Но ${M(m)} = ${m.w} + ${F({ n: m.n, d: m.d })}, а корень из суммы не равен сумме корней. ${conv}${tail}`);
+      }
+      if (qeq(v, Q(t.p, t.q * t.q)) || qeq(v, Q(t.p * t.p, t.q)))
+        return bad('frac', `Корень нужно извлечь и из числителя, и из знаменателя: ${conv}${F(r)}² = ${F({ n: t.p * t.p, d: t.q * t.q })}, значит ${RT(F(a), true)} = ${htmlQ(r, 'frac')}.`);
+      return bad('calc', `Проверим возведением в квадрат: (${htmlQ(v, 'frac')})² = ${htmlQ(qmul(v, v), 'frac')}, а под корнем ${htmlQ(a, 'frac')}. ${conv}${tail}`);
+    },
+    // ошибка «корень отдельно из целой части и из дроби» — когда оба корня извлекаются
+    sep: t => {
+      if (!t.mixed) return null;
+      const m = toMixed(TYPES.fraction.under(t)), w = isqrt(m.w), n = isqrt(m.n), d = isqrt(m.d);
+      return w != null && n != null && d != null ? qadd(Q(w), Q(n, d)) : null;
+    },
+    key: t => keyQ(Q(t.p, t.q), 'frac'),
+    keyHTML: t => htmlQ(Q(t.p, t.q), 'frac'),
+    traps: t => [TYPES.fraction.sep(t), Q(t.p, t.q * t.q), Q(t.p * t.p, t.q)].filter(Boolean)
+      .map(x => ({ key: keyQ(x, 'frac'), html: htmlQ(x, 'frac') })),
+    hints: t => { const a = TYPES.fraction.under(t);
+      return [t.mixed ? `Переведи смешанное число в неправильную дробь: ${M(toMixed(a))} = ${F({ n: '?', d: a.d })}.` : `Найди корень из числителя и корень из знаменателя.`,
+        `${RT(F(a), true)}: ${RT(a.n)} = ${t.p}, ${RT(a.d)} = ${t.q}.`]; },
+  },
+  meaning: {
+    input: 'choice', title: 'Имеет ли смысл выражение', options: yesNo,
+    gen: rnd => {
+      const form = pick(rnd, ['neg', 'out', 'sqneg', 'negsq', 'diff']);
+      const m = int(rnd, 2, 25), p = int(rnd, 2, 40), q = int(rnd, 2, 40);
+      return { form, m, p, q };
+    },
+    bad: t => t.form === 'diff' && t.p === t.q,
+    text: t => ({
+      neg: RT(`${MINUS}${t.m}`), out: `${MINUS}${RT(t.m)}`, sqneg: RT(`(${MINUS}${t.m})²`),
+      negsq: RT(`${MINUS}${t.m}²`), diff: RT(`${t.p} ${MINUS} ${t.q}`),
+    })[t.form],
+    under: t => ({ neg: -t.m, out: t.m, sqneg: t.m * t.m, negsq: -t.m * t.m, diff: t.p - t.q })[t.form],
+    ans: t => TYPES.meaning.under(t) >= 0 ? 'yes' : 'no',
+    why(t) {
+      const u = TYPES.meaning.under(t), us = (u < 0 ? MINUS : '') + Math.abs(u);
+      const calc = { neg: '', out: `Под корнем ${t.m} ≥ 0, а минус стоит перед корнем: ${MINUS}${RT(t.m)} — это число, противоположное ${RT(t.m)}. `,
+        sqneg: `(${MINUS}${t.m})² = ${t.m * t.m}: квадрат отрицательного числа положителен. `,
+        negsq: `${MINUS}${t.m}² = ${MINUS}(${t.m}²) = ${us}: в квадрат возводится только ${t.m}, минус остаётся. `,
+        diff: `${t.p} ${MINUS} ${t.q} = ${us}. ` }[t.form];
+      return calc + (u >= 0 ? `Под корнем ${us} ≥ 0 — выражение имеет смысл.` : `Под корнем ${us} &lt; 0, а квадрат любого числа неотрицателен — выражение не имеет смысла.`);
+    },
+    ok: t => TYPES.meaning.why(t),
+    wrong: t => bad('meaning', TYPES.meaning.why(t)),
+    hints: t => [`Вычисли, какое число стоит под знаком корня. Корень из отрицательного числа не существует.`,
+      `Под корнем ${(TYPES.meaning.under(t) < 0 ? MINUS : '') + Math.abs(TYPES.meaning.under(t))}.`],
+  },
+  square: {
+    input: 'num', title: 'Квадрат корня',
+    gen: rnd => ({ form: pick(rnd, ['A', 'B', 'C', 'D']), a: int(rnd, 2, 99), k: int(rnd, 2, 6), b: int(rnd, 2, 11), m: int(rnd, 2, 20) }),
+    bad: t => isqrt(t.a) != null || isqrt(t.b) != null,
+    text: t => ({ A: `(${RT(t.a)})²`, B: `(${MINUS}${RT(t.a)})²`, C: `(${t.k}${RT(t.b)})²`, D: RT(`(${MINUS}${t.m})²`) })[t.form],
+    ans: t => Q({ A: t.a, B: t.a, C: t.k * t.k * t.b, D: t.m }[t.form]),
+    ok: t => ({
+      A: `По определению (${RT('<i>a</i>')})² = <i>a</i>: ${TYPES.square.text(t)} = ${t.a}.`,
+      B: `Квадрат отрицательного числа положителен: (${MINUS}${RT(t.a)})² = (${RT(t.a)})² = ${t.a}.`,
+      C: `В квадрат возводится каждый множитель: (${t.k}${RT(t.b)})² = ${t.k}² · (${RT(t.b)})² = ${t.k * t.k} · ${t.b} = ${t.k * t.k * t.b}.`,
+      D: `(${MINUS}${t.m})² = ${t.m * t.m}, ${RT(t.m * t.m)} = ${t.m}.`,
+    })[t.form],
+    wrong(t, v) {
+      const ok = TYPES.square.ok(t), f = t.form;
+      if (f === 'A' && qeq(v, Q(t.a * t.a))) return bad('square', `${RT(t.a)} — это число, квадрат которого равен ${t.a}. Поэтому (${RT(t.a)})² = ${t.a}, а не ${t.a}².`);
+      if (f === 'B' && qeq(v, Q(-t.a))) return bad('square', ok);
+      if (f === 'C' && qeq(v, Q(t.k * t.b))) return bad('square', `Множитель ${t.k} тоже нужно возвести в квадрат. ${ok}`);
+      if (f === 'D' && qeq(v, Q(-t.m))) return bad('sign', `Арифметический корень не бывает отрицательным. ${ok}`);
+      if (f === 'D' && qeq(v, Q(t.m * t.m))) return bad('square', `Это значение подкоренного выражения, а нужен корень из него. ${ok}`);
+      return bad('square', ok);
+    },
+    key: t => keyQ(TYPES.square.ans(t)),
+    traps: t => ({ A: [t.a * t.a], B: [-t.a], C: [t.k * t.b, 2 * t.k * t.b], D: [-t.m, t.m * t.m] })[t.form]
+      .map(n => ({ key: keyQ(Q(n)), html: htmlQ(Q(n)) })),
+    hints: t => [`Вспомни: (${RT('<i>a</i>')})² = <i>a</i> — по определению корня.`,
+      ({ A: `Квадрат корня из ${t.a} равен ${t.a}.`, B: `(${MINUS}${RT(t.a)})² = (${RT(t.a)})².`, C: `(${t.k}${RT(t.b)})² = ${t.k}² · (${RT(t.b)})².`, D: `Сначала вычисли (${MINUS}${t.m})².` })[t.form]],
+  },
+  expr: {
+    input: 'num', title: 'Значение выражения',
+    // c₁√A ± c₂√B: коэффициенты — целые, десятичные или дроби вида 1/n, корни — целые или десятые
+    gen: rnd => {
+      const coef = () => pick(rnd, [Q(1), Q(2), Q(3), Q(4), Q(5), Q(10), Q(1, 10), Q(1, 5), Q(1, 2), Q(1, 3), Q(1, 4), Q(1, 6)]);
+      const root = () => rnd() < 0.5 ? Q(int(rnd, 2, 12)) : Q(int(rnd, 1, 9), 10);
+      return { c1: coef(), s1: root(), c2: coef(), s2: root(), op: rnd() < 0.6 ? '+' : MINUS };
+    },
+    bad: t => {
+      const p1 = qmul(t.c1, t.s1), p2 = qmul(t.c2, t.s2), r = TYPES.expr.ans(t);
+      const hundredths = x => 100 % x.d === 0;   // не больше двух знаков после запятой
+      return r.n <= 0 || !hundredths(p1) || !hundredths(p2) || !hundredths(r) || (t.s1.d === 1 && t.s2.d === 1) || qeq(t.s1, t.s2);
+    },
+    coef: c => qeq(c, Q(1)) ? '' : htmlQ(c, c.d === 3 || c.d === 4 || c.d === 6 ? 'frac' : 'dec'),
+    text: t => { const E = TYPES.expr; return `${E.coef(t.c1)}${RT(D(qmul(t.s1, t.s1)))} ${t.op} ${E.coef(t.c2)}${RT(D(qmul(t.s2, t.s2)))}`; },
+    ans: t => (t.op === '+' ? qadd : qsub)(qmul(t.c1, t.s1), qmul(t.c2, t.s2)),
+    calc(t, s1 = t.s1, s2 = t.s2) {
+      const E = TYPES.expr, part = (c, s) => `${RT(D(qmul(s, s)))} = ${D(s)}` + (qeq(c, Q(1)) ? '' : `, ${E.coef(c)} · ${D(s)} = ${D(qmul(c, s))}`);
+      return `${part(t.c1, s1)}; ${part(t.c2, s2)}; ${D(qmul(t.c1, s1))} ${t.op} ${D(qmul(t.c2, s2))} = ${D(TYPES.expr.ans(t))}.`;
+    },
+    ok: t => TYPES.expr.calc(t),
+    // ошибка в запятой у одного из корней: √0,04 = 0,02 вместо 0,2
+    slips(t) {
+      const out = [], val = (a, b) => (t.op === '+' ? qadd : qsub)(qmul(t.c1, a), qmul(t.c2, b));
+      if (t.s1.d > 1) out.push(val(qmul(t.s1, Q(1, 10)), t.s2), val(qmul(t.s1, Q(10)), t.s2));
+      if (t.s2.d > 1) out.push(val(t.s1, qmul(t.s2, Q(1, 10))), val(t.s1, qmul(t.s2, Q(10))));
+      return out;
+    },
+    wrong(t, v) {
+      const E = TYPES.expr;
+      if (E.slips(t).some(x => qeq(x, v))) return bad('decimal', `Ошибка в запятой при извлечении корня: в квадрате десятичной дроби знаков после запятой вдвое больше, например 0,2² = 0,04. ${E.calc(t)}`);
+      const other = (t.op === '+' ? qsub : qadd)(qmul(t.c1, t.s1), qmul(t.c2, t.s2));
+      if (qeq(v, other)) return bad('calc', `Проверь знак действия: в выражении «${t.op}». ${E.calc(t)}`);
+      return bad('calc', `Вычислим по шагам: сначала корни, потом умножение, потом ${t.op === '+' ? 'сложение' : 'вычитание'}. ${E.calc(t)}`);
+    },
+    key: t => keyQ(TYPES.expr.ans(t)),
+    traps: t => [TYPES.expr.slips(t)[0], (t.op === '+' ? qsub : qadd)(qmul(t.c1, t.s1), qmul(t.c2, t.s2))]
+      .filter(x => x && x.n > 0 && decStr(x)).map(x => ({ key: keyQ(x), html: htmlQ(x) })),
+    hints: t => [`Сначала извлеки корни, потом умножь на коэффициенты, потом ${t.op === '+' ? 'сложи' : 'вычти'}.`,
+      `${RT(D(qmul(t.s1, t.s1)))} = ${D(t.s1)}, ${RT(D(qmul(t.s2, t.s2)))} = ${D(t.s2)}.`],
+  },
+  sum: {
+    input: 'num', title: 'Корень из суммы',
+    gen: rnd => {
+      const [a, b, c] = pick(rnd, [[3, 4, 5], [6, 8, 10], [5, 12, 13], [9, 12, 15], [8, 15, 17], [12, 16, 20], [7, 24, 25], [15, 20, 25], [10, 24, 26], [20, 21, 29]]);
+      return rnd() < 0.5 ? { minus: false, a, b, c } : { minus: true, a: rnd() < 0.5 ? a : b, b: rnd() < 0.5 ? b : a, c };
+    },
+    bad: t => t.a === t.b,
+    text: t => t.minus ? RT(`${t.c * t.c} ${MINUS} ${t.a * t.a}`) : RT(`${t.a * t.a} + ${t.b * t.b}`),
+    ans: t => Q(t.minus ? isqrt(t.c * t.c - t.a * t.a) : t.c),
+    ok: t => t.minus ? `${t.c * t.c} ${MINUS} ${t.a * t.a} = ${t.c * t.c - t.a * t.a}, ${RT(t.c * t.c - t.a * t.a)} = ${isqrt(t.c * t.c - t.a * t.a)}.`
+      : `${t.a * t.a} + ${t.b * t.b} = ${t.c * t.c}, ${RT(t.c * t.c)} = ${t.c}.`,
+    wrong(t, v) {
+      const ok = TYPES.sum.ok(t);
+      if (qeq(v, Q(t.minus ? t.c - t.a : t.a + t.b)))
+        return bad('sumRoot', `Корень из ${t.minus ? 'разности' : 'суммы'} не равен ${t.minus ? 'разности' : 'сумме'} корней: ${t.minus ? `${t.c} ${MINUS} ${t.a} = ${t.c - t.a}` : `${t.a} + ${t.b} = ${t.a + t.b}`}, а ${htmlQ(v)}² = ${sq2(v)}. Сначала вычисли выражение под корнем: ${ok}`);
+      return bad('calc', `Сначала вычисли выражение под корнем, потом извлеки корень: ${ok}`);
+    },
+    hints: t => [`Сначала вычисли то, что стоит под корнем.`, `Под корнем ${t.minus ? t.c * t.c - t.a * t.a : t.c * t.c}.`],
+  },
+  eq: {
+    input: 'eq', title: 'Уравнение x² = a',
+    // a — чему равен x² после переноса; text — запись уравнения; alt — x² при ошибке в переносе
+    gen: (rnd, form) => {
+      form = form || pick(rnd, ['sq', 'sq', 'dec', 'frac', 'zero', 'neg', 'irr', 'shift', 'shift']);
+      const t = { form };
+      if (form === 'sq') t.a = Q(int(rnd, 2, 15) ** 2);
+      if (form === 'dec') { const j = int(rnd, 1, 19); t.bad = j % 10 === 0; t.a = qmul(Q(j, 10), Q(j, 10)); }
+      if (form === 'frac') { const p = int(rnd, 1, 9), q = int(rnd, 2, 9); t.bad = gcd(p, q) !== 1 || p > q; t.a = Q(p * p, q * q); }
+      if (form === 'zero') t.a = Q(0);
+      if (form === 'neg') t.a = Q(-int(rnd, 1, 100));
+      if (form === 'irr') { const m = int(rnd, 2, 60); t.bad = isqrt(m) != null; t.a = Q(m); }
+      if (form === 'shift') {
+        const pos = rnd() < 0.65, c = int(rnd, 1, 30);
+        if (pos) {
+          const k = int(rnd, 2, 12), a = k * k;
+          t.a = Q(a);
+          if (rnd() < 0.4) { t.lhs = `${X}² ${MINUS} ${a} = 0`; t.alt = []; }
+          else { t.lhs = `${X}² + ${c} = ${a + c}`; t.alt = [Q(a + 2 * c), Q(a + c)]; t.move = `${X}² = ${a + c} ${MINUS} ${c} = ${a}`; }
+        } else {
+          const m = int(rnd, 1, 20) ** (rnd() < 0.5 ? 2 : 1);
+          t.a = Q(-m);
+          if (rnd() < 0.5) { t.lhs = `${X}² + ${m} = 0`; t.alt = [Q(m)]; t.move = `${X}² = ${MINUS}${m}`; }
+          else { t.lhs = `${X}² + ${m + c} = ${c}`; t.alt = [Q(m + 2 * c), Q(c)]; t.move = `${X}² = ${c} ${MINUS} ${m + c} = ${MINUS}${m}`; }
+        }
+      }
+      return t;
+    },
+    bad: t => !!t.bad,
+    style: t => t.form === 'frac' ? 'frac' : 'dec',
+    text: t => t.lhs || `${X}² = ${htmlQ(t.a, TYPES.eq.style(t))}`,
+    ans: t => eqRoots(t.a),
+    same: (t, x) => {
+      const R = eqRoots(t.a);
+      if (x.roots.length !== R.length) return false;
+      const left = R.slice();
+      return x.roots.every(v => { const i = left.findIndex(r => V.eq(r, v)); if (i < 0) return false; left.splice(i, 1); return true; });
+    },
+    ok(t) {
+      const R = eqRoots(t.a), st = TYPES.eq.style(t), a = htmlQ(t.a, st), pre = t.move ? `${t.move}. ` : '';
+      if (!R.length) return `${pre}Квадрат числа не бывает отрицательным — корней нет.`;
+      if (R.length === 1) return `${pre}${X}² = 0 только при ${X} = 0 — один корень.`;
+      return `${pre}${X} = ${V.html(R[0], st)} и ${X} = ${V.html(R[1], st)}: (±${V.html(R[0], st)})² = ${a}.`;
+    },
+    wrong(t, x) {
+      const R = eqRoots(t.a), n = x.roots.length, st = TYPES.eq.style(t), a = htmlQ(t.a, st), ok = TYPES.eq.ok(t);
+      const pre = t.move ? `Сначала найдём ${X}²: ${t.move}. ` : '';
+      if (t.alt && t.alt.some(alt => TYPES.eq.same({ a: alt }, x)))
+        return bad('eqShift', `Ошибка при переносе: слагаемое переносят в другую часть уравнения с противоположным знаком. ${ok}`);
+      if (t.a.n < 0) return bad('eqNone', `${pre}${X}² = ${a}: квадрат любого числа неотрицателен, а ${a} &lt; 0. Уравнение корней не имеет.`);
+      if (t.a.n === 0) return bad('eqCount', n === 0 ? `${X} = 0 — корень: 0² = 0. ${ok}` : `${X}² = 0 только при ${X} = 0 — корень один.`);
+      if (n === 0) return bad('eqCount', `${pre}${a} &gt; 0 — корни есть: ${eqHTML(R, st)}.`);
+      if (n === 1 && R.some(r => V.eq(r, x.roots[0])))
+        return bad('eqTwo', `Это только один корень. ${pre}(${V.html(R[0], st)})² = ${a} и (${V.html(R[1], st)})² = ${a}, поэтому у уравнения два корня: ${eqHTML(R, st)}.`);
+      if (t.form === 'irr' && x.roots.every(v => v.q && v.q.d > 1))
+        return bad('calc', `${a} — не квадрат целого числа, и ${RT(a)} не записывается конечной десятичной дробью. Корни записывают со знаком корня: ${eqHTML(R, st)}.`);
+      if (n === 2 && V.eq(x.roots[0], x.roots[1]) && R.some(r => V.eq(r, x.roots[0])))
+        return bad('eqTwo', `Ты записал один и тот же корень дважды. ${ok}`);
+      const tall = a.includes('frac');
+      return bad('calc', `${pre}${X}² = ${a}, значит ${X} = ${RT(a, tall)} или ${X} = ${MINUS}${RT(a, tall)}. ${ok}`);
+    },
+    key: t => eqKey(eqRoots(t.a), TYPES.eq.style(t)),
+    keyHTML: t => { const R = eqRoots(t.a), st = TYPES.eq.style(t); return !R.length ? 'нет корней' : R.length === 1 ? V.html(R[0], st) : '±' + V.html(R[0], st); },
+    traps(t) {
+      const R = eqRoots(t.a), st = TYPES.eq.style(t), out = [];
+      const add = roots => out.push({ key: eqKey(roots, st), html: !roots.length ? 'нет корней' : (roots.length === 2 ? '±' : '') + V.html(roots[0], st) });
+      if (R.length === 2) add([R[0]]);
+      if (t.alt) t.alt.forEach(alt => add(eqRoots(alt)));
+      if (t.a.n < 0) add(eqRoots(qneg(t.a)));
+      if (t.a.n === 0) add([]);
+      return out;
+    },
+    hints: t => [t.move ? 'Сначала перенеси число в правую часть с противоположным знаком.' : `Сколько корней: если ${X}² равен положительному числу — два, нулю — один, отрицательному — ни одного.`,
+      `${X}² = ${htmlQ(t.a, TYPES.eq.style(t))}.` + (t.a.n > 0 ? ` Подумай, какие два числа в квадрате дают это число.` : '')],
+  },
+  est: {
+    input: 'est', title: 'Оценка корня',
+    gen: rnd => ({ a: int(rnd, 2, 150) }),
+    bad: t => isqrt(t.a) != null,
+    text: t => RT(t.a),
+    ans: t => { const lo = floorSqrt(t.a); return { lo, hi: lo + 1 }; },
+    same: (t, x) => { const r = TYPES.est.ans(t); return x.lo === r.lo && x.hi === r.hi; },
+    ok: t => { const { lo, hi } = TYPES.est.ans(t); return `${lo}² = ${lo * lo} &lt; ${t.a} &lt; ${hi * hi} = ${hi}², значит ${lo} &lt; ${RT(t.a)} &lt; ${hi}.`; },
+    wrong(t, x) {
+      const ok = TYPES.est.ok(t);
+      if (x.hi !== x.lo + 1) return bad('est', `Нужны соседние целые числа — они отличаются на 1. ${ok}`);
+      return bad('est', `Проверим: ${x.lo}² = ${x.lo * x.lo}, ${x.hi}² = ${x.hi * x.hi} — число ${t.a} не лежит между ними. Ищем соседние квадраты: ${ok}`);
+    },
+    key: t => { const { lo, hi } = TYPES.est.ans(t); return `${lo} и ${hi}`; },
+    keyHTML: t => TYPES.est.key(t),
+    traps: t => { const { lo, hi } = TYPES.est.ans(t); return [[lo - 1, lo], [hi, hi + 1]].filter(([p]) => p >= 1).map(([p, q]) => ({ key: `${p} и ${q}`, html: `${p} и ${q}` })); },
+    hints: t => [`Найди два соседних квадрата целых чисел: один меньше ${t.a}, другой больше.`, `${floorSqrt(t.a)}² = ${floorSqrt(t.a) ** 2}.`],
+  },
+  cmp: {
+    input: 'choice', title: 'Сравнение', options: [['<', '&lt;'], ['=', '='], ['>', '&gt;']],
+    // L и R: html — запись, sq — квадрат (оба числа положительны, сравниваем квадраты)
+    gen: rnd => {
+      const form = pick(rnd, ['A', 'A', 'B', 'C']);
+      let L, R;
+      if (form === 'A') { const k = int(rnd, 2, 12), a = k * k + (rnd() < 0.5 ? -1 : 1) * int(rnd, 1, 9);
+        L = { html: RT(a), sq: Q(a), line: `(${RT(a)})² = ${a}` }; R = { html: String(k), sq: Q(k * k), line: `${k}² = ${k * k}`, bad: a < 2 || isqrt(a) != null }; }
+      if (form === 'B') { const k = int(rnd, 2, 5), m = int(rnd, 2, 7), j = int(rnd, 2, 5), n = int(rnd, 2, 7);
+        L = { html: `${k}${RT(m)}`, sq: Q(k * k * m), line: `(${k}${RT(m)})² = ${k * k} · ${m} = ${k * k * m}` };
+        R = { html: `${j}${RT(n)}`, sq: Q(j * j * n), line: `(${j}${RT(n)})² = ${j * j} · ${n} = ${j * j * n}`, bad: isqrt(m) != null || isqrt(n) != null || k === j || m === n || k * k * m === j * j * n }; }
+      if (form === 'C') { const k = int(rnd, 1, 9), j = int(rnd, 1, 9), tq = Q(k, 10), dq = Q(j, 10);
+        L = { html: D(tq), sq: qmul(tq, tq), line: `${D(tq)}² = ${D(qmul(tq, tq))}` };
+        R = { html: RT(D(dq)), sq: dq, line: `(${RT(D(dq))})² = ${D(dq)}`, bad: qeq(qmul(tq, tq), dq) }; }
+      const swap = rnd() < 0.5;
+      return { form, L: swap ? R : L, R: swap ? L : R, bad: L.bad || R.bad };
+    },
+    bad: t => !!t.bad,
+    text: t => `${t.L.html} <span class="cmpbox">?</span> ${t.R.html}`,
+    ans: t => { const c = qsub(t.L.sq, t.R.sq).n; return c < 0 ? '<' : c > 0 ? '>' : '='; },
+    ok(t) {
+      const s = TYPES.cmp.ans(t), e = esc(s);
+      return `Сравним квадраты: ${t.L.line}, ${t.R.line}. ${htmlQ(t.L.sq)} ${e} ${htmlQ(t.R.sq)}, значит ${t.L.html} ${e} ${t.R.html}.` +
+        (t.form === 'C' ? ' Квадрат десятичной дроби, меньшей 1, меньше самой дроби.' : '');
+    },
+    wrong: t => bad('cmp', `Положительные числа сравнивают по их квадратам: чем больше квадрат, тем больше число. ${TYPES.cmp.ok(t)}`),
+    key: t => TYPES.cmp.ans(t),
+    keyHTML: t => esc(TYPES.cmp.ans(t)),
+    traps: t => { const s = TYPES.cmp.ans(t), o = s === '<' ? '>' : '<'; return [{ key: o, html: esc(o) }]; },
+    hints: t => ['Возведи оба числа в квадрат и сравни квадраты.', `${t.L.line}.`],
+  },
+};
+// число — ответ: same по умолчанию, ключ и ловушки по умолчанию
+for (const T of Object.values(TYPES)) {
+  if (T.input === 'num' || T.input === 'frac') {
+    T.same = T.same || ((t, v) => qeq(v, T.ans(t)));
+    T.key = T.key || (t => keyQ(T.ans(t)));
+    T.keyHTML = T.keyHTML || (t => htmlQ(T.ans(t)));
+  }
+  if (T.input === 'choice') T.same = T.same || ((t, v) => v === T.ans(t));
+}
+function generate(type, rnd, form, tries = 2000) {
+  for (let k = 0; k < tries; k++) {
+    const t = TYPES[type].gen(rnd, form);
+    if (!TYPES[type].bad?.(t)) return { type, ...t };
+  }
+  throw new Error('Генератор не нашёл задание: ' + type);
+}
+const SECTIONS = [
+  { title: 'Раздел 1', text: 'Вычисли корень', types: ['table', 'dec', 'fraction'], ex: () => `${RT('0,09')} = ?` },
+  { title: 'Раздел 2', text: 'Определение и выражения', types: ['meaning', 'square', 'expr', 'sum'], ex: () => `(${RT(7)})² = ?` },
+  { title: 'Раздел 3', text: `Уравнение ${X}² = <i>a</i>`, types: ['eq'], ex: () => `${X}² = 49` },
+  { title: 'Раздел 4', text: 'Оценка и сравнение', types: ['est', 'cmp'], ex: () => `${RT(50)} <span class="cmpbox">?</span> 7` },
+];
+
+// ================= Раздатка: вариант восстанавливается по номеру =================
+// Версия 1: восемь заданий, верные ответы складываются в слово из 8 разных букв
+const KINDS_V1 = [['dec'], ['fraction', 'mixed'], ['expr'], ['square'], ['eq', ['sq', 'dec', 'frac']],
+  ['eq', ['neg', 'irr', 'shift', 'shift']], ['est'], ['cmp']];
+const WORDS_V1 = ['ПАРУСНИК', 'ЛИСТОПАД', 'ЖУРАВЛИК', 'ГРУЗОВИК', 'СНЕГОВИК', 'ГОЛУБИКА', 'ПЕРЧАТКИ', 'ПОЛЯРНИК', 'ХРУСТАЛЬ'];
+const ABC = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ';
+function makeVariant(num, version = GEN_VERSION) {
+  if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
+  const tasks = [];
+  KINDS_V1.forEach(([type, forms], i) => {
+    const rnd = taskRnd(num, i);
+    let t, guard = 0;
+    do t = generate(type, rnd, Array.isArray(forms) ? pick(rnd, forms) : forms);
+    while (tasks.some(u => TYPES[u.type].key(u) === TYPES[type].key(t)) && ++guard < 200);
+    tasks.push(t);
+  });
+  const rnd = taskRnd(num, 99);
+  const word = pick(rnd, WORDS_V1);
+  const answers = tasks.map(t => TYPES[t.type].key(t));
+  const bank = new Map();   // ответ → { html, letter }
+  tasks.forEach((t, i) => bank.set(answers[i], { key: answers[i], html: TYPES[t.type].keyHTML(t), letter: word[i] }));
+  const decoys = shuffle(rnd, [...ABC].filter(ch => !word.includes(ch)));
+  tasks.forEach(t => (TYPES[t.type].traps?.(t) || []).slice(0, CONFIG.print.traps).forEach(x => {
+    if (!bank.has(x.key)) bank.set(x.key, { ...x, letter: decoys.shift() });
+  }));
+  return { num, version, label: version + '-' + num, tasks, answers, word, bank: shuffle(rnd, [...bank.values()]) };
+}
+
+// Ссылка «← Назад на сайт» на стартовом экране: материал открыт с сайта (/zapusk/<slug>/ или /materials/<slug>.html)
+// ведёт на страницу материала /item/<slug>/. Скачанный файл и ссылка для учеников её не показывают.
+function siteHref() {
+  if (STUDENT || location.protocol === 'file:') return '';
+  let top = location;
+  try { if (window.top !== window && window.top.location.origin === location.origin) top = window.top.location; } catch {}
+  const z = top.pathname.match(/^(.*\/)zapusk\/([a-z0-9-]+)\/?$/);
+  if (z) return `${top.origin}${z[1]}item/${z[2]}/`;
+  const m = location.pathname.match(/^(.*\/)materials\/([a-z0-9-]+)\.html$/);
+  return m ? `${location.origin}${m[1]}item/${m[2]}/` : '';
+}
+
+// ================= Экраны =================
+let screen = null;
+function show(name) {
+  if (STUDENT && name !== 'home') return;
+  boardStopPreview();
+  screen = name;
+  ['start', 'board', 'print', 'home'].forEach(s => { $(s).hidden = s !== name; });
+  $('help').hidden = true;
+  if (name === 'board') renderBoard();
+  if (name === 'print') renderPrint();
+  if (name === 'home') homeSetup();
+}
+function toggleTheme() {
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+  store.set('theme', document.documentElement.dataset.theme);
+}
+async function toggleFull() {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch {}
+}
+
+// ================= 🖥 На доске =================
+// На экране — то, что видит класс: короткий вопрос, ответ, чертёж и запись в тетради.
+// Что сказать словами — в подсказке учителю (кнопка «💬 Учителю»).
+const BW = 980, BH = 400;
+const B = { e: null, steps: [], i: 0, phase: 0, timer: 0, notes: false };
+const svg = (inner, label) => `<svg viewBox="0 0 ${BW} ${BH}" role="img" aria-label="${label}" preserveAspectRatio="xMidYMid meet">${inner}</svg>`;
+const tx = (x, y, s, cls = 'lab', anchor = 'middle') => `<text class="${cls}" x="${x}" y="${y}" text-anchor="${anchor}">${s}</text>`;
+const sr = s => `√<tspan class="ov">${s}</tspan>`;   // корень в подписи чертежа
+const ds = x => decStr(x) || `${x.n}/${x.d}`;
+// клетчатый квадрат cols × rows клеток размера c; fill — заливка, every — жирная линия через every клеток
+function grid(x, y, cols, rows, c, fill = 'ge', every = 0) {
+  let s = `<rect class="${fill}" x="${x}" y="${y}" width="${cols * c}" height="${rows * c}"/>`;
+  for (let i = 1; i < cols; i++) s += `<line class="gl${every && i % every === 0 ? ' gk' : ''}" x1="${x + i * c}" x2="${x + i * c}" y1="${y}" y2="${y + rows * c}"/>`;
+  for (let j = 1; j < rows; j++) s += `<line class="gl${every && j % every === 0 ? ' gk' : ''}" x1="${x}" x2="${x + cols * c}" y1="${y + j * c}" y2="${y + j * c}"/>`;
+  return s + `<rect class="gf" x="${x}" y="${y}" width="${cols * c}" height="${rows * c}"/>`;
+}
+// скобка под отрезком и подпись
+const under = (x, y, w, s, cls = '') => `<path class="br ${cls}" d="M${x} ${y + 10}v12H${x + w}v-12"/>` + tx(x + w / 2, y + 62, s, 'lab' + (cls ? ' ' + cls : ''));
+function svgFrac(cx, cy, n, d, cls = '') {
+  const w = Math.max(String(n).length, String(d).length) * 10 + 10;
+  return `<g class="lbl ${cls}"><text x="${cx}" y="${cy - 8}" text-anchor="middle">${n}</text><line x1="${cx - w}" x2="${cx + w}" y1="${cy}" y2="${cy}"/><text x="${cx}" y="${cy + 31}" text-anchor="middle">${d}</text></g>`;
+}
+// квадрат k × k клеток слева, справа — строки подписей
+function squareScene(k, side, lines = [], opt = {}) {
+  const c = Math.min(46, 300 / k), size = k * c, x = 120, y = (BH - size) / 2 - 24;
+  let s = grid(x, y, k, k, c, opt.fill || 'gs') + under(x, y + size, size, side, opt.sideCls || 'warm');
+  s += tx(x + size + 60, y + size / 2 + 12, `S = ${k * k}`, 'lab', 'start');
+  lines.forEach((l, i) => { s += `<g class="${l.cls || ''}">${tx(560, 90 + i * 64, l.t, 'lab' + (l.lc ? ' ' + l.lc : ''), 'start')}</g>`; });
+  return s;
+}
+// парабола y = x² и горизонтальные прямые y = c
+const PX = x => 490 + x * 46, PY = y => 306 - y * 7;   // y от −11 до 40 помещается в чертёж
+function parabola(lines) {
+  let path = '';
+  for (let x = -6.2; x <= 6.21; x += 0.1) path += (path ? 'L' : 'M') + PX(x).toFixed(1) + ' ' + PY(x * x).toFixed(1);
+  let s = `<line class="axis" x1="${PX(-7)}" x2="${PX(7)}" y1="${PY(0)}" y2="${PY(0)}"/><line class="axis" x1="${PX(0)}" x2="${PX(0)}" y1="${PY(-12)}" y2="${PY(41)}"/>`;
+  s += `<path class="curve" d="${path}"/>` + tx(PX(4.4), PY(36), `y = ${X.replace(/<\/?i>/g, '')}²`, 'lab s acc', 'start');
+  lines.forEach(c => {
+    s += `<g class="new"><line class="hline" x1="${PX(-6.8)}" x2="${PX(6.8)}" y1="${PY(c)}" y2="${PY(c)}"/>` + tx(PX(-6.9), PY(c) + 10, `y = ${c < 0 ? MINUS + -c : c}`, 'lab s warm', 'end');
+    const r = Math.sqrt(Math.max(c, 0));
+    if (c > 0) s += `<circle class="dot" cx="${PX(-r)}" cy="${PY(c)}" r="11"/><circle class="dot" cx="${PX(r)}" cy="${PY(c)}" r="11"/>` +
+      tx(PX(-r), PY(c) - 22, `${MINUS}${r}`, 'lab s warm') + tx(PX(r), PY(c) - 22, `${r}`, 'lab s warm');
+    if (c === 0) s += `<circle class="dot" cx="${PX(0)}" cy="${PY(0)}" r="11"/>`;
+    s += '</g>';
+  });
+  return s;
+}
+// числовая прямая от a до b (в десятых), подсветка [h, h + step]
+function numLine(y, a, b, step, labelEvery, hl, cls = '') {
+  const x0 = 90, x1 = 890, k = (x1 - x0) / (b - a);
+  let s = `<line class="axis" x1="${x0 - 20}" x2="${x1 + 20}" y1="${y}" y2="${y}"/>`;
+  const n = Math.round((b - a) / step);
+  for (let i = 0; i <= n; i++) {
+    const v = a + i * step, x = x0 + i * step * k;
+    s += `<line class="tick" x1="${x}" x2="${x}" y1="${y - 12}" y2="${y + 12}"/>`;
+    if (i % labelEvery === 0) s += tx(x, y + 48, String(Math.round(v * 1000) / 1000).replace('.', ','), 'lab s');
+  }
+  if (hl != null) s += `<line class="seg ${cls}" x1="${x0 + (hl - a) * k}" x2="${x0 + (hl + step - a) * k}" y1="${y}" y2="${y}"/>`;
+  return s;
+}
+
+function buildSteps(e) {
+  const k = e.side, k2 = e.trap, a = k * k, a2 = k2 * k2;
+  const dq = Q(e.dec, 10), dA = qmul(dq, dq);
+  const [r, q] = e.frac, fA = Q(r * r, q * q), fm = toMixed(fA), fr = Q(r, q);
+  const n = floorSqrt(e.approx), t10 = floorSqrt(e.approx * 100), t100 = floorSqrt(e.approx * 10000);
+  const [ta, tb, tc] = e.triple;
+  const steps = [];
+  steps.push({
+    q: `Площадь квадрата ${a}. Чему равна его сторона?`,
+    a: `${k}, потому что ${k}² = ${a}.`,
+    note: 'Пусть класс вспомнит: площадь квадрата — сторона в квадрате. Ищем обратное: по площади — сторону.',
+    draw: ph => squareScene(k, ph ? String(k) : '?'), rec: ph => ph ? [`${k}² = ${a}`] : [],
+  });
+  steps.push({
+    q: `Какие числа в квадрате дают ${a}?`,
+    a: `${k} и ${MINUS}${k}: ${k}² = ${a} и (${MINUS}${k})² = ${a}.`,
+    note: 'Обычно называют только положительное число — спросите, а подойдёт ли отрицательное.',
+    draw: ph => squareScene(k, String(k), ph ? [{ t: `${k}² = ${a}`, cls: 'new' }, { t: `(${MINUS}${k})² = ${a}`, cls: 'new' }] : []),
+    rec: ph => ph ? [`${k}² = ${a}, (${MINUS}${k})² = ${a}`] : [`${k}² = ${a}`],
+  });
+  steps.push({
+    q: `Какое из них может быть длиной стороны?`,
+    a: `Только ${k}: длина не бывает отрицательной. Это ${RT(a)} = ${k}.`,
+    note: `Определение: арифметическим квадратным корнем из числа <i>a</i> называется неотрицательное число, квадрат которого равен <i>a</i>. Знак √ — знак арифметического корня, число под ним — подкоренное выражение.`,
+    draw: ph => squareScene(k, ph ? `${sr(a)} = ${k}` : String(k), ph ? [{ t: `${sr(a)} = ${k}`, cls: 'new', lc: 'acc' }, { t: `${k} ≥ 0, ${k}² = ${a}`, cls: 'new' }] : []),
+    rec: ph => ph ? [`${RT(a)} = ${k}, так как ${k} ≥ 0 и ${k}² = ${a}`] : [`${k}² = ${a}, (${MINUS}${k})² = ${a}`],
+  });
+  steps.push({
+    q: `В тетради написано: ${RT(a2)} = ±${k2}. Верно?`,
+    a: `Нет: ${RT(a2)} = ${k2}. Два числа ±${k2} — корни уравнения ${X}² = ${a2}.`,
+    note: `Корень — одно неотрицательное число. Уравнение ${X}² = ${a2} — это вопрос «какие числа в квадрате дают ${a2}», у него два ответа. На графике — две точки пересечения.`,
+    draw: ph => {
+      const c = 34, size = k2 * c, x = 90, y = 70;
+      let s = grid(x, y, k2, k2, c, 'gs') + under(x, y + size, size, ph ? `${sr(a2)} = ${k2}` : `${sr(a2)} = ?`, 'warm');
+      if (ph) s += `<g transform="translate(220 0)">${parabola([a2])}</g>`;
+      return s;
+    },
+    rec: ph => ph ? [`${RT(a2)} = ${k2};  ${X}² = ${a2}: ${X} = ${k2} или ${X} = ${MINUS}${k2}`] : [],
+  });
+  steps.push({
+    q: `Можно ли найти ${RT(`${MINUS}${e.neg}`)}?`,
+    a: `Нет: квадрат любого числа неотрицателен. ${RT('<i>a</i>')} имеет смысл только при <i>a</i> ≥ 0.`,
+    note: `На графике y = x² нет точек ниже оси: прямая y = ${MINUS}${e.neg} его не пересекает. Поэтому выражение ${RT(`${MINUS}${e.neg}`)} не имеет смысла, а у уравнения ${X}² = ${MINUS}${e.neg} нет корней.`,
+    draw: ph => parabola(ph ? [-e.neg] : []),
+    rec: ph => ph ? [`${RT(`${MINUS}${e.neg}`)} не имеет смысла: ${X}² ≥ 0 при любом ${X}`] : [],
+  });
+  steps.push({
+    q: `Площадь закрашенного квадрата ${ds(dA)}. Сторона ${ds(qmul(dq, Q(1, 10)))} или ${ds(dq)}?`,
+    a: `${ds(dq)}: ${ds(dq)}² = ${ds(dA)}, а ${ds(qmul(dq, Q(1, 10)))}² = ${ds(qmul(dA, Q(1, 100)))}.`,
+    note: `Большой квадрат — единица, клетка — 0,1 × 0,1 = 0,01. Закрашено ${e.dec * e.dec} клеток — это ${ds(dA)}, сторона — ${e.dec} клеток, то есть ${ds(dq)}. В квадрате десятичной дроби знаков после запятой вдвое больше.`,
+    draw: ph => {
+      const c = 30, x = 120, y = 40, w = e.dec * c;
+      let s = grid(x, y, 10, 10, c, 'ge') + `<rect class="gs" x="${x}" y="${y}" width="${w}" height="${w}"/>`;
+      for (let i = 1; i < 10; i++) s += `<line class="gl" x1="${x + i * c}" x2="${x + i * c}" y1="${y}" y2="${y + 300}"/><line class="gl" x1="${x}" x2="${x + 300}" y1="${y + i * c}" y2="${y + i * c}"/>`;
+      s += `<rect class="gf" x="${x}" y="${y}" width="${w}" height="${w}" style="stroke:var(--a)"/><rect class="gf" x="${x}" y="${y}" width="300" height="300"/>`;
+      s += tx(x + 334, y + 162, '1', 'lab soft', 'start') + `<path class="br" d="M${x + 312} ${y}h12V${y + 300}h-12"/>`;
+      s += tx(x + 380, y + 120, `S = ${ds(dA)}`, 'lab', 'start');
+      s += tx(x + 380, y + 190, ph ? `сторона ${ds(dq)}` : 'сторона ?', 'lab warm', 'start');
+      if (ph) s += `<g class="new">${tx(x + 380, y + 260, 'клетка: 0,1 · 0,1 = 0,01', 'lab s soft', 'start')}</g>`;
+      return s;
+    },
+    rec: ph => ph ? [`${RT(ds(dA))} = ${ds(dq)}, так как ${ds(dq)}² = ${ds(dA)}`] : [],
+  });
+  steps.push({
+    q: `Чему равен ${RT(M(fm), true)}?`,
+    a: `${M(fm)} = ${F(fA)}, ${RT(F(fA), true)} = ${F(fr)} = ${M(toMixed(fr))}.`,
+    note: `Смешанное число сначала переводим в неправильную дробь. Проверка: (${r}/${q})² = ${r * r}/${q * q}. Частая ошибка — извлекать корень отдельно из целой части и из дроби. На чертеже единица — ${q} × ${q} клеток (жирные линии), клетка — 1/${q * q}.`,
+    draw: ph => {
+      const c = Math.min(42, 300 / r), x = 120, y = (BH - r * c) / 2 - 24;
+      let s = grid(x, y, r, r, c, 'gs', q) + `<path class="br" d="M${x} ${y - 10}v-12H${x + q * c}v12"/>` + tx(x + q * c / 2, y - 32, '1', 'lab soft');
+      s += tx(x + r * c + 60, y + r * c / 2 - 10, `S = ${fm.w}`, 'lab', 'start') + svgFrac(x + r * c + 60 + 104 + String(fm.w).length * 20, y + r * c / 2 - 18, fm.n, fm.d);
+      s += `<path class="br warm" d="M${x} ${y + r * c + 10}v12H${x + r * c}v-12"/>`;
+      s += ph ? svgFrac(x + r * c / 2, y + r * c + 60, r, q, 'warm') : tx(x + r * c / 2, y + r * c + 62, '?', 'lab warm');
+      return s;
+    },
+    rec: ph => ph ? [`${RT(M(fm), true)} = ${RT(F(fA), true)} = ${F(fr)} = ${M(toMixed(fr))}`] : [],
+  });
+  steps.push({
+    q: `Площадь квадрата ${e.approx}. Между какими целыми числами его сторона?`,
+    a: `${n}² = ${n * n} &lt; ${e.approx} &lt; ${(n + 1) ** 2} = ${n + 1}², значит ${n} &lt; ${RT(e.approx)} &lt; ${n + 1}.`,
+    note: `Квадрат площадью ${e.approx} больше квадрата ${n} × ${n}, но меньше квадрата ${n + 1} × ${n + 1}. Значит, его сторона ${RT(e.approx)} — между ${n} и ${n + 1}.`,
+    draw: ph => {
+      const c = 300 / (n + 1), x = 120, y = 30, side = Math.sqrt(e.approx) * c;
+      let s = grid(x, y, n + 1, n + 1, c, 'ge') + `<rect class="gs" x="${x}" y="${y}" width="${n * c}" height="${n * c}"/>`;
+      for (let i = 1; i <= n; i++) s += `<line class="gl" x1="${x + i * c}" x2="${x + i * c}" y1="${y}" y2="${y + n * c}"/><line class="gl" x1="${x}" x2="${x + n * c}" y1="${y + i * c}" y2="${y + i * c}"/>`;
+      s += `<rect class="gx" x="${x}" y="${y}" width="${side}" height="${side}"/><rect class="gf" x="${x}" y="${y}" width="${(n + 1) * c}" height="${(n + 1) * c}"/>`;
+      s += tx(x + 360, y + 70, `${n}² = ${n * n}`, 'lab acc', 'start') + tx(x + 360, y + 150, `S = ${e.approx}`, 'lab warm', 'start') + tx(x + 360, y + 230, `${n + 1}² = ${(n + 1) ** 2}`, 'lab', 'start');
+      if (ph) s += `<g class="new">${tx(x + 360, y + 310, `${n} &lt; ${sr(e.approx)} &lt; ${n + 1}`, 'lab warm', 'start')}</g>`;
+      return s;
+    },
+    rec: ph => ph ? [`${n}² = ${n * n} &lt; ${e.approx} &lt; ${(n + 1) ** 2} = ${n + 1}²,  ${n} &lt; ${RT(e.approx)} &lt; ${n + 1}`] : [],
+  });
+  const d10 = x => ds(Q(x, 10)), d100 = x => ds(Q(x, 100));
+  steps.push({
+    q: `А точнее? Между какими десятыми лежит ${RT(e.approx)}?`,
+    a: `${d10(t10)}² = ${ds(Q(t10 * t10, 100))} &lt; ${e.approx} &lt; ${ds(Q((t10 + 1) ** 2, 100))} = ${d10(t10 + 1)}², значит ${d10(t10)} &lt; ${RT(e.approx)} &lt; ${d10(t10 + 1)}.`,
+    note: `Перебираем десятые: ${d10(t10)}² = ${ds(Q(t10 * t10, 100))}, ${d10(t10 + 1)}² = ${ds(Q((t10 + 1) ** 2, 100))}. Так же уточняем до сотых: ${d100(t100)} &lt; ${RT(e.approx)} &lt; ${d100(t100 + 1)}. Сколько ни уточняй, ${RT(e.approx)} не записывается конечной десятичной дробью — к этому вернёмся в теме об иррациональных числах.`,
+    draw: ph => {
+      let s = numLine(110, n, n + 1, 0.1, 1, ph ? t10 / 10 : null);
+      if (ph) {
+        const x0 = 90, k = 800, xa = x0 + (t10 / 10 - n) * k, xb = xa + 0.1 * k;
+        s += `<g class="new"><line class="link" x1="${xa}" y1="${122}" x2="90" y2="268"/><line class="link" x1="${xb}" y1="${122}" x2="890" y2="268"/>` +
+          numLine(280, t10 / 10, (t10 + 1) / 10, 0.01, 5, t100 / 100) + tx(490, 230, `${d100(t100)} &lt; ${sr(e.approx)} &lt; ${d100(t100 + 1)}`, 'lab s warm') + '</g>';
+      }
+      return s;
+    },
+    rec: ph => ph ? [`${d10(t10)} &lt; ${RT(e.approx)} &lt; ${d10(t10 + 1)},  ${d100(t100)} &lt; ${RT(e.approx)} &lt; ${d100(t100 + 1)}`] : [`${n} &lt; ${RT(e.approx)} &lt; ${n + 1}`],
+  });
+  steps.push({
+    q: `${RT(`${ta * ta} + ${tb * tb}`)} = ${ta} + ${tb} = ${ta + tb}?`,
+    a: `Нет: ${RT(`${ta * ta} + ${tb * tb}`)} = ${RT(tc * tc)} = ${tc}.`,
+    note: `Квадраты площадью ${ta * ta} и ${tb * tb} вместе дают площадь ${tc * tc} — это квадрат со стороной ${tc}, а не ${ta + tb}. Сначала вычисляем выражение под корнем. Корень из суммы не равен сумме корней.`,
+    draw: ph => {
+      const c = Math.min(34, 760 / (ta + tb + tc), 290 / tc), y0 = 40 + tc * c;
+      const xa = 50, xb = xa + ta * c + 50, xc = xb + tb * c + 70;
+      let s = grid(xa, y0 - ta * c, ta, ta, c, 'gs') + grid(xb, y0 - tb * c, tb, tb, c, 'gw');
+      s += tx(xa + ta * c / 2, y0 + 50, `S = ${ta * ta}`, 'lab s') + tx(xb + tb * c / 2, y0 + 50, `S = ${tb * tb}`, 'lab s');
+      if (ph) s += `<g class="new">${grid(xc, y0 - tc * c, tc, tc, c, 'ge')}${tx(xc + tc * c / 2, y0 + 50, `S = ${tc * tc}, сторона ${tc}`, 'lab s warm')}</g>`;
+      return s;
+    },
+    rec: ph => ph ? [`${RT(`${ta * ta} + ${tb * tb}`)} = ${RT(tc * tc)} = ${tc},  ${tc} ≠ ${ta} + ${tb}`] : [],
+  });
+  steps.push({
+    q: `Сколько корней у уравнения ${X}² = <i>a</i>?`,
+    a: `<i>a</i> &gt; 0 — два: ${X} = ±${RT('<i>a</i>')}; <i>a</i> = 0 — один: ${X} = 0; <i>a</i> &lt; 0 — корней нет.`,
+    note: `На графике: прямая y = ${a2} пересекает параболу в двух точках (${X} = ±${k2}), y = 0 касается в одной, y = ${MINUS}${e.neg} не пересекает. Попросите привести свои примеры уравнений каждого вида.`,
+    draw: ph => parabola(ph ? [a2, 0, -e.neg] : []),
+    rec: ph => ph ? [`${X}² = ${a2}: ${X} = ±${k2};  ${X}² = 0: ${X} = 0;  ${X}² = ${MINUS}${e.neg}: корней нет`] : [],
+  });
+  steps.push({
+    q: 'Что нужно запомнить?',
+    a: `<ul><li>${RT('<i>a</i>')} — неотрицательное число, квадрат которого равен <i>a</i>.</li><li>${RT('<i>a</i>')} имеет смысл при <i>a</i> ≥ 0, и (${RT('<i>a</i>')})² = <i>a</i>.</li><li>${X}² = <i>a</i>, <i>a</i> &gt; 0: ${X} = ±${RT('<i>a</i>')}.</li></ul>`,
+    note: 'Пусть класс сам сформулирует по записям в тетради, потом откройте ответ.',
+    draw: () => '', rec: () => [`${RT('<i>a</i>')} ≥ 0,  (${RT('<i>a</i>')})² = <i>a</i>,  <i>a</i> ≥ 0`],
+  });
+  return steps;
+}
+
+function boardNumbers(random) {
+  const C = CONFIG.board;
+  if (!random) B.e = { side: C.side, trap: C.trap, neg: C.neg, dec: C.dec, frac: C.frac, approx: C.approx, triple: C.triple };
+  else {
+    const rnd = mulberry32((Math.random() * 4294967296) >>> 0), old = B.e || {};
+    const other = (lo, hi, prev) => { let v; do v = int(rnd, lo, hi); while (v === prev); return v; };
+    const side = other(4, 9, old.side);
+    let trap; do trap = int(rnd, 3, 6); while (trap === side);
+    let approx; do approx = int(rnd, 2, 47); while (isqrt(approx) != null || approx === old.approx);
+    B.e = { side, trap, neg: pick(rnd, [4, 9]), dec: other(2, 9, old.dec),
+      frac: pick(rnd, [[5, 3], [7, 4], [5, 2], [7, 3], [8, 3], [9, 4], [7, 2]]), approx,
+      triple: pick(rnd, [[3, 4, 5], [6, 8, 10], [5, 12, 13]]) };
+  }
+  B.steps = buildSteps(B.e);
+  B.i = 0; B.phase = 0;
+}
+function renderBoard() {
+  if (!B.steps.length) boardNumbers(false);
+  const st = B.steps[B.i];
+  $('bCnt').textContent = `Шаг ${B.i + 1} из ${B.steps.length}`;
+  $('bQ').innerHTML = st.q;
+  $('bA').innerHTML = st.a;
+  $('bA').classList.toggle('hide', B.phase === 0);
+  const pic = st.draw(B.phase);
+  $('bStage').innerHTML = pic ? svg(pic, 'Чертёж к шагу') : '';
+  $('bRec').innerHTML = st.rec(B.phase).map(l => `<div class="ln">${l}</div>`).join('');
+  $('bNote').innerHTML = `<b>Учителю</b>${st.note}`;
+  $('bNote').hidden = !B.notes;
+  $('bNotesBtn').setAttribute('aria-pressed', String(B.notes));
+  $('bNext').textContent = B.phase === 0 ? 'Показать ответ' : 'Далее →';
+  $('bNext').disabled = B.i === B.steps.length - 1 && B.phase === 1;
+}
+function boardNext() {
+  if (B.phase === 0) B.phase = 1;
+  else if (B.i < B.steps.length - 1) { B.i++; B.phase = 0; }
+  renderBoard();
+}
+function boardPrev() {
+  if (B.phase === 1) B.phase = 0;
+  else if (B.i > 0) { B.i--; B.phase = 1; }
+  renderBoard();
+}
+function boardGo(i, phase = 0) { B.i = Math.max(0, Math.min(i, B.steps.length - 1)); B.phase = phase ? 1 : 0; renderBoard(); }
+function boardNotes() { B.notes = !B.notes; store.set('notes', B.notes ? 1 : 0); renderBoard(); }
+// превью на сайте: доска сама идёт по шагам с чертежами
+function boardStartPreview() {
+  $('board').classList.add('preview');
+  B.timer = setInterval(() => {
+    if (B.i >= 9 && B.phase === 1) boardGo(0, 0);
+    else boardNext();
+  }, CONFIG.board.previewDelay);
+}
+function boardStopPreview() { clearInterval(B.timer); B.timer = 0; }
+function boardPoster() { boardStopPreview(); boardGo(7, 1); }
+
+// ================= 🖨 Раздатка =================
+let printNums = [];
+function newNumbers(count) {
+  const set = new Set();
+  while (set.size < count) set.add(1000 + Math.floor(Math.random() * 9000));
+  return [...set];
+}
+function parseNums(text) {
+  const nums = [], bad = [];
+  for (const part of text.split(/[\s,;]+/).filter(Boolean)) {
+    const m = part.match(/^(?:(\d+)[-–])?(\d{4})$/);
+    if (!m || (m[1] && +m[1] !== GEN_VERSION)) bad.push(part);
+    else if (!nums.includes(+m[2])) nums.push(+m[2]);
+  }
+  return { nums, bad };
+}
+function sheetTask(t) {
+  const T = TYPES[t.type];
+  if (t.type === 'eq') return `Реши уравнение ${T.text(t)}`;
+  if (t.type === 'est') return `Между какими соседними целыми числами лежит ${T.text(t)}?`;
+  if (t.type === 'cmp') return `Сравни: ${t.L.html} и ${t.R.html}`;
+  return `${T.text(t)} =`;
+}
+function sheetHTML(v) {
+  const bank = v.bank.map(x => `<div class="bk"><div>${x.html}</div><div>${x.letter}</div></div>`).join('');
+  const cols = v.tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  const empty = v.tasks.map(() => '<td></td>').join('');
+  return `<div class="sheet">
+    <div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">Вариант ${v.label}</span></div>
+    <h2>Арифметический квадратный корень</h2>
+    <p class="instr">Дробь в ответе — несократимая, у неправильной выдели целую часть. Ответ к уравнению: ±0,9; 0 или «нет корней».
+    В задании 7 запиши два числа, в задании 8 — знак &lt; или &gt;. Найди ответ в таблице букв и впиши букву — получится слово.
+    Нет ответа в таблице или слово не сложилось — ищи ошибку.</p>
+    <ol class="tasks">${v.tasks.map((t, i) => `<li class="task"><span class="no">${i + 1})</span>${sheetTask(t)}<div class="cells"></div></li>`).join('')}</ol>
+    <p class="sub-h">Таблица букв</p><div class="bank">${bank}</div>
+    <table class="ans"><tr><th>Задание</th>${cols}</tr><tr class="tall"><th>Ответ</th>${empty}</tr><tr><th>Буква</th>${empty}</tr></table>
+    <div class="word">Слово: ______________________</div>
+  </div>`;
+}
+function keyHTML(vs) {
+  const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  return `<div class="page key"><h2>Ключ учителя · арифметический квадратный корень</h2>
+    <table class="key"><tr><th>Вариант</th>${head}<th>Слово</th></tr>
+    ${vs.map(v => `<tr><td>${v.label}</td>${v.tasks.map(t => `<td>${TYPES[t.type].keyHTML(t)}</td>`).join('')}<td><b>${v.word}</b></td></tr>`).join('')}
+    </table><p style="font-size:10pt">Слово сложилось — все ответы верны. Ключ всегда можно восстановить по номеру варианта в режиме «Раздатка».</p></div>`;
+}
+// Номера и настройки запоминаются в браузере: напечатал листы, закрыл вкладку — ключ потом
+// печатается по тем же номерам. Без localStorage номера просто будут новыми.
+function renderPrint() {
+  if (!printNums.length) {
+    const saved = parseNums(store.get('printNums') || '').nums;
+    printNums = saved.length ? saved : newNumbers(CONFIG.print.variants);
+    $('pCount').value = printNums.length;
+    $('pSpace').checked = store.get('printSpace') ? store.get('printSpace') === '1' : CONFIG.print.space;
+    $('pTwo').checked = store.get('printTwo') === '1';
+    if (saved.length) $('pMsg').textContent = 'Открыты номера, с которыми вы работали в прошлый раз. Для другого класса нажмите «Новые номера».';
+  }
+  $('pNums').value = printNums.map(n => GEN_VERSION + '-' + n).join(', ');
+  drawSheets();
+}
+function drawSheets() {
+  const vs = printNums.map(n => makeVariant(n));
+  const space = $('pSpace').checked, two = $('pTwo').checked && !space;
+  store.set('printNums', printNums.join(','));
+  store.set('printSpace', space ? 1 : 0);
+  store.set('printTwo', $('pTwo').checked ? 1 : 0);
+  $('pTwo').disabled = space;
+  let html = '';
+  if (two) for (let i = 0; i < vs.length; i += 2)
+    html += `<div class="page half compact">${sheetHTML(vs[i])}${vs[i + 1] ? sheetHTML(vs[i + 1]) : ''}</div>`;
+  else html = vs.map(v => `<div class="page${space ? '' : ' compact'}">${sheetHTML(v)}</div>`).join('');
+  $('pSheets').innerHTML = (vs.length ? keyHTML(vs) : '') + html;
+  return vs;
+}
+function printNow(what) {
+  document.body.classList.remove('print-key', 'print-sheets');
+  document.body.classList.add(what === 'key' ? 'print-key' : 'print-sheets');
+  try { window.print(); } catch {}
+}
+
+// ================= 🏠 Тренировка =================
+const CATS = {
+  sign:    ['Знак корня', 'Арифметический корень — неотрицательное число: √25 = 5, а не ±5 и не −5.'],
+  decimal: ['Запятая в корне из десятичной дроби', 'В квадрате десятичной дроби знаков после запятой вдвое больше: √0,09 = 0,3, потому что 0,3² = 0,09.'],
+  frac:    ['Корень из дроби', 'Смешанное число переведи в неправильную дробь, потом извлеки корень из числителя и из знаменателя.'],
+  meaning: ['Когда корень имеет смысл', 'Под знаком корня должно быть неотрицательное число. Сначала вычисли подкоренное выражение.'],
+  square:  ['Квадрат корня', '(√a)² = a по определению; в выражении (k√a)² в квадрат возводятся оба множителя.'],
+  sumRoot: ['Корень из суммы', '√(a + b) ≠ √a + √b: сначала вычисли выражение под корнем.'],
+  eqTwo:   ['Второй корень уравнения', 'При a > 0 у уравнения x² = a два корня: √a и −√a.'],
+  eqNone:  ['Уравнение без корней', 'Квадрат числа не бывает отрицательным: при a < 0 у x² = a корней нет.'],
+  eqCount: ['Число корней', 'x² = a: при a > 0 — два корня, при a = 0 — один, при a < 0 — ни одного.'],
+  eqShift: ['Перенос слагаемого', 'Число переносят в другую часть уравнения с противоположным знаком.'],
+  est:     ['Оценка корня', 'Найди соседние квадраты: 8² = 64 < 73 < 81 = 9², значит 8 < √73 < 9.'],
+  cmp:     ['Сравнение', 'Положительные числа сравнивай по квадратам: 7² = 49 < 50, значит 7 < √50.'],
+  calc:    ['Вычисления', 'Проверяй ответ возведением в квадрат.'],
+};
+const H = { level: 0, rnd: null, n: 0, score: 0, streak: 0, clean: 0, cats: {}, task: null, hints: 0, hintLevel: 0,
+  wait: false, taskDone: false, repeat: null, finished: false, gain: 0, eqCount: null, history: [] };
+
+function homeSetup() {
+  $('hSetup').hidden = false; $('hPlay').hidden = true; $('hEnd').hidden = true;
+  $('hLevels').innerHTML = SECTIONS.map((S, i) => {
+    const best = +store.get('best' + i) || 0;
+    return `<button type="button" class="level" data-level="${i}"><b>${S.title} →</b><span>${S.text}</span><span class="lex">${S.ex()}</span><small>Рекорд: ${best}</small></button>`;
+  }).join('');
+  $('home').classList.remove('playing');
+  // учителю: ссылка сразу на раздел, чтобы отправить её в чат класса
+  $('hLinks').innerHTML = 'Учителю — ссылка сразу на раздел: ' + SECTIONS.map((S, i) =>
+    `<button type="button" class="linkbtn" data-copy="${i + 1}">раздел ${i + 1}</button>`).join(' ') + ' <span id="hCopied"></span>';
+}
+function levelLink(n) {
+  let loc = location;
+  try { if (window.top !== window && window.top.location.origin === location.origin) loc = window.top.location; } catch {}
+  return `${loc.origin}${loc.pathname}?mode=home&level=${n}&student=1`;
+}
+async function copyLevelLink(n) {
+  const url = levelLink(n);
+  let ok = false;
+  try { await navigator.clipboard.writeText(url); ok = true; } catch {}
+  $('hCopied').innerHTML = ok ? `Скопировано: ${url}` : `Скопируйте ссылку: <b>${url}</b>`;
+}
+function homeStart({ level = H.level, seed } = {}) {
+  Object.assign(H, { level, n: 0, score: 0, streak: 0, clean: 0, cats: {}, repeat: null, finished: false, history: [], last: null,
+    rnd: mulberry32(seed ?? ((Math.random() * 4294967296) >>> 0)) });
+  $('hSetup').hidden = true; $('hEnd').hidden = true; $('hPlay').hidden = false;
+  $('home').classList.add('playing');
+  homeNewTask();
+}
+function homeNewTask() {
+  const types = SECTIONS[H.level].types;
+  // после ошибки — задание того же типа с другими числами; иначе — другой тип, чем в прошлый раз
+  let type = H.repeat;
+  if (!type) { const rest = types.filter(x => x !== H.task?.type); type = pick(H.rnd, rest.length ? rest : types); }
+  const prev = H.task;
+  let t, guard = 0;
+  do t = generate(type, H.rnd);
+  while (prev && JSON.stringify(t) === JSON.stringify(prev) && ++guard < 50);
+  H.task = t;
+  H.n++; H.hints = 0; H.hintLevel = 0; H.wait = false; H.taskDone = false; H.repeat = null; H.eqCount = null; H.last = null;
+  homeRender();
+}
+// Проверка. x: num/frac — {n, d}; choice — строка; eq — {roots: [...]}; est — {lo, hi}
+function homeCheck(x) {
+  if (H.wait || H.finished) return null;
+  if (x == null || x.empty) return { ok: false, empty: true, msg: x?.msg || 'Впиши ответ.' };
+  const t = H.task, T = TYPES[t.type];
+  let r;
+  if (T.same(t, x)) {
+    H.streak++; H.clean++;
+    const mult = Math.min(CONFIG.home.maxMultiplier, 1 + Math.floor((H.streak - 1) / 3));
+    H.gain = Math.max(0, CONFIG.home.points[H.level] - H.hints * CONFIG.home.hintPenalty) * mult;
+    H.score += H.gain;
+    r = { ok: true, msg: T.ok(t) };
+  } else {
+    H.streak = 0; H.gain = 0;
+    r = { ok: false, ...T.wrong(t, x) };
+    H.cats[r.cat] = (H.cats[r.cat] || 0) + 1;
+    H.repeat = t.type;
+  }
+  H.history.push({ n: H.n, type: t.type, ok: r.ok, cat: r.cat });
+  H.wait = true; H.taskDone = true; H.last = r;
+  homeRender(r);
+  return r;
+}
+function homeContinue() {
+  if (!H.wait) return;
+  if (H.n >= CONFIG.home.round) return homeEnd();
+  homeNewTask();
+}
+function homeHint() {
+  if (H.wait || H.finished) return null;
+  const hints = TYPES[H.task.type].hints(H.task);
+  const text = hints[Math.min(H.hintLevel, hints.length - 1)];
+  if (H.hintLevel < hints.length) { H.hints++; H.hintLevel++; }
+  H.lastHint = text;
+  homeRender({ hint: text });
+  return text;
+}
+function homeEnd() {
+  H.finished = true;
+  const key = 'best' + H.level, best = +store.get(key) || 0, record = H.score > best;
+  if (record) store.set(key, H.score);
+  const cats = Object.entries(H.cats).sort((x, y) => y[1] - x[1]);
+  $('hPlay').hidden = true; $('hEnd').hidden = false;
+  $('hEnd').innerHTML = `<div class="card">
+    <h2 style="margin-top:0">Итоги: ${SECTIONS[H.level].title.toLowerCase()}</h2>
+    <p style="font-size:22px">Очки: <b>${H.score}</b>${record ? ' — новый рекорд!' : ` (рекорд: ${Math.max(best, H.score)})`}<br>
+    Без ошибок: <b>${H.clean} из ${CONFIG.home.round}</b></p>
+    <h3>Над чем поработать</h3>
+    ${cats.length ? `<ul class="work">${cats.map(([c, k]) => `<li><b>${CATS[c][0]}</b> — ошибок: ${k}<br>${esc(CATS[c][1])}</li>`).join('')}</ul>`
+      : `<p>Ошибок нет. ${H.level < SECTIONS.length - 1 ? 'Попробуй следующий раздел.' : 'Отличная работа!'}</p>`}
+    <div class="hbtns"><button type="button" class="main" data-act="again">Ещё раз</button>
+    ${H.level < SECTIONS.length - 1 && !cats.length ? `<button type="button" data-act="nextlevel">Следующий раздел</button>` : ''}
+    <button type="button" data-act="setup">Выбрать раздел</button></div></div>`;
+}
+
+const inp = (k, label, cls = '', mode = 'decimal') => `<input data-k="${k}" class="${cls}" inputmode="${mode}" autocomplete="off" aria-label="${label}">`;
+const checkBtn = '<button type="button" class="main check" data-act="check">Проверить</button>';
+function askHTML(t) {
+  const T = TYPES[t.type];
+  if (t.type === 'meaning') return `Имеет ли смысл выражение ${T.text(t)}?`;
+  if (t.type === 'eq') return `Реши уравнение ${T.text(t)}`;
+  if (t.type === 'est') return `Между какими соседними целыми числами лежит ${T.text(t)}?`;
+  if (t.type === 'cmp') return `Сравни: ${T.text(t)}`;
+  return `${T.text(t)} = ?`;
+}
+function inputHTML(t) {
+  const T = TYPES[t.type];
+  if (T.input === 'num') return `<div class="inrow">${T.text(t)} = ${inp('v', 'ответ', 'wide')} ${checkBtn}</div>`;
+  if (T.input === 'frac') return `<div class="inrow">${T.text(t)} = ${inp('w', 'целая часть', '', 'numeric')} <span class="frac fin">${inp('n', 'числитель', '', 'numeric')}${inp('d', 'знаменатель', '', 'numeric')}</span> ${checkBtn}</div>` +
+    '<p class="hnote">Целую часть можно не писать — подойдёт и неправильная дробь.</p>';
+  if (T.input === 'choice') return `<div class="inrow">${T.options.map(([v, l]) => `<button type="button" class="choice" data-choice="${v}">${l}</button>`).join('')}</div>`;
+  if (T.input === 'est') return `<div class="inrow">${inp('lo', 'меньшее число', '', 'numeric')} &lt; ${T.text(t)} &lt; ${inp('hi', 'большее число', '', 'numeric')} ${checkBtn}</div>`;
+  // уравнение: сначала число корней, потом сами корни
+  const c = H.eqCount, b = (n, l) => `<button type="button" data-count="${n}" aria-pressed="${c === n}">${l}</button>`;
+  let html = `<div class="cnts">${b(0, 'Корней нет')}${b(1, 'Один корень')}${b(2, 'Два корня')}</div>`;
+  const sqrtBtn = '<button type="button" class="sqrtbtn" data-act="sqrt" title="Вставить знак корня" aria-label="Вставить знак корня">√</button>';
+  if (c === 0) html += `<div class="inrow">${checkBtn}</div>`;
+  if (c === 1) html += `<div class="inrow"><span class="nw">${X} =</span> ${inp('r1', 'корень', 'wide', 'text')} ${sqrtBtn} ${checkBtn}</div>`;
+  if (c === 2) html += `<div class="inrow"><span class="nw">${X}<sub>1</sub> =</span> ${inp('r1', 'первый корень', 'wide', 'text')} <span class="nw">${X}<sub>2</sub> =</span> ${inp('r2', 'второй корень', 'wide', 'text')} ${sqrtBtn} ${checkBtn}</div>`;
+  if (c) html += '<p class="hnote">Корень можно записать числом (−0,9; 2/3) или со знаком корня: √7, −√7.</p>';
+  return html;
+}
+function homeRender(fb) {
+  const t = H.task, T = TYPES[t.type];
+  const mult = Math.min(CONFIG.home.maxMultiplier, 1 + Math.floor(H.streak / 3));
+  $('hStats').innerHTML = `<span>Задание <b>${H.n}</b> из ${CONFIG.home.round}</span><span>Очки: <b>${H.score}</b></span>` +
+    `<span>Серия: <b>${H.streak}</b>${mult > 1 ? ` (×${mult})` : ''}</span><span>${SECTIONS[H.level].title}</span>`;
+  $('hTask').innerHTML = askHTML(t);
+  $('hPen').textContent = CONFIG.home.hintPenalty;
+  $('hStep').innerHTML = H.wait ? '' : inputHTML(t);
+  let html = '';
+  if (fb && fb.hint) html = `<div class="fb info"><span class="tag">Подсказка</span>${fb.hint}</div>`;
+  else if (fb && fb.empty) html = `<div class="fb info">${fb.msg}</div>`;
+  else if (fb) html = `<div class="fb ${fb.ok ? 'ok' : 'bad'}"><span class="tag">${fb.ok ? `Верно! +${H.gain}` : 'Ошибка'}</span>${fb.msg}</div>`;
+  if (H.taskDone && !fb?.ok) html += `<div class="fb info"><span class="tag">Ответ</span>${answerHTML(t)}. Дальше — такое же задание с другими числами.</div>`;
+  $('hFb').innerHTML = html;
+  $('hHint').hidden = H.wait; $('hNext').hidden = !H.wait;
+  $('hNext').textContent = H.n >= CONFIG.home.round ? 'Итоги →' : 'Следующее задание →';
+  if (!PREVIEW) {
+    const first = $('hStep').querySelector('input');
+    if (first) first.focus(); else if (H.wait) $('hNext').focus();
+  }
+}
+function answerHTML(t) {
+  const T = TYPES[t.type];
+  if (t.type === 'eq') return eqHTML(T.ans(t), T.style(t));
+  if (t.type === 'est') { const { lo, hi } = T.ans(t); return `${lo} &lt; ${T.text(t)} &lt; ${hi}`; }
+  if (t.type === 'cmp') return `${t.L.html} ${esc(T.ans(t))} ${t.R.html}`;
+  if (t.type === 'meaning') return T.ans(t) === 'yes' ? 'имеет смысл' : 'не имеет смысла';
+  return `${T.text(t)} = ${T.keyHTML(t)}`;
+}
+const readInt = s => { const v = String(s).replace(/\s+/g, ''); return /^\d+$/.test(v) ? +v : null; };
+function homeCollect() {
+  const t = H.task, kind = TYPES[t.type].input;
+  const get = k => $('hStep').querySelector(`[data-k="${k}"]`)?.value ?? '';
+  if (kind === 'num') {
+    const v = parseQ(get('v'));
+    return v || { empty: true, msg: get('v').trim() ? 'Не понял число. Пиши, например, 0,3 или 12.' : 'Впиши ответ.' };
+  }
+  if (kind === 'frac') {
+    const w = get('w').trim() ? readInt(get('w')) : 0, n = readInt(get('n')), d = readInt(get('d'));
+    if (w == null || n == null || !d) return { empty: true, msg: 'Заполни числитель и знаменатель (целую часть — если есть).' };
+    return Q(w * d + n, d);
+  }
+  if (kind === 'est') {
+    const lo = readInt(get('lo')), hi = readInt(get('hi'));
+    return lo == null || hi == null ? { empty: true, msg: 'Впиши оба числа.' } : { lo, hi };
+  }
+  if (kind === 'eq') {
+    if (H.eqCount == null) return { empty: true, msg: 'Сначала выбери, сколько корней у уравнения.' };
+    const roots = [];
+    for (let i = 1; i <= H.eqCount; i++) {
+      const s = get('r' + i), v = parseVal(s);
+      if (!v) return { empty: true, msg: s.trim() ? `Не понял корень «${esc(s)}». Пиши число (−0,9; 2/3) или корень (√7, −√7).` : 'Впиши корни.' };
+      roots.push(v);
+    }
+    return { roots };
+  }
+  return null;
+}
+function homeCheckClick(x = homeCollect()) { const r = homeCheck(x); if (r && r.empty) homeRender(r); }
+
+// ================= Управление =================
+let lastInput = null;
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-go],[data-act],[data-level],[data-copy],[data-choice],[data-count]');
+  if (!el) return;
+  if (el.dataset.go) return show(el.dataset.go);
+  if (el.dataset.level) { H.level = +el.dataset.level; return homeStart(); }
+  if (el.dataset.copy) return copyLevelLink(+el.dataset.copy);
+  if (el.dataset.choice) return homeCheckClick(el.dataset.choice);
+  if (el.dataset.count) { H.eqCount = +el.dataset.count; return homeRender(); }
+  const act = el.dataset.act;
+  if (act === 'menu') { if (document.fullscreenElement) toggleFull(); show('start'); }
+  if (act === 'next') boardNext();
+  if (act === 'prev') boardPrev();
+  if (act === 'restart') boardGo(0, 0);
+  if (act === 'numbers') { boardNumbers(true); renderBoard(); }
+  if (act === 'theme') toggleTheme();
+  if (act === 'full') toggleFull();
+  if (act === 'notes') boardNotes();
+  if (act === 'check') homeCheckClick();
+  if (act === 'sqrt') {
+    const i = lastInput && $('hStep').contains(lastInput) ? lastInput : $('hStep').querySelector('input');
+    if (i) { const p = i.selectionStart ?? i.value.length; i.value = i.value.slice(0, p) + '√' + i.value.slice(p); i.focus(); i.setSelectionRange?.(p + 1, p + 1); }
+  }
+  if (act === 'help') $('help').hidden = false;
+  if (act === 'help-close') $('help').hidden = true;
+  if (act === 'again') homeStart();
+  if (act === 'nextlevel') { H.level++; homeStart(); }
+  if (act === 'setup') homeSetup();
+});
+$('hStep').addEventListener('focusin', e => { if (e.target.matches('input')) lastInput = e.target; });
+$('help').addEventListener('click', e => { if (e.target === $('help')) $('help').hidden = true; });
+$('themeBtn').addEventListener('click', toggleTheme);
+$('hHint').addEventListener('click', homeHint);
+$('hNext').addEventListener('click', homeContinue);
+// открылась клавиатура телефона — подтягиваем «Проверить» в видимую часть экрана
+window.visualViewport?.addEventListener('resize', () => {
+  if (screen === 'home' && !PREVIEW) $('hStep').querySelector('.check')?.scrollIntoView({ block: 'nearest' });
+});
+$('hStep').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); homeCheckClick(); } });
+$('pNew').addEventListener('click', () => { $('pMsg').textContent = ''; printNums = newNumbers(Math.max(1, Math.min(40, +$('pCount').value || CONFIG.print.variants))); renderPrint(); });
+$('pCount').addEventListener('change', () => $('pNew').click());
+$('pSpace').addEventListener('change', drawSheets);
+$('pTwo').addEventListener('change', drawSheets);
+$('pNums').addEventListener('change', () => {
+  const { nums, bad } = parseNums($('pNums').value);
+  $('pMsg').innerHTML = bad.length ? `<span class="err">Не понял номера: ${esc(bad.join(', '))}. Номер — как на листе, например ${GEN_VERSION}-4817.</span>` : '';
+  if (nums.length) { printNums = nums.slice(0, 40); $('pCount').value = printNums.length; drawSheets(); }
+});
+$('pPrint').addEventListener('click', () => printNow('sheets'));
+$('pPrintKey').addEventListener('click', () => printNow('key'));
+addEventListener('afterprint', () => document.body.classList.remove('print-key', 'print-sheets'));
+
+document.addEventListener('keydown', e => {
+  if (e.target.matches?.('input') && e.key !== 'Escape') return;
+  if (e.key === 'Escape') {
+    if (!$('help').hidden) { $('help').hidden = true; return; }
+    if (screen !== 'start' && !STUDENT) show('start');
+    return;
+  }
+  if (screen === 'home' && e.key === 'Enter' && H.wait) { e.preventDefault(); homeContinue(); return; }
+  if (screen !== 'board') return;
+  if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); boardNext(); }
+  else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); boardPrev(); }
+  else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') toggleFull();
+});
+
+// ================= Запуск =================
+(() => {
+  const th = store.get('theme');
+  if (th === 'dark' || th === 'light') document.documentElement.dataset.theme = th;
+  B.notes = store.get('notes') === '1';
+  const back = siteHref();
+  if (back) { $('toSite').href = back; $('toSite').hidden = false; }
+  const ra = RT('<i>a</i>');
+  ['helpRa', 'helpRa2', 'helpRa3', 'helpRa4'].forEach(id => { $(id).innerHTML = ra; });
+  $('helpSq').innerHTML = `(${ra})² = <i>a</i>`;
+  $('helpEx1').innerHTML = `Например, ${RT(49)} = 7, потому что 7 ≥ 0 и 7² = 49. Число ${MINUS}7 тоже даёт 49 в квадрате, но ${RT(49)} ≠ ${MINUS}7.`;
+  $('helpEx2').innerHTML = `${RT('0,09')} = 0,3`;
+  $('helpEx3').innerHTML = `${RT(M({ w: 2, n: 7, d: 9 }), true)} = ${RT(F({ n: 25, d: 9 }), true)} = ${F({ n: 5, d: 3 })} = ${M({ w: 1, n: 2, d: 3 })}`;
+  $('helpEx4').innerHTML = RT(73);
+  const lvl = +P.get('level');
+  if (STUDENT) document.body.classList.add('student');
+  if (PREVIEW) { show('board'); boardStartPreview(); }
+  else if ((MODE === 'home' || STUDENT) && lvl >= 1 && lvl <= SECTIONS.length) {
+    H.level = lvl - 1;
+    show('home'); homeStart();
+  } else show(STUDENT ? 'home' : MODE || 'start');
+})();
+
+// Для автотестов и снимка превью
+window.APP = {
+  CONFIG, GEN_VERSION, TYPES, SECTIONS, KINDS_V1, WORDS_V1,
+  Q, qeq, decStr, keyQ, parseQ, parseVal, eqRoots, generate, makeVariant, taskRnd, mulberry32, parseNums,
+  STUDENT, show, get screen() { return screen; },
+  board: { get steps() { return B.steps; }, get i() { return B.i; }, get phase() { return B.phase; }, get e() { return B.e; },
+    next: boardNext, prev: boardPrev, go: boardGo, numbers: random => { boardNumbers(random); renderBoard(); }, poster: boardPoster },
+  print: { draw: drawSheets, set nums(v) { printNums = v; } },
+  home: { state: H, start: homeStart, check: homeCheck, hint: homeHint, next: homeContinue, collect: homeCollect,
+    setCount: n => { H.eqCount = n; homeRender(); } },
+};
+</script>
+</body>
+</html>
