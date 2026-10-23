@@ -110,6 +110,8 @@ title: Сложение дробей с разными знаменателям�
 type: lesson                  # lesson | course | app
 subject: math                 # math (5–6, Виленкин) | algebra (Макарычев) | geometry (Мерзляк)
 parts: [board, print, home]   # какие режимы есть в материале
+sheets:                       # необязательно: другие виды листа раздатки — отдельная кнопка на сайте
+  - { kind: oge, label: "Бланк ОГЭ" }   # ведёт на /zapusk/<slug>/?mode=print&kind=oge; материал читает ?kind=
 summary: "Одно-два предложения для карточки"
 emoji: 🍰
 color: "#E07A1F"              # основной цвет материала, им красится обложка карточки

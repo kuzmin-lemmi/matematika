@@ -10,6 +10,12 @@ const items = defineCollection({
     type: z.enum(['lesson', 'course', 'app']),
     subject: z.enum(['math', 'algebra', 'geometry']).optional(),   // у материала к уроку указывать всегда
     parts: z.array(z.enum(['board', 'print', 'home'])).default([]), // что внутри: доска, раздатка, дом
+    // другие виды листа раздатки — своя кнопка на сайте, адрес /zapusk/<slug>/?mode=print&kind=<kind>
+    sheets: z.array(z.object({
+      kind: z.string().regex(/^[a-z0-9-]+$/),
+      label: z.string(),            // «Бланк ОГЭ» — коротко, это текст кнопки
+      icon: z.string().default('🧾'),
+    })).default([]),
     summary: z.string(),
     emoji: z.string().default('✨'),
     color: z.string().default('#2F6FD6'),

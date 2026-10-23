@@ -13,6 +13,8 @@ export const openPageHref = (item: { id: string; data: { url: string } }, mode?:
   isLocalFile(item.data.url)
     ? `${import.meta.env.BASE_URL}zapusk/${item.id}/${mode ? `?mode=${mode}` : ''}`
     : openHref(item.data.url);
+// Другой вид листа раздатки (поле sheets карточки): режим «Раздатка» сразу с нужным листом
+export const sheetHref = (item: { id: string; data: { url: string } }, kind: string) => `${openPageHref(item, 'print')}&kind=${kind}`;
 // Ссылка для учеников — в чат класса: тренажёр «Дома» на весь экран, закрытый (student=1):
 // без выхода на сайт и к доске и раздатке. Пусто, если у материала нет режима «Дома».
 export const studentHref = (item: { id: string; data: { url: string; access: string; parts: string[] } }, site?: URL) =>

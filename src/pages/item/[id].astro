@@ -4,7 +4,7 @@ import { getCollection, render } from 'astro:content';
 import Preview from '../../components/Preview.astro';
 import StudentLink from '../../components/StudentLink.astro';
 import { TYPES, ACCESS, PARTS } from '../../config';
-import { openPageHref, ogImage, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady, isLocalFile } from '../../lib';
+import { openPageHref, sheetHref, ogImage, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady, isLocalFile } from '../../lib';
 
 export async function getStaticPaths() {
   const items = await getCollection('items');
@@ -24,7 +24,7 @@ const rows = [
   ['Тема', d.topic],
   ['Учебник', d.textbook],
   ['Время', d.duration],
-  ['Что внутри', d.parts.map(p => `${PARTS[p].icon} ${PARTS[p].label}`).join(' · ')],
+  ['Что внутри', [...d.parts.map(p => `${PARTS[p].icon} ${PARTS[p].label}`), ...d.sheets.map(s => `${s.icon} ${s.label}`)].join(' · ')],
   ['Доступ', ACCESS[d.access]],
 ].filter(([, v]) => v);
 ---
@@ -38,6 +38,7 @@ const rows = [
         <p class="lead">{d.summary}</p>
         <div class="cta">
           {ready && local && d.parts.map(p => <a class="btn primary" href={openPageHref(item, p)}>{PARTS[p].icon} {PARTS[p].label}</a>)}
+          {ready && local && d.sheets.map(s => <a class="btn primary" href={sheetHref(item, s.kind)}>{s.icon} {s.label}</a>)}
           {ready && (external || !d.parts.length) && (
             <a class="btn primary" href={openPageHref(item)} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>
               {d.type === 'course' ? 'Перейти к курсу' : 'Открыть'} {external ? '↗' : '▶'}
