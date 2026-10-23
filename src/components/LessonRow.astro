@@ -4,7 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 import Preview from './Preview.astro';
 import StudentLink from './StudentLink.astro';
 import { ACCESS, PARTS, TYPES } from '../config';
-import { openPageHref, pageHref, downloadHref, downloadName, colorVars, isReady, isLocalFile } from '../lib';
+import { openPageHref, sheetHref, pageHref, downloadHref, downloadName, colorVars, isReady, isLocalFile } from '../lib';
 interface Props { item: CollectionEntry<'items'>; n: number }
 const { item, n } = Astro.props;
 const d = item.data;
@@ -20,6 +20,7 @@ const dl = ready ? downloadHref(d) : '';
     {d.duration && <p class="facts">⏱ {d.duration}</p>}
     <div class="act">
       {ready && isLocalFile(d.url) && d.parts.map(p => <a class="btn part" href={openPageHref(item, p)}>{PARTS[p].icon} {PARTS[p].label}</a>)}
+      {ready && isLocalFile(d.url) && d.sheets.map(s => <a class="btn part" href={sheetHref(item, s.kind)}>{s.icon} {s.label}</a>)}
       <StudentLink item={item} />
       {dl && <a class="btn" href={dl} download={downloadName(d.url)}>⬇ Скачать</a>}
       <a class="btn" href={pageHref(item.id)}>Подробнее</a>

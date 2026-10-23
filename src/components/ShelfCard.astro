@@ -22,7 +22,7 @@ const dl = ready ? downloadHref(d) : '';
     </p>
     <h3><a href={pageHref(item.id)}>{d.title}</a></h3>
     {d.topic && <p class="topic">{d.topic}</p>}
-    {d.parts.length > 0 && <p class="parts" aria-label={d.parts.map(p => PARTS[p].label).join(', ')}>{d.parts.map(p => <span title={PARTS[p].label}>{PARTS[p].icon}</span>)}</p>}
+    {d.parts.length > 0 && <p class="parts" aria-label={[...d.parts.map(p => PARTS[p].label), ...d.sheets.map(s => s.label)].join(', ')}>{d.parts.map(p => <span title={PARTS[p].label}>{PARTS[p].icon}</span>)}{d.sheets.map(s => <span title={s.label}>{s.icon}</span>)}</p>}
     <div class="act">
       {ready && (
         <a class="play" href={openPageHref(item)} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>

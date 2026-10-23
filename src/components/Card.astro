@@ -25,7 +25,7 @@ const dl = ready ? downloadHref(d) : '';
     <h3><a href={pageHref(item.id)}>{d.title}</a></h3>
     {d.topic && <p class="topic ink-c">{d.topic}</p>}
     <p class="sum">{d.summary}</p>
-    {d.parts.length > 0 && <p class="parts">{d.parts.map(p => <span>{PARTS[p].icon} {PARTS[p].label}</span>)}</p>}
+    {d.parts.length > 0 && <p class="parts">{d.parts.map(p => <span>{PARTS[p].icon} {PARTS[p].label}</span>)}{d.sheets.map(s => <span>{s.icon} {s.label}</span>)}</p>}
     <div class="act">
       {ready && (
         <a class="btn primary" href={openPageHref(item)} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>
