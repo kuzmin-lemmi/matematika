@@ -1,0 +1,1713 @@
+<!doctype html>
+<!-- Собрано конструктором «Матшага» (D:\Конструктор математика) из materials/formuly-sokrashchennogo-umnozheniya/. Не правь этот файл руками:
+     правь тему или ядро и пересобери — npm run build -- formuly-sokrashchennogo-umnozheniya. -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Формулы сокращённого умножения — Матшаг</title>
+<meta name="description" content="Формулы сокращённого умножения: показ на доске, раздатка с кодовым словом и тренажёр с разбором ошибок. Квадрат суммы и разности, разность квадратов, кубы, вычисление удобным способом, восстановление пропущенного. 7 класс.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- знаки, которых может не быть в Golos Text (∠ △ ∥ ⊥ π ≠ ∞ □ ≥ ≤ ±), — подмножество Noto Sans Math -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%E2%88%A0%E2%96%B3%E2%88%A5%E2%8A%A5%CF%80%E2%89%A0%E2%88%9E%E2%96%A1%E2%89%A5%E2%89%A4%C2%B1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F3EB; --surface:#FFFDF8; --ink:#203B31; --soft:#5C7065; --line:#D8DFD2; --grid:rgba(37,100,73,.09);
+  --accent:#256449; --accent-ink:#FFFFFF;
+  --a:#256449; --a-soft:#A8D5BA;          /* квадрат, площадь которого известна */
+  --b:#B94C2D; --b-soft:#F6DDD3;          /* выделение: искомая сторона, ловушка */
+  --ok:#256449; --ok-soft:#E1EFE5; --bad:#B3261E; --bad-soft:#F8E1DE; --info-soft:#F1ECDD;
+  --font:'Golos Text','Noto Sans Math','Cambria Math','Segoe UI Symbol','Segoe UI',system-ui,-apple-system,sans-serif;
+  --r:14px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
+    --accent:#99D7B4; --accent-ink:#153725;
+    --a:#99D7B4; --a-soft:#3F7A5C; --b:#FFAE8C; --b-soft:#5B3326;
+    --ok:#99D7B4; --ok-soft:#24402F; --bad:#FF9C8F; --bad-soft:#4A2622; --info-soft:#2E3A2F;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
+  --accent:#99D7B4; --accent-ink:#153725;
+  --a:#99D7B4; --a-soft:#3F7A5C; --b:#FFAE8C; --b-soft:#5B3326;
+  --ok:#99D7B4; --ok-soft:#24402F; --bad:#FF9C8F; --bad-soft:#4A2622; --info-soft:#2E3A2F;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:400 18px/1.45 var(--font);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:.5em 1em;font-weight:600}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+[hidden]{display:none !important}
+.screen{min-height:100vh;min-height:100dvh}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 48px}
+
+/* дроби этажом и знак корня с чертой над подкоренным выражением */
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.1;margin:0 .12em;text-align:center}
+.frac > :last-child{border-top:.08em solid currentColor;padding:0 .15em;align-self:stretch}
+.mixed,.nw{white-space:nowrap}
+.mixed > .w{vertical-align:middle}
+.rt{white-space:nowrap}
+.rt > .rs{display:inline-block;transform:scale(1,1.12);transform-origin:50% 75%}
+.rt > .rad{display:inline-block;line-height:1;border-top:.07em solid currentColor;padding:.04em .1em 0 .02em;margin-left:-.03em}
+.rt.tall{display:inline-flex;align-items:stretch;vertical-align:middle}
+.rt.tall > .rs{display:flex;align-items:center;font-size:1.9em;line-height:1;font-weight:400;margin-right:-.06em;transform:none}
+.rt.tall > .rad{margin:.18em 0 0;display:flex;align-items:center;line-height:1.1;padding-top:0}
+.cmpbox{display:inline-block;min-width:1.4em;border:2px dashed currentColor;border-radius:8px;text-align:center;margin:0 .2em;padding:0 .1em}
+
+/* стартовый экран */
+#start .wrap{max-width:880px;padding-top:48px}
+.kicker{color:var(--soft);font-weight:600;margin:0 0 6px}
+h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing:-.01em}
+.lead{font-size:20px;color:var(--soft);margin:0 0 32px;max-width:40em}
+.modes{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.mode{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;padding:22px;border-radius:var(--r);min-height:170px}
+.mode b{font-size:26px}
+.mode span{font-weight:400;color:var(--soft)}
+.mode:hover{transform:translateY(-2px)}
+.tosite{position:fixed;top:calc(12px + env(safe-area-inset-top));left:calc(12px + env(safe-area-inset-left));z-index:5;
+  display:inline-flex;align-items:center;min-height:44px;padding:.35em .9em;border:2px solid var(--line);border-radius:12px;
+  background:var(--surface);color:var(--ink);font-weight:600;text-decoration:none}
+.tosite:hover{border-color:var(--accent)}
+.topright{position:fixed;top:calc(12px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));display:flex;gap:8px;z-index:5}
+.icon{padding:.35em .6em;min-width:44px;min-height:44px}
+
+/* доска: на проекторе шрифт не мельче 28px */
+#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
+.bbar{display:flex;align-items:center;gap:8px;font-size:20px}
+.bbar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap;margin-right:6px}
+.bbar button{font-size:18px;min-height:44px;padding:.2em .7em;white-space:nowrap}
+.btext{padding:4px 0}
+.btext .q{font-size:clamp(30px,3vw,46px);font-weight:700;line-height:1.3}
+.btext .a{font-size:clamp(28px,2.7vw,42px);line-height:1.35;margin-top:.15em;color:var(--accent);font-weight:600}
+.btext .a ul{margin:.1em 0;padding-left:1.2em;color:var(--ink)}
+.btext .a.hide{visibility:hidden}
+.bstage{min-height:0;display:flex;align-items:center;justify-content:center}
+.bstage svg{width:100%;height:100%;max-height:100%}
+.brec{border-top:2px dashed var(--line);padding:6px 0 2px;min-height:calc(2 * 1.9em + 26px);font-size:clamp(26px,2.4vw,36px);line-height:1.9}
+.brec .rt-h{display:block;font-size:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);line-height:1.2}
+.brec .ln{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bctl{display:flex;gap:12px;justify-content:center;padding-top:8px}
+.bctl button{font-size:26px;min-height:60px;padding:.25em 1em}
+.bctl .main{min-width:10em}
+.bnote{position:fixed;right:clamp(12px,3vw,40px);bottom:96px;max-width:min(520px,90vw);background:var(--surface);border:2px solid var(--accent);
+  border-radius:var(--r);padding:12px 16px;font-size:20px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:4}
+.bnote b{display:block;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+#board.preview .bctl,#board.preview .bbar button{visibility:hidden}
+#board.preview .bnote{display:none}
+@media (max-width:1150px){ .bbar .ttl{visibility:hidden} .bbar button .t{display:none} }
+
+svg text{font-family:var(--font);fill:var(--ink)}
+svg .lab{font-size:38px;font-weight:700}
+svg .lab.s{font-size:30px;font-weight:600}
+svg .lab.acc{fill:var(--accent)}
+svg .lab.warm{fill:var(--b)}
+svg .lab.soft{fill:var(--soft)}
+svg .ov{text-decoration:overline}
+svg .ge{fill:var(--surface)}
+svg .gs{fill:var(--a-soft)}
+svg .gw{fill:var(--b-soft)}
+svg .gl{stroke:var(--ink);stroke-width:1.3;opacity:.45}
+svg .gk{stroke:var(--ink);stroke-width:4;opacity:1}
+svg .gf{fill:none;stroke:var(--ink);stroke-width:4}
+svg .gx{fill:none;stroke:var(--b);stroke-width:6;stroke-dasharray:14 8}
+svg .br{fill:none;stroke:var(--ink);stroke-width:3}
+svg .br.warm{stroke:var(--b)}
+svg .axis{stroke:var(--ink);stroke-width:3}
+svg .tick{stroke:var(--ink);stroke-width:2.5}
+svg .curve{fill:none;stroke:var(--a);stroke-width:6}
+svg .hline{stroke:var(--b);stroke-width:4;stroke-dasharray:12 8}
+svg .seg{stroke:var(--b);stroke-width:12;stroke-linecap:round}
+svg .link{stroke:var(--soft);stroke-width:2;stroke-dasharray:6 6}
+svg .dot{fill:var(--b);stroke:var(--surface);stroke-width:3}
+svg .lbl text{font-size:32px;font-weight:700}
+svg .lbl line{stroke:var(--ink);stroke-width:3}
+svg .lbl.warm text{fill:var(--b)} svg .lbl.warm line{stroke:var(--b)}
+svg .new{animation:fade .6s ease-out both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){ svg .new, .mode:hover{animation:none;transform:none} }
+
+/* раздатка: панель */
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;margin-bottom:24px}
+.panel .row{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.panel label{display:inline-flex;gap:8px;align-items:center}
+.panel input[type=text]{width:100%;min-width:0;padding:.4em .6em;border:2px solid var(--line);border-radius:10px;background:var(--bg)}
+.panel input[type=number]{width:5em;padding:.3em .5em;border:2px solid var(--line);border-radius:10px;background:var(--bg)}
+.note{color:var(--soft);font-size:16px;margin:0}
+.err{color:var(--bad);font-weight:600}
+.sheets{display:grid;gap:24px;justify-items:center;overflow-x:auto}
+
+/* лист A4: на экране — как на бумаге */
+.page{width:210mm;min-height:297mm;padding:12mm;background:#fff;color:#000;box-shadow:0 2px 16px rgba(0,0,0,.18);font-size:12pt;line-height:1.35}
+.page.half .sheet{height:136mm;overflow:hidden;gap:1mm}
+.page.half .sheet + .sheet{border-top:1px dashed #888;padding-top:3mm}
+.half .sheet h2{display:none}
+.half .shead{font-size:10pt}
+.half .tasks{gap:.5mm 4mm}
+.half .task{font-size:12pt;line-height:1.25}
+.half .instr{font-size:8.5pt;line-height:1.15}
+.half .sub-h{display:none}
+.half .bank{font-size:10pt;gap:.8mm}
+.half .bank .bk{min-width:11mm}
+.half .bank .bk > :first-child{padding:0 1mm}
+.half table.ans{font-size:10pt}
+.half table.ans td,.half table.ans th{padding:.4mm 1mm}
+.half table.ans .tall td{height:7mm}
+.half .word{font-size:10pt}
+/* бланк ответов в стиле ОГЭ */
+.seg{display:inline-flex;flex-wrap:wrap;gap:6px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.mode.split{border:2px solid var(--line);background:var(--surface)}
+.mode.split:hover{transform:none}
+.kinds{display:grid;gap:8px;width:100%;margin-top:auto}
+.kinds button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;font-size:17px;padding:.5em .8em}
+.kinds small{font-weight:400;font-size:14px;color:var(--soft)}
+.oge .task{font-size:12pt;line-height:1.35}
+.oge .cells{height:15mm}
+.oge .otv{font-size:11pt;margin-top:1mm}
+.oge .bhead{display:flex;align-items:center;justify-content:space-between;gap:4mm;margin-top:1mm}
+.oge .sample{display:flex;align-items:center;gap:2mm;font-size:10pt}
+.oge .sample .brow b{display:none}
+.blank{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm 8mm}
+.brow{display:flex;align-items:center}
+.brow b{width:7mm;font-size:12pt}
+.brow i{width:6.5mm;height:8mm;border:1px solid #000;margin-left:-1px;display:inline-flex;align-items:center;justify-content:center;
+  font-style:normal;font-size:12pt}
+.half .oge .task{font-size:11pt;line-height:1.25}
+.half .oge .otv{display:none}
+.half .blank{gap:1.2mm 8mm}
+.half .brow i{height:6.5mm}
+.sheet{display:flex;flex-direction:column;gap:3mm}
+.shead{display:grid;grid-template-columns:1fr 22mm 28mm auto;gap:4mm;font-size:11pt;align-items:end}
+.shead span{border-bottom:1px solid #000;padding-bottom:1mm;white-space:nowrap}
+.shead .vn{border:1.5px solid #000;padding:1mm 2mm;font-weight:700}
+.sheet h2{font-size:14pt;margin:1mm 0 0}
+.sheet .instr{margin:0;font-size:10.5pt}
+.tasks{display:grid;grid-template-columns:1fr 1fr;gap:3mm 6mm;margin:0;padding:0;list-style:none}
+.task{break-inside:avoid;font-size:14pt}
+.task .no{font-weight:700;margin-right:2mm}
+.cells{height:24mm;margin-top:1.5mm;border:1px solid #bbb;
+  background-image:linear-gradient(#cfcfcf .3mm,transparent .3mm),linear-gradient(90deg,#cfcfcf .3mm,transparent .3mm);
+  background-size:5mm 5mm;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+.compact .cells{display:none}
+.bank{display:flex;flex-wrap:wrap;gap:1.5mm;font-size:12pt}
+.bank .bk{border:1px solid #000;min-width:13mm;text-align:center;display:flex;flex-direction:column}
+.bank .bk > :first-child{padding:1mm 1.5mm;flex:1;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.bank .bk > :last-child{border-top:1px solid #000;font-weight:700;padding:.5mm}
+.sub-h{font-weight:700;font-size:11pt;margin:1mm 0 0}
+table.ans{border-collapse:collapse;width:100%;font-size:11pt;table-layout:fixed}
+table.ans td,table.ans th{border:1px solid #000;padding:1mm;text-align:center}
+table.ans th:first-child{width:18mm;text-align:left}
+table.ans .tall td{height:13mm}
+.word{font-size:11pt}
+.key h2{font-size:15pt;margin:0 0 3mm}
+table.key{border-collapse:collapse;width:100%;font-size:10.5pt}
+table.key td,table.key th{border:1px solid #000;padding:1mm 1.2mm;text-align:center;white-space:nowrap}
+table.key td:first-child{font-weight:700}
+
+/* тренажёр */
+.hhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:16px}
+.hhead h2{margin:0;font-size:26px;flex:1;min-width:12em}
+.levels{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin:16px 0}
+.level{text-align:left;padding:16px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.level small{font-weight:400;color:var(--soft)}
+.level .lex{font-size:24px;font-weight:700;margin:4px 0}
+.stats{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--soft);font-weight:600}
+.stats b{color:var(--ink)}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:clamp(16px,3vw,28px)}
+.taskx{font-size:clamp(26px,5vw,40px);font-weight:700;margin:4px 0 16px;text-align:center;line-height:1.35}
+.inrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 14px;font-size:26px}
+.inrow input{width:3.4em;padding:.15em .2em;text-align:center;border:2px solid var(--line);border-radius:10px;background:var(--bg);font-weight:700}
+.inrow input.wide{width:5.5em}
+.inrow .frac input{width:2.6em;margin:2px 0}
+.inrow .frac.fin > :last-child{border-top:3px solid currentColor;padding-top:4px}
+.inrow .check{font-size:20px;min-height:52px}
+.choice{font-size:26px;min-width:3.2em;min-height:60px}
+.cnts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px}
+.cnts button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
+.sqrtbtn{font-size:24px;min-width:52px;min-height:52px;padding:0 .4em}
+.hbtns{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.fb{margin-top:16px;padding:14px 16px;border-radius:12px;font-size:19px;line-height:1.6}
+.fb.ok{background:var(--ok-soft);border-left:6px solid var(--ok)}
+.fb.bad{background:var(--bad-soft);border-left:6px solid var(--bad)}
+.fb.info{background:var(--info-soft);border-left:6px solid var(--soft)}
+.fb .tag{font-weight:700;display:block;margin-bottom:2px}
+.hnote{color:var(--soft);font-size:16px;text-align:center;margin:10px 0 0}
+.linkbtn{font-size:15px;padding:.2em .6em;border-width:1.5px}
+#home.playing .hhead h2{font-size:18px;color:var(--soft)}
+#home.playing .wrap{padding-top:12px}
+/* телефон: задание и «Проверить» — в верхней половине, нижнюю закрывает клавиатура */
+@media (max-width:600px){
+  #home.playing .hhead{margin-bottom:6px;flex-wrap:nowrap;justify-content:space-between}
+  #home.playing .hhead h2{display:none}
+  #home.playing .stats{font-size:15px;gap:2px 12px}
+  #home.playing .card{padding:12px 14px;margin-top:8px !important}
+  .taskx{margin:0 0 8px}
+  .inrow{font-size:23px;gap:8px 12px}
+  #home.playing .wrap{padding-bottom:50vh}
+}
+.work{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:10px}
+.work li{background:var(--bg);border-radius:10px;padding:10px 14px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px;z-index:20}
+.overlay .card{max-width:720px;max-height:90vh;overflow:auto}
+.overlay h3{margin:0 0 8px;font-size:24px}
+.overlay h4{margin:16px 0 4px}
+.overlay p{margin:4px 0}
+
+body.student [data-act="menu"],body.student #hLinks{display:none !important}
+@page{size:A4;margin:0}
+@media print{
+  html,body{background:#fff !important;color:#000 !important;background-image:none !important;padding:0}
+  .no-print,.screen:not(#print),.topright{display:none !important}
+  #print .wrap{max-width:none;padding:0}
+  .sheets{display:block;overflow:visible}
+  .page{box-shadow:none;margin:0;break-after:page;min-height:auto;height:297mm;overflow:hidden}
+  .page.key{height:auto;overflow:visible}
+  table.key tr{break-inside:avoid}
+  .page:last-child{break-after:auto}
+  body.print-key .page:not(.key){display:none}
+  body.print-sheets .page.key{display:none}
+}
+@media (max-width:600px){
+  .bbar{font-size:18px}
+  .bctl button{font-size:18px;min-height:48px}
+}
+
+/* тема */
+/* Тема «Формулы сокращённого умножения» */
+/* пропуск в формуле */
+.fmuq{display:inline-block;min-width:1.3em;text-align:center;border-bottom:2px dashed currentColor;font-weight:700}
+/* поля ввода одночлена: коэффициент, x и степень */
+.mono{display:inline-flex;align-items:center;white-space:nowrap}
+.inrow .mono input.mk{width:2.6em}
+.inrow .mono sup{display:inline-block;margin-left:.1em;vertical-align:baseline;position:relative;top:-.5em}
+.inrow .mono input.mp{width:2.1em;font-size:.75em}
+.inrow select.sg{font:inherit;font-weight:700;padding:.1em .3em;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:inherit}
+.inrow.picks{flex-direction:column;align-items:stretch}
+.inrow.picks .choice{font-size:24px}
+/* чертёж доски: сетка поверх цветных частей — без заливки */
+svg .gn{fill:none}
+
+</style>
+</head>
+<body>
+
+<!-- стартовый экран -->
+<section id="start" class="screen" hidden>
+  <a class="tosite no-print" id="toSite" target="_top" hidden>← Назад на сайт</a>
+  <div class="topright no-print">
+    <button class="icon" id="themeBtn" type="button" title="Светлая или тёмная тема" aria-label="Сменить тему">◐</button>
+  </div>
+  <div class="wrap">
+    <p class="kicker">7 класс · Макарычев и др. · Алгебра</p>
+    <h1>Формулы сокращённого умножения</h1>
+    <p class="lead">Одна тема в трёх режимах: показ на доске, раздатка с кодовым словом и тренажёр, который объясняет каждую ошибку.</p>
+    <div class="modes">
+      <button class="mode" type="button" data-go="board"><b>🖥 На доске</b><span>Квадрат суммы — это не сумма квадратов: площадь квадрата (a + b)² и четыре фигуры внутри него. Ловушки (a + b)² = a² + b² и −2ab в квадрате разности.</span></button>
+      <div class="mode split"><b>🖨 Раздатка</b><span>У каждого свой вариант, ключ — по номеру варианта.</span>
+        <div class="kinds">
+          <button type="button" data-go="print" data-kind="word">🔤 Кодовое слово<small>верные ответы складываются в слово</small></button>
+          <button type="button" data-go="print" data-kind="oge">🧾 Бланк как в ОГЭ<small>ответ-число в клеточки бланка</small></button>
+        </div>
+      </div>
+      <button class="mode" type="button" data-go="home"><b>🏠 Тренировка</b><span>Раскрытие скобок, восстановление пропущенного члена, вычисления удобным способом, разложение на множители, куб суммы и разности. Разбор каждой ошибки.</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- доска -->
+<section id="board" class="screen" hidden>
+  <div class="bbar">
+    <button class="icon" type="button" data-act="menu" title="Меню (Esc)" aria-label="Меню">☰</button>
+    <span class="ttl">Формулы сокращённого умножения</span>
+    <span class="cnt" id="bCnt"></span>
+    <button type="button" data-act="restart" title="С первого шага" aria-label="Заново">↺<span class="t"> Заново</span></button>
+    <button type="button" data-act="numbers" title="Тот же показ с другими числами" aria-label="Другие числа">🎲<span class="t"> Другие числа</span></button>
+    <button type="button" data-act="notes" id="bNotesBtn" aria-pressed="false" title="Что сказать на этом шаге. Подсказку видно и на проекторе — включайте, когда нужно" aria-label="Подсказка учителю">💬<span class="t"> Учителю</span></button>
+    <button class="icon" type="button" data-act="theme" title="Светлая или тёмная тема" aria-label="Сменить тему">◐</button>
+    <button class="icon" type="button" data-act="full" title="Во весь экран (F)" aria-label="Во весь экран">⛶</button>
+  </div>
+  <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
+  <div class="bstage" id="bStage"></div>
+  <div class="brec"><span class="rt-h">Запись в тетради</span><div id="bRec"></div></div>
+  <div class="bctl">
+    <button type="button" data-act="prev" title="Назад (←, PageUp)">← Назад</button>
+    <button type="button" class="main" data-act="next" id="bNext" title="Далее (→, Пробел, PageDown)">Показать ответ</button>
+  </div>
+  <div class="bnote" id="bNote" hidden></div>
+</section>
+
+<!-- раздатка -->
+<section id="print" class="screen" hidden>
+  <div class="wrap">
+    <div class="hhead no-print">
+      <button class="icon" type="button" data-act="menu" aria-label="Меню">☰</button>
+      <h2>Раздатка: формулы сокращённого умножения</h2>
+    </div>
+    <div class="panel no-print">
+      <div class="row">
+        <b>Вид листа:</b>
+        <div class="seg" role="group" aria-label="Вид листа">
+          <button type="button" data-kind-set="word" aria-pressed="true">🔤 Кодовое слово</button>
+          <button type="button" data-kind-set="oge" aria-pressed="false">🧾 Бланк ответов, как в ОГЭ</button>
+        </div>
+        <input type="hidden" id="pKind" value="word">
+      </div>
+      <div class="row">
+        <label>Вариантов <input type="number" id="pCount" min="1" max="40"></label>
+        <button type="button" id="pNew">Новые номера</button>
+        <label><input type="checkbox" id="pSpace"> место для решения (сетка)</label>
+        <label><input type="checkbox" id="pTwo"> два варианта на листе</label>
+      </div>
+      <label style="display:grid;gap:4px">Номера вариантов (можно вписать свои — ключ восстановится по номеру)
+        <input type="text" id="pNums" autocomplete="off" spellcheck="false">
+      </label>
+      <p class="note" id="pMsg"></p>
+      <div class="row">
+        <button type="button" class="main" id="pPrint">🖨 Печать листов</button>
+        <button type="button" id="pPrintKey">🔑 Печать ключа</button>
+      </div>
+      <p class="note"><span id="pAbout"></span> Печать — A4, поля браузера — «по умолчанию» или «нет».</p>
+    </div>
+    <div class="sheets" id="pSheets"></div>
+  </div>
+</section>
+
+<!-- тренажёр -->
+<section id="home" class="screen" hidden>
+  <div class="wrap">
+    <div class="hhead">
+      <button class="icon" type="button" data-act="menu" aria-label="Меню">☰</button>
+      <h2>Тренировка: формулы сокращённого умножения</h2>
+      <button type="button" data-act="help">📖 Справка</button>
+    </div>
+    <div id="hSetup">
+      <p>Выбери раздел — и начнём. В каждом 10 заданий, после ошибки — разбор и такое же задание с другими числами.</p>
+      <div class="levels" id="hLevels"></div>
+      <p class="note" id="hLinks"></p>
+    </div>
+    <div id="hPlay" hidden>
+      <div class="stats" id="hStats"></div>
+      <div class="card" style="margin-top:12px">
+        <div class="taskx" id="hTask"></div>
+        <div id="hStep"></div>
+        <div id="hFb"></div>
+        <div class="hbtns">
+          <button type="button" id="hHint">Подсказка (−<span id="hPen"></span>)</button>
+          <button type="button" class="main" id="hNext" hidden>Дальше →</button>
+        </div>
+      </div>
+    </div>
+    <div id="hEnd" hidden></div>
+  </div>
+</section>
+
+<div class="overlay" id="help" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="helpT">
+    <h3 id="helpT">Справка: формулы сокращённого умножения</h3>
+    <h4>Квадрат суммы и квадрат разности</h4>
+    <p>Квадрат суммы двух выражений равен квадрату первого выражения плюс удвоенное произведение первого и второго плюс квадрат второго.</p>
+    <p id="helpSqSum"></p>
+    <p>Квадрат разности: так же, только перед удвоенным произведением стоит «−». Последний член — всегда «+».</p>
+    <p id="helpSqDif"></p>
+    <h4>Разность квадратов</h4>
+    <p>Разность квадратов двух выражений равна произведению их разности и их суммы. Среднего члена здесь нет.</p>
+    <p id="helpDiff"></p>
+    <h4>Куб суммы и куб разности</h4>
+    <p>Четыре слагаемых, коэффициенты 1, 3, 3, 1. В кубе суммы все знаки «+», в кубе разности знаки чередуются.</p>
+    <p id="helpCubeSum"></p>
+    <p id="helpCubeDif"></p>
+    <h4>Примеры</h4>
+    <p id="helpEx1"></p>
+    <p>Вычисление удобным способом:</p>
+    <p id="helpEx2"></p>
+    <p>Упрощение: квадраты сокращаются, остаётся линейное выражение:</p>
+    <p id="helpEx3"></p>
+    <div class="hbtns"><button type="button" class="main" data-act="help-close">Понятно</button></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// Материал «Формулы сокращённого умножения». Собран конструктором «Матшага» из materials/formuly-sokrashchennogo-umnozheniya/ и core/.
+const SLUG = "formuly-sokrashchennogo-umnozheniya";
+const META = {"title":"Формулы сокращённого умножения","description":"Формулы сокращённого умножения: показ на доске, раздатка с кодовым словом и тренажёр с разбором ошибок. Квадрат суммы и разности, разность квадратов, кубы, вычисление удобным способом, восстановление пропущенного. 7 класс.","kicker":"7 класс · Макарычев и др. · Алгебра","lead":"Одна тема в трёх режимах: показ на доске, раздатка с кодовым словом и тренажёр, который объясняет каждую ошибку.","modeBoard":"Квадрат суммы — это не сумма квадратов: площадь квадрата (a + b)² и четыре фигуры внутри него. Ловушки (a + b)² = a² + b² и −2ab в квадрате разности.","modePrint":"У каждого свой вариант, ключ — по номеру варианта.","modeHome":"Раскрытие скобок, восстановление пропущенного члена, вычисления удобным способом, разложение на множители, куб суммы и разности. Разбор каждой ошибки.","printTitle":"Раздатка: формулы сокращённого умножения","homeTitle":"Тренировка: формулы сокращённого умножения","homeIntro":"Выбери раздел — и начнём. В каждом 10 заданий, после ошибки — разбор и такое же задание с другими числами."};
+// ---------- ядро: core/shell.js ----------
+// Общие константы, адрес материала, хранилище настроек. SLUG и META вставляет сборка.
+const MINUS = '−';
+
+const P = new URLSearchParams(location.search);
+const MODE = ['board', 'print', 'home'].includes(P.get('mode')) ? P.get('mode') : null;
+const PREVIEW = P.get('preview') === '1';
+// Ссылка для учеников (?mode=home&student=1): только тренажёр — без меню, доски и раздатки
+const STUDENT = P.get('student') === '1';
+const $ = id => document.getElementById(id);
+const store = {
+  get(k) { try { return localStorage.getItem('matshag:' + SLUG + ':' + k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem('matshag:' + SLUG + ':' + k, String(v)); } catch {} },
+};
+
+// Ссылка «← Назад на сайт» на стартовом экране: материал открыт с сайта (/zapusk/<slug>/ или /materials/<slug>.html)
+// ведёт на страницу материала /item/<slug>/. Скачанный файл и ссылка для учеников её не показывают.
+function siteHref() {
+  if (STUDENT || location.protocol === 'file:') return '';
+  let top = location;
+  try { if (window.top !== window && window.top.location.origin === location.origin) top = window.top.location; } catch {}
+  const z = top.pathname.match(/^(.*\/)zapusk\/([a-z0-9-]+)\/?$/);
+  if (z) return `${top.origin}${z[1]}item/${z[2]}/`;
+  const m = location.pathname.match(/^(.*\/)materials\/([a-z0-9-]+)\.html$/);
+  return m ? `${location.origin}${m[1]}item/${m[2]}/` : '';
+}
+
+// ================= Экраны =================
+let screen = null;
+function show(name) {
+  if (STUDENT && name !== 'home') return;
+  boardStopPreview();
+  screen = name;
+  ['start', 'board', 'print', 'home'].forEach(s => { $(s).hidden = s !== name; });
+  $('help').hidden = true;
+  if (name === 'board') renderBoard();
+  if (name === 'print') renderPrint();
+  if (name === 'home') homeSetup();
+}
+function toggleTheme() {
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+  store.set('theme', document.documentElement.dataset.theme);
+}
+async function toggleFull() {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch {}
+}
+
+
+// ---------- ядро: core/math.js ----------
+// ================= Точная арифметика: числа — несократимые дроби {n, d} =================
+const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b, a % b]; return a; };
+const Q = (n, d = 1) => { if (d < 0) { n = -n; d = -d; } const g = gcd(n, d) || 1; return { n: n / g, d: d / g }; };
+const qadd = (x, y) => Q(x.n * y.d + y.n * x.d, x.d * y.d);
+const qsub = (x, y) => Q(x.n * y.d - y.n * x.d, x.d * y.d);
+const qmul = (x, y) => Q(x.n * y.n, x.d * y.d);
+const qeq = (x, y) => !!x && !!y && x.n === y.n && x.d === y.d;
+const qneg = x => Q(-x.n, x.d);
+const isqrt = n => { if (n < 0) return null; const r = Math.round(Math.sqrt(n)); return r * r === n ? r : null; };
+const qsqrt = x => { const a = isqrt(x.n), b = isqrt(x.d); return a == null || b == null ? null : Q(a, b); };
+const floorSqrt = n => { let r = Math.floor(Math.sqrt(n)); while (r * r > n) r--; while ((r + 1) * (r + 1) <= n) r++; return r; };
+const toMixed = f => { const w = Math.floor(f.n / f.d); return { w, n: f.n - w * f.d, d: f.d }; };
+// конечная десятичная запись с запятой или null
+function decStr(x) {
+  for (let k = 0; k <= 8; k++) {
+    const m = x.n * 10 ** k;
+    if (m % x.d !== 0) continue;
+    const v = Math.abs(m / x.d), s = String(v).padStart(k + 1, '0');
+    return (x.n < 0 ? MINUS : '') + (k ? s.slice(0, -k) + ',' + s.slice(-k) : s);
+  }
+  return null;
+}
+
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const int = (rnd, a, b) => a + Math.floor(rnd() * (b - a + 1));
+const pick = (rnd, arr) => arr[Math.floor(rnd() * arr.length)];
+function shuffle(rnd, arr) {
+  const r = arr.slice();
+  for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
+  return r;
+}
+const taskRnd = (n, i) => mulberry32(GEN_VERSION * 1000003 + n * 7919 + i * 104729 + 1);
+const plural = (n, one, few, many) => {
+  const m10 = n % 10, m100 = n % 100;
+  return m10 === 1 && m100 !== 11 ? one : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? few : many;
+};
+
+// ================= Запись =================
+const F = f => `<span class="frac"><span>${f.n}</span><span>${f.d}</span></span>`;
+const M = m => m.w ? `<span class="mixed"><span class="w">${m.w}</span>${m.n ? F(m) : ''}</span>` : F(m);
+// корень: √ и черта над подкоренным выражением; tall — под корнем дробь
+const RT = (inner, tall) => `<span class="rt${tall ? ' tall' : ''}"><span class="rs">√</span><span class="rad">${inner}</span></span>`;
+const X = '<i>x</i>';
+const esc = s => String(s).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// число: style 'dec' — десятичной дробью, если она конечная; 'frac' — обыкновенной (смешанной)
+function htmlQ(x, style = 'dec') {
+  if (x.d === 1) return (x.n < 0 ? MINUS : '') + Math.abs(x.n);
+  const s = style === 'dec' && decStr(x);
+  if (s) return s;
+  const a = { n: Math.abs(x.n), d: x.d };
+  return (x.n < 0 ? MINUS : '') + (a.n > a.d ? M(toMixed(a)) : F(a));
+}
+function keyQ(x, style = 'dec') {
+  if (x.d === 1) return (x.n < 0 ? MINUS : '') + Math.abs(x.n);
+  const s = style === 'dec' && decStr(x);
+  if (s) return s;
+  const a = { n: Math.abs(x.n), d: x.d }, m = toMixed(a);
+  return (x.n < 0 ? MINUS : '') + (m.w ? m.w + ' ' : '') + m.n + '/' + m.d;
+}
+const sq2 = x => htmlQ(qmul(x, x));   // квадрат числа для проверки в объяснениях
+// десятичная дробь с одной-двумя цифрами после запятой — для подкоренных выражений
+const D = x => decStr(x) || htmlQ(x, 'frac');
+
+// Значение корня уравнения: {q} — рациональное число, {m, s} — s·√m, m не квадрат
+const V = {
+  q: q => ({ q }),
+  html: (v, style) => v.q ? htmlQ(v.q, style) : (v.s < 0 ? MINUS : '') + RT(v.m),
+  key: (v, style) => v.q ? keyQ(v.q, style) : (v.s < 0 ? MINUS : '') + '√' + v.m,
+  eq: (a, b) => a.q && b.q ? qeq(a.q, b.q) : !a.q && !b.q && a.m === b.m && a.s === b.s,
+};
+function eqRoots(a) {
+  if (a.n < 0) return [];
+  if (a.n === 0) return [V.q(Q(0))];
+  const s = qsqrt(a);
+  if (s) return [V.q(s), V.q(qneg(s))];
+  return [{ m: a.n, s: 1 }, { m: a.n, s: -1 }];   // a — целое, не квадрат
+}
+const eqKey = (R, style) => !R.length ? 'нет корней' : R.length === 1 ? V.key(R[0], style) : '±' + V.key(R[0], style);
+const eqHTML = (R, style) => `<span class="nw">${!R.length ? 'корней нет' : R.length === 1 ? `${X} = ${V.html(R[0], style)}` : `${X} = ±${V.html(R[0], style)}`}</span>`;
+
+// Ввод: «0,3», «12», «−5», «5/3», «1 2/3»
+function parseQ(s) {
+  const t = String(s).trim().replace(/[−–]/g, '-').replace(/\s+/g, ' ');
+  let m = t.match(/^(-)?(\d+) (\d+)\/(\d+)$/);
+  if (m) return +m[4] ? Q((m[1] ? -1 : 1) * (+m[2] * +m[4] + +m[3]), +m[4]) : null;
+  m = t.match(/^(-)?(\d+)\/(\d+)$/);
+  if (m) return +m[3] ? Q((m[1] ? -1 : 1) * +m[2], +m[3]) : null;
+  m = t.replace(/ /g, '').replace('.', ',').match(/^(-)?(\d*)(?:,(\d+))?$/);
+  if (!m || (!m[2] && !m[3])) return null;
+  const fr = m[3] || '', k = fr.length;
+  return Q((m[1] ? -1 : 1) * (+(m[2] || 0) * 10 ** k + +(fr || 0)), 10 ** k);
+}
+// корень уравнения: число или «√7», «−√7», «2√3»
+function parseVal(s) {
+  const t = String(s).trim().replace(/[−–]/g, '-').replace(/\s+/g, '');
+  const m = t.match(/^([+-])?(\d+)?√(\d+)$/);
+  if (!m) { const q = parseQ(s); return q ? V.q(q) : null; }
+  const k = +(m[2] || 1), sign = m[1] === '-' ? -1 : 1, under = k * k * +m[3];
+  const r = isqrt(under);
+  return r != null ? V.q(Q(sign * r)) : { m: under, s: sign };
+}
+
+// ---------- тема: materials/formuly-sokrashchennogo-umnozheniya/topic.js ----------
+// Тема «Формулы сокращённого умножения» (7 класс, Макарычев). Только содержание — каркас даёт ядро (core/).
+// Что тема обязана задать и как — ИНСТРУКЦИЯ.md, раздел «Из чего состоит тема».
+// Базовые формулы: (a ± b)² = a² ± 2ab + b², a² − b² = (a − b)(a + b), (a ± b)³.
+// Одночлен в задачах — объект {k, m}: k·x^m (одна буква x, m ≥ 1). У выражений A = k₁x^m₁ и B = k₂x^m₂
+// показатели разные (m₁ ≠ m₂): иначе a², 2ab и b² оказались бы подобными слагаемыми и слились бы в одно.
+
+// ================= Параметры: учитель может поменять их за минуту =================
+const CONFIG = {
+  board: {
+    a: 20, b: 3,            // первый пример на доске: квадрат со стороной (20 + 3)
+    previewDelay: 1700,     // превью на сайте: пауза между шагами, мс
+  },
+  print: {
+    variants: 25,           // сколько вариантов печатать по умолчанию
+    traps: 2,               // сколько ответов-ловушек на задание в таблице букв
+    space: true,            // сетка для решения под каждым заданием
+  },
+  home: {
+    round: 10,              // заданий в тренировке
+    points: [10, 10, 15],   // очки за задание по разделам (столько чисел, сколько разделов)
+    hintPenalty: 3,         // штраф за подсказку
+    maxMultiplier: 3,       // множитель за серию: +1 за каждые 3 задания подряд без ошибок
+  },
+};
+// Версия генератора — первая часть номера варианта «1-4817». Изменил генератор или состав
+// заданий раздатки — увеличь версию и оставь старую ветку, пока на неё есть напечатанные листы.
+const GEN_VERSION = 1;
+
+// ================= Запись формул =================
+const VI = v => `<i>${v}</i>`;                    // переменная курсивом
+const PW = s => `<sup>${s}</sup>`;               // степень верхним регистром
+const LA = VI('a'), LB = VI('b');
+const sgn = s => (s > 0 ? '+' : MINUS);
+const mono = x => (x.k === 1 ? '' : x.k) + X + (x.m === 1 ? '' : PW(x.m));
+// сумма одночленов со знаками: [{k: 4, m: 2}, {k: −12, m: 3}] → 4x² − 12x³
+const poly = xs => xs.map((x, i) => {
+  const s = mono({ k: Math.abs(x.k), m: x.m });
+  return i ? (x.k < 0 ? ` ${MINUS} ` : ' + ') + s : (x.k < 0 ? MINUS : '') + s;
+}).join('');
+const monoKey = x => `${x.k}x${x.m}`;            // ключ для таблицы букв и ответа
+const polyKey = xs => xs.map(monoKey).join(',');
+const sqOf = x => ({ k: x.k * x.k, m: 2 * x.m });
+const crOf = (A, B) => ({ k: 2 * A.k * B.k, m: A.m + B.m });
+const neg = x => ({ k: -x.k, m: x.m });
+const eqm = (u, v) => !!u && !!v && u.k === v.k && u.m === v.m;
+const binom = (A, s, B) => `(${mono(A)} ${sgn(s)} ${mono(B)})`;
+const prodDiff = (A, B) => `(${mono(A)} ${MINUS} ${mono(B)})(${mono(A)} + ${mono(B)})`;
+// формулы в тексте объяснений
+const FSQ = s => `(${LA} ${sgn(s)} ${LB})${PW(2)} = ${LA}${PW(2)} ${sgn(s)} 2${LA}${LB} + ${LB}${PW(2)}`;
+const FDIF = `${LA}${PW(2)} ${MINUS} ${LB}${PW(2)} = (${LA} ${MINUS} ${LB})(${LA} + ${LB})`;
+const FCUBE = s => `(${LA} ${sgn(s)} ${LB})${PW(3)} = ${LA}${PW(3)} ${sgn(s)} 3${LA}${PW(2)}${LB} + 3${LA}${LB}${PW(2)} ${sgn(s)} ${LB}${PW(3)}`;
+
+// Пара одночленов A, B с разными показателями; sign — знак в скобке
+function genAB(rnd, form, kmax, mmax) {
+  const A = { k: int(rnd, 1, kmax), m: int(rnd, 1, mmax) };
+  let B;
+  do B = { k: int(rnd, 1, kmax), m: int(rnd, 1, mmax) }; while (B.m === A.m);
+  return { form, sign: form === 'sqdif' ? -1 : 1, A, B };
+}
+
+// ================= Типы заданий =================
+// gen(rnd, form) — задание из зерна (никакого Math.random), text(t) — запись, ans(t) — ответ,
+// ok(t) — объяснение верного, wrong(t, x) — {cat, msg} с вычислением, hints(t) — две подсказки,
+// key/keyHTML — ответ для ключа, traps(t) — ловушки [{key, html}], correct/wrongInput — ответы для теста-контракта.
+const bad = (cat, msg) => ({ cat, msg });
+
+const TYPES = {
+  expand: {   // раскрыть скобки: квадрат суммы, квадрат разности, произведение разности и суммы
+    input: 'poly', title: 'Раскрытие скобок',
+    forms: ['sqsum', 'sqdif', 'diff'],
+    gen: (rnd, form) => genAB(rnd, form || pick(rnd, TYPES.expand.forms), 4, 3),
+    terms: t => {
+      const sa = sqOf(t.A), sb = sqOf(t.B), cr = crOf(t.A, t.B);
+      return t.form === 'diff' ? [sa, neg(sb)] : [sa, t.form === 'sqdif' ? neg(cr) : cr, sb];
+    },
+    text: t => t.form === 'diff' ? prodDiff(t.A, t.B) : `${binom(t.A, t.sign, t.B)}${PW(2)}`,
+    ask: t => `Раскройте скобки:  ${TYPES.expand.text(t)}`,
+    sheet: t => `Раскройте скобки: ${TYPES.expand.text(t)}`,
+    answer: t => `${TYPES.expand.text(t)} = ${poly(TYPES.expand.terms(t))}`,
+    ans: t => TYPES.expand.terms(t),
+    same: (t, x) => { const a = TYPES.expand.terms(t); return x.length === a.length && x.every((v, i) => eqm(v, a[i])); },
+    ok(t) {
+      const T = TYPES.expand, sa = sqOf(t.A), sb = sqOf(t.B), cr = crOf(t.A, t.B);
+      if (t.form === 'diff') return `${FDIF}: (${mono(t.A)})${PW(2)} = ${mono(sa)}, (${mono(t.B)})${PW(2)} = ${mono(sb)}. Получаем ${poly(T.terms(t))}.`;
+      return `${FSQ(t.sign)}: 2 · ${mono(t.A)} · ${mono(t.B)} = ${mono(cr)}, квадраты — ${mono(sa)} и ${mono(sb)}. Получаем ${poly(T.terms(t))}.`;
+    },
+    wrong(t, x) {
+      const T = TYPES.expand, sa = sqOf(t.A), sb = sqOf(t.B), cr = crOf(t.A, t.B), at = T.terms(t), ok = T.ok(t);
+      const ab = { k: t.A.k * t.B.k, m: t.A.m + t.B.m };
+      if (t.form === 'diff') {
+        if (x.length === 2 && eqm(x[0], sa) && eqm(x[1], sb))
+          return bad('sign', `Между квадратами должен стоять «${MINUS}»: ${mono(sa)} ${MINUS} ${mono(sb)}, а не «+». ${ok}`);
+        if (x.length === 3)
+          return bad('diff', `Это не квадрат разности. В произведении суммы и разности всего ДВА слагаемых: средние члены ${mono(ab)} и ${MINUS}${mono(ab)} взаимно уничтожаются. ${ok}`);
+      } else {
+        if (x.length === 2 && eqm(x[0], sa) && eqm(x[1], sb))
+          return bad('middle', `Ты сложил квадраты, а нужно ТРИ слагаемых: потерялось удвоенное произведение 2 · ${mono(t.A)} · ${mono(t.B)} = ${mono(cr)}. ${ok}`);
+        if (x.length === 2 && eqm(x[0], sa) && eqm(x[1], neg(sb)))
+          return bad('sign', `(${LA} ${sgn(t.sign)} ${LB})${PW(2)} никогда не даёт ${LA}${PW(2)} ${MINUS} ${LB}${PW(2)}: последний член — ПЛЮС квадрат второго одночлена, а в середине стоит 2${LA}${LB}. ${ok}`);
+        if (x.length === 3 && eqm(x[0], sa) && eqm(x[2], sb)) {
+          if (eqm(x[1], neg(at[1])))
+            return bad('sign', t.sign > 0
+              ? `Внутри скобки «+», значит и средний член 2${LA}${LB} со знаком «+»: 2 · ${mono(t.A)} · ${mono(t.B)} = +${mono(cr)}. ${ok}`
+              : `В квадрате РАЗНОСТИ средний член со знаком «${MINUS}»: ${MINUS}2 · ${mono(t.A)} · ${mono(t.B)} = ${MINUS}${mono(cr)}. ${ok}`);
+          if (x[1].m === cr.m && Math.abs(x[1].k) * 2 === cr.k)
+            return bad('coef', `Средний член — УДВОЕННОЕ произведение: 2 · ${mono(t.A)} · ${mono(t.B)} = ${mono(cr)}, а ты записал одно произведение. ${ok}`);
+        }
+      }
+      if (!eqm(x[0], sa) || !eqm(x[x.length - 1], at[at.length - 1]))
+        return bad('power', `Проверь возведение в квадрат: (${mono(t.A)})${PW(2)} = ${mono(sa)} и (${mono(t.B)})${PW(2)} = ${mono(sb)} — в квадрат возводятся и коэффициент, и степень. ${ok}`);
+      return bad('calc', `Проверь вычисление среднего члена. ${ok}`);
+    },
+    key: t => polyKey(TYPES.expand.terms(t)),
+    keyHTML: t => poly(TYPES.expand.terms(t)),
+    traps(t) {
+      const sa = sqOf(t.A), sb = sqOf(t.B), cr = crOf(t.A, t.B);
+      const out = [[sa, sb], t.form === 'sqdif' ? [sa, neg(sb)] : [sa, neg(cr), sb]];   // забыли 2ab; перепутали знак
+      return out.slice(0, CONFIG.print.traps).map(xs => ({ key: polyKey(xs), html: poly(xs) }));
+    },
+    hints(t) {
+      const sa = sqOf(t.A), sb = sqOf(t.B), cr = crOf(t.A, t.B);
+      if (t.form === 'diff') return [`Произведение разности и суммы: ${FDIF.split(' = ').reverse().join(' = ')} — два слагаемых, среднего члена нет.`,
+        `Квадраты: (${mono(t.A)})${PW(2)} = ${mono(sa)} и (${mono(t.B)})${PW(2)} = ${mono(sb)}, между ними «${MINUS}».`];
+      return [`${FSQ(t.sign)} — три слагаемых, крайние всегда «+».`, `Начни так: ${mono(sa)} ${sgn(t.sign)} ${mono(cr)} + …`];
+    },
+    correct: t => TYPES.expand.ans(t),
+    wrongInput: t => [{ k: sqOf(t.A).k + 2, m: sqOf(t.A).m }, ...TYPES.expand.ans(t).slice(1)],
+  },
+  fill: {   // восстановить пропущенный член: 2ab или 3a²b
+    input: 'mono', title: 'Пропущенный член',
+    forms: ['sqsum', 'sqdif', 'cube'],
+    gen: (rnd, form) => {
+      form = form || pick(rnd, TYPES.fill.forms);
+      const t = genAB(rnd, form, form === 'cube' ? 3 : 4, form === 'cube' ? 2 : 3);
+      if (form === 'cube') t.sign = rnd() < 0.5 ? 1 : -1;
+      return t;
+    },
+    factor: t => (t.form === 'cube' ? 3 : 2),
+    want: t => t.form === 'cube' ? { k: 3 * t.A.k * t.A.k * t.B.k, m: 2 * t.A.m + t.B.m } : crOf(t.A, t.B),
+    text(t) {
+      const q = '<span class="fmuq">?</span>';
+      if (t.form === 'cube') {
+        const cuA = { k: t.A.k ** 3, m: 3 * t.A.m }, cuB = { k: t.B.k ** 3, m: 3 * t.B.m }, c2 = { k: 3 * t.A.k * t.B.k * t.B.k, m: t.A.m + 2 * t.B.m };
+        return `<span class="nw">${binom(t.A, t.sign, t.B)}${PW(3)} =</span> <span class="nw">${mono(cuA)} ${sgn(t.sign)} ${q} + ${mono(c2)} ${sgn(t.sign)} ${mono(cuB)}</span>`;
+      }
+      return `<span class="nw">${binom(t.A, t.sign, t.B)}${PW(2)} =</span> <span class="nw">${mono(sqOf(t.A))} ${sgn(t.sign)} ${q} + ${mono(sqOf(t.B))}</span>`;
+    },
+    ask: t => `Какой одночлен пропущен?<br>${TYPES.fill.text(t)}`,
+    sheet: t => `Запишите пропущенный одночлен: ${TYPES.fill.text(t)}`,
+    answer: t => `пропущен одночлен ${mono(TYPES.fill.want(t))}`,
+    ans: t => TYPES.fill.want(t),
+    same: (t, x) => eqm(x, TYPES.fill.want(t)),
+    ok(t) {
+      const T = TYPES.fill, w = T.want(t);
+      if (t.form === 'cube') return `${FCUBE(t.sign)}: пропущен член 3${LA}${PW(2)}${LB} = 3 · (${mono(t.A)})${PW(2)} · ${mono(t.B)} = ${mono(w)}.`;
+      return `${FSQ(t.sign)}: между квадратами стоит удвоенное произведение 2 · ${mono(t.A)} · ${mono(t.B)} = ${mono(w)}. Знак «${sgn(t.sign)}» уже записан перед пропуском.`;
+    },
+    wrong(t, x) {
+      const T = TYPES.fill, w = T.want(t), f = T.factor(t), ok = T.ok(t);
+      if (x.m === w.m && x.k * f === w.k)
+        return bad('coef', `Ты забыл множитель ${f}: пропущенный член — ${f === 2 ? 'удвоенное' : 'утроенное'} произведение, а не просто произведение. ${ok}`);
+      if (x.m !== w.m)
+        return bad('power', `При умножении одночленов показатели складываются: ${t.form === 'cube' ? `${2 * t.A.m} + ${t.B.m}` : `${t.A.m} + ${t.B.m}`} = ${w.m}, поэтому степень равна ${w.m}. ${ok}`);
+      return bad('calc', `Проверь коэффициент: ${t.form === 'cube' ? `3 · ${t.A.k}${PW(2)} · ${t.B.k}` : `2 · ${t.A.k} · ${t.B.k}`} = ${w.k}. ${ok}`);
+    },
+    key: t => monoKey(TYPES.fill.want(t)),
+    keyHTML: t => mono(TYPES.fill.want(t)),
+    traps(t) {
+      const w = TYPES.fill.want(t), f = TYPES.fill.factor(t);
+      return [{ k: w.k / f, m: w.m }, { k: w.k, m: w.m + 1 }].slice(0, CONFIG.print.traps).map(x => ({ key: monoKey(x), html: mono(x) }));
+    },
+    hints(t) {
+      if (t.form === 'cube') return [FCUBE(t.sign), `Пропущен член 3${LA}${PW(2)}${LB}: коэффициент 3 · ${t.A.k}${PW(2)} · ${t.B.k}, степень ${2 * t.A.m} + ${t.B.m}.`];
+      return ['Между двумя квадратами спрятано удвоенное произведение 2ab.', `Коэффициент: 2 · ${t.A.k} · ${t.B.k}; степень: ${t.A.m} + ${t.B.m}.`];
+    },
+    correct: t => TYPES.fill.ans(t),
+    wrongInput: t => ({ k: TYPES.fill.want(t).k + 3, m: TYPES.fill.want(t).m }),
+  },
+  smart: {   // вычисление удобным способом: a² − b² = (a − b)(a + b)
+    input: 'num', title: 'Удобным способом',
+    gen: (rnd, form) => {
+      form = form || pick(rnd, ['int', 'dec']);
+      if (form === 'dec') return { form, k: int(rnd, 11, 99), j: int(rnd, 1, 9) };
+      return { form: 'int', a: int(rnd, 16, 49), d: int(rnd, 6, 15) };
+    },
+    pair: t => t.form === 'dec' ? [Q(t.k, 10), Q(t.j, 10)] : [Q(t.a + t.d), Q(t.a - t.d)],
+    dec: q => decStr(q) || htmlQ(q, 'frac'),
+    text: t => { const E = TYPES.smart, [x, y] = E.pair(t); return `${E.dec(x)}${PW(2)} ${MINUS} ${E.dec(y)}${PW(2)}`; },
+    ask: t => `Вычислите удобным способом:  ${TYPES.smart.text(t)}`,
+    sheet: t => `Вычислите удобным способом: ${TYPES.smart.text(t)}`,
+    ans: t => { const E = TYPES.smart, [x, y] = E.pair(t); return qsub(qmul(x, x), qmul(y, y)); },
+    ok(t) {
+      const E = TYPES.smart, [x, y] = E.pair(t), lo = qsub(x, y), hi = qadd(x, y);
+      return `${FDIF}: (${E.dec(x)} ${MINUS} ${E.dec(y)}) · (${E.dec(x)} + ${E.dec(y)}) = ${E.dec(lo)} · ${E.dec(hi)} = ${htmlQ(E.ans(t))}.`;
+    },
+    wrong(t, v) {
+      const E = TYPES.smart, [x, y] = E.pair(t), ok = E.ok(t);
+      const xs = qmul(x, x), ys = qmul(y, y), sum = qadd(x, y), dif = qsub(x, y);
+      if (qeq(v, qadd(xs, ys))) return bad('smart', `Здесь разность квадратов, а ты сложил квадраты: ${E.dec(x)}${PW(2)} + ${E.dec(y)}${PW(2)} = ${htmlQ(qadd(xs, ys))}. Нужно (${LA} ${MINUS} ${LB})(${LA} + ${LB}). ${ok}`);
+      if (qeq(v, qmul(dif, dif)) || qeq(v, qmul(sum, sum))) return bad('smart', `Ты возвёл в квадрат разность (или сумму): это (${LA} ∓ ${LB})${PW(2)} — три слагаемых, а нужно ${LA}${PW(2)} ${MINUS} ${LB}${PW(2)} = (${LA} ${MINUS} ${LB})(${LA} + ${LB}). ${ok}`);
+      if (qeq(v, sum) || qeq(v, dif)) return bad('smart', `Скобки нужно ПЕРЕМНОЖИТЬ: ${E.dec(dif)} · ${E.dec(sum)}, а не оставить только сумму или только разность. ${ok}`);
+      return bad('calc', `Разложим по формуле и посчитаем заново. ${ok}`);
+    },
+    traps(t) {
+      const E = TYPES.smart, [x, y] = E.pair(t);
+      return [qmul(x, x), qmul(y, y)].filter(z => z.n > 0 && !qeq(z, E.ans(t))).map(z => ({ key: keyQ(z), html: htmlQ(z) })).slice(0, CONFIG.print.traps);
+    },
+    hints(t) {
+      const E = TYPES.smart, [x, y] = E.pair(t);
+      return [`Видишь разность двух квадратов — сворачивай в произведение: (${LA} ${MINUS} ${LB})(${LA} + ${LB}).`, `${LA} = ${E.dec(x)}, ${LB} = ${E.dec(y)}: ${LA} ${MINUS} ${LB} = ${E.dec(qsub(x, y))}, ${LA} + ${LB} = ${E.dec(qadd(x, y))}.`];
+    },
+  },
+  value: {   // значение выражения a² − b² при данных значениях букв
+    input: 'num', title: 'Значение выражения',
+    gen: rnd => ({ r: Q(int(rnd, 12, 40), 10), s: Q(int(rnd, 1, 11), 10) }),
+    text: () => `${LA}${PW(2)} ${MINUS} ${LB}${PW(2)}`,
+    ask: t => `Найдите значение выражения ${TYPES.value.text(t)}<br>при ${LA} = ${decStr(t.r)}, ${LB} = ${decStr(t.s)}.`,
+    sheet: t => `Найдите значение выражения ${TYPES.value.text(t)} при ${LA} = ${decStr(t.r)}, ${LB} = ${decStr(t.s)}.`,
+    answer: t => `${TYPES.value.text(t)} = ${decStr(TYPES.value.ans(t))} при ${LA} = ${decStr(t.r)}, ${LB} = ${decStr(t.s)}`,
+    ans: t => qsub(qmul(t.r, t.r), qmul(t.s, t.s)),
+    ok(t) {
+      const E = TYPES.value, lo = qsub(t.r, t.s), hi = qadd(t.r, t.s);
+      return `${FDIF} = (${decStr(t.r)} ${MINUS} ${decStr(t.s)}) · (${decStr(t.r)} + ${decStr(t.s)}) = ${decStr(lo)} · ${decStr(hi)} = ${decStr(E.ans(t))}.`;
+    },
+    wrong(t, v) {
+      const E = TYPES.value, ok = E.ok(t);
+      const lo = qsub(t.r, t.s), hi = qadd(t.r, t.s);
+      if (qeq(v, qmul(lo, lo))) return bad('value', `Ты возвёл в квадрат РАЗНОСТЬ: (${LA} ${MINUS} ${LB})${PW(2)} = ${decStr(qmul(lo, lo))} — это три слагаемых. Здесь разность квадратов: ${LA}${PW(2)} ${MINUS} ${LB}${PW(2)} = (${LA} ${MINUS} ${LB})(${LA} + ${LB}). ${ok}`);
+      if (qeq(v, qmul(hi, hi))) return bad('value', `Это квадрат СУММЫ (${LA} + ${LB})${PW(2)} = ${decStr(qmul(hi, hi))}, а нужна разность квадратов: ${LA}${PW(2)} ${MINUS} ${LB}${PW(2)} = (${LA} ${MINUS} ${LB})(${LA} + ${LB}). ${ok}`);
+      if (qeq(v, qadd(qmul(t.r, t.r), qmul(t.s, t.s)))) return bad('calc', `В выражении стоит «${MINUS}»: квадрат ${decStr(t.s)} вычитаем, а не прибавляем. ${ok}`);
+      if (qeq(v, lo) || qeq(v, hi)) return bad('calc', `Это только один множитель. Второй — ${qeq(v, lo) ? `сумма: ${decStr(hi)}` : `разность: ${decStr(lo)}`}. ${ok}`);
+      return bad('calc', `Подставим числа в формулу и пересчитаем. ${ok}`);
+    },
+    traps(t) {
+      const E = TYPES.value, lo = qsub(t.r, t.s);
+      return [qmul(lo, lo), qadd(qmul(t.r, t.r), qmul(t.s, t.s))]
+        .filter(z => z.n > 0 && decStr(z) && !qeq(z, E.ans(t))).map(z => ({ key: keyQ(z), html: htmlQ(z) })).slice(0, CONFIG.print.traps);
+    },
+    hints(t) {
+      return [`Не возводи в квадрат столбиком: подставь числа в ${LA}${PW(2)} ${MINUS} ${LB}${PW(2)} = (${LA} ${MINUS} ${LB})(${LA} + ${LB}).`, `${LA} ${MINUS} ${LB} = ${decStr(qsub(t.r, t.s))}, ${LA} + ${LB} = ${decStr(qadd(t.r, t.s))}.`];
+    },
+  },
+  fact: {   // разложение на множители: выбрать верный вариант
+    input: 'pick', title: 'Разложение на множители',
+    forms: ['diff', 'sqsum', 'sqdif'],
+    gen: (rnd, form) => {
+      const t = genAB(rnd, form || pick(rnd, TYPES.fact.forms), 3, 3);
+      t.o = int(rnd, 1, 1000000);   // порядок кнопок
+      return t;
+    },
+    text(t) {
+      const sa = sqOf(t.A), sb = sqOf(t.B), cr = crOf(t.A, t.B);
+      return t.form === 'diff' ? `${mono(sa)} ${MINUS} ${mono(sb)}` : `${mono(sa)} ${sgn(t.sign)} ${mono(cr)} + ${mono(sb)}`;
+    },
+    right: t => t.form === 'diff' ? prodDiff(t.A, t.B) : `${binom(t.A, t.sign, t.B)}${PW(2)}`,
+    // неверные варианты: на них же строятся кнопки, ловушки раздатки и объяснения
+    wrongs(t) {
+      const sa = sqOf(t.A), sb = sqOf(t.B), cr = crOf(t.A, t.B);
+      if (t.form === 'diff') return [
+        { key: 'fact:t1', html: `${binom(t.A, -1, t.B)}${PW(2)}`, cat: 'fact',
+          why: `Это квадрат разности: (${mono(t.A)} ${MINUS} ${mono(t.B)})${PW(2)} = ${poly([sa, neg(cr), sb])} — три слагаемых, а у нас разность двух квадратов.` },
+        { key: 'fact:t2', html: `${binom(t.A, 1, t.B)}${PW(2)}`, cat: 'fact',
+          why: `Это квадрат суммы: (${mono(t.A)} + ${mono(t.B)})${PW(2)} = ${poly([sa, cr, sb])} — тоже три слагаемых, а у нас два.` }];
+      const other = t.form === 'sqsum' ? 'sqdif' : 'sqsum', ot = { A: t.A, B: t.B, form: other, sign: -t.sign };
+      return [
+        { key: 'fact:t1', html: `${binom(t.A, -t.sign, t.B)}${PW(2)}`, cat: 'sign',
+          why: `Знак в скобке должен совпадать со знаком перед средним членом «${sgn(t.sign)}». Скобка (${mono(t.A)} ${sgn(-t.sign)} ${mono(t.B)})${PW(2)} даёт ${poly(TYPES.expand.terms(ot))}.` },
+        { key: 'fact:t2', html: prodDiff(t.A, t.B), cat: 'fact',
+          why: `${prodDiff(t.A, t.B)} = ${poly([sa, neg(sb)])} — два слагаемых. У нас три, средний член ${mono(cr)}: это полный квадрат.` }];
+    },
+    opts: t => [{ key: 'fact:ok', html: TYPES.fact.right(t) }, ...TYPES.fact.wrongs(t).map(({ key, html }) => ({ key, html }))],
+    ask: t => `Разложите на множители:<br>${TYPES.fact.text(t)}`,
+    sheet: t => `Разложите на множители: ${TYPES.fact.text(t)}`,
+    answer: t => `${TYPES.fact.text(t)} = ${TYPES.fact.right(t)}`,
+    ans: () => 'fact:ok',
+    same: (t, v) => v === 'fact:ok',
+    ok: t => `Проверим обратным умножением: ${TYPES.fact.right(t)} = ${TYPES.fact.text(t)} (${t.form === 'diff' ? FDIF : FSQ(t.sign)}).`,
+    wrong(t, v) {
+      const T = TYPES.fact, w = T.wrongs(t).find(x => x.key === v);
+      return bad(w ? w.cat : 'fact', `${w ? w.why : 'Сравни с формулами.'} ${T.ok(t)}`);
+    },
+    key: () => 'fact:ok',
+    keyHTML: t => TYPES.fact.right(t),
+    traps: t => TYPES.fact.wrongs(t).slice(0, CONFIG.print.traps).map(({ key, html }) => ({ key, html })),
+    hints(t) {
+      if (t.form === 'diff') return [`Два квадрата и «${MINUS}» между ними: ${FDIF}.`, `Из первого члена получается ${mono(t.A)}, из второго — ${mono(t.B)}.`];
+      return [`Три слагаемых, крайние — квадраты, среднее — 2ab: это полный квадрат ${LA} ± ${LB} в квадрате.`, `Скобка: ${binom(t.A, t.sign, t.B)}${PW(2)}.`];
+    },
+    correct: () => 'fact:ok',
+    wrongInput: t => TYPES.fact.wrongs(t)[0].key,
+  },
+  cube: {   // куб суммы и разности: выбрать верное раскрытие
+    input: 'pick', title: 'Куб суммы и разности',
+    gen: rnd => {
+      const t = genAB(rnd, 'cube', 3, 2);
+      t.sign = rnd() < 0.5 ? 1 : -1;
+      t.o = int(rnd, 1, 1000000);
+      return t;
+    },
+    parts: t => ({ cu: { k: t.A.k ** 3, m: 3 * t.A.m }, c1: { k: 3 * t.A.k ** 2 * t.B.k, m: 2 * t.A.m + t.B.m },
+      c2: { k: 3 * t.A.k * t.B.k ** 2, m: t.A.m + 2 * t.B.m }, cb: { k: t.B.k ** 3, m: 3 * t.B.m } }),
+    line: (t, s = t.sign) => {
+      const P = TYPES.cube.parts(t);
+      return `${mono(P.cu)} ${sgn(s)} ${mono(P.c1)} + ${mono(P.c2)} ${sgn(s)} ${mono(P.cb)}`;
+    },
+    text: t => `${binom(t.A, t.sign, t.B)}${PW(3)}`,
+    ask: t => `Раскройте скобки:<br>${TYPES.cube.text(t)}`,
+    sheet: t => `Раскройте скобки: ${TYPES.cube.text(t)}`,
+    answer: t => `${TYPES.cube.text(t)} = ${TYPES.cube.line(t)}`,
+    wrongs(t) {
+      const T = TYPES.cube, P = T.parts(t), mine = t.sign > 0 ? 'все «+»' : `чередуются: «${MINUS}», «+», «${MINUS}»`;
+      return [
+        { key: 'cube:t1', html: T.line(t, -t.sign), cat: 'sign',
+          why: `У ${t.sign > 0 ? 'суммы' : 'разности'} знаки ${mine}, а в этом ответе они как у ${t.sign > 0 ? 'разности' : 'суммы'}: ${T.line(t, -t.sign)}.` },
+        { key: 'cube:t2', html: `${mono(P.cu)} ${sgn(t.sign)} ${mono(P.cb)}`, cat: 'cube',
+          why: `У куба ЧЕТЫРЕ слагаемых: пропали ${mono(P.c1)} и ${mono(P.c2)} — это 3${LA}${PW(2)}${LB} и 3${LA}${LB}${PW(2)}.` }];
+    },
+    opts: t => [{ key: 'cube:ok', html: TYPES.cube.line(t) }, ...TYPES.cube.wrongs(t).map(({ key, html }) => ({ key, html }))],
+    ans: () => 'cube:ok',
+    same: (t, v) => v === 'cube:ok',
+    ok: t => `Коэффициенты 1, 3, 3, 1; знаки ${t.sign > 0 ? 'все «+»' : `чередуются: «${MINUS}», «+», «${MINUS}»`}. Получаем ${TYPES.cube.line(t)}.`,
+    wrong(t, v) {
+      const T = TYPES.cube, w = T.wrongs(t).find(x => x.key === v);
+      return bad(w ? w.cat : 'cube', `${w ? w.why : ''} ${T.ok(t)}`);
+    },
+    key: () => 'cube:ok',
+    keyHTML: t => TYPES.cube.line(t),
+    traps: t => TYPES.cube.wrongs(t).slice(0, CONFIG.print.traps).map(({ key, html }) => ({ key, html })),
+    hints(t) {
+      const P = TYPES.cube.parts(t);
+      return [`${FCUBE(t.sign)} — четыре слагаемых, коэффициенты 1, 3, 3, 1.`, `Первые два члена: ${mono(P.cu)} ${sgn(t.sign)} ${mono(P.c1)} …`];
+    },
+    correct: () => 'cube:ok',
+    wrongInput: t => TYPES.cube.wrongs(t)[0].key,
+  },
+};
+
+// ================= Ошибки: блок «Над чем поработать» =================
+const CATS = {
+  middle: ['Забыт средний член', '(a ± b)² — это три слагаемых: a² ± 2ab + b². Средний член 2ab теряется чаще всего.'],
+  sign: ['Знак в формуле', 'В (a − b)² средний член со знаком «−», а последний член всегда «+». В кубе разности знаки чередуются.'],
+  diff: ['Разность квадратов', 'a² − b² = (a − b)(a + b): два множителя, среднего члена 2ab в ней нет.'],
+  coef: ['Коэффициент', 'У квадрата средний член 2ab, у куба — 3a²b и 3ab²: коэффициенты 1, 3, 3, 1.'],
+  power: ['Степени', 'В квадрат возводятся и коэффициент, и степень: (3x²)² = 9x⁴. При умножении показатели складываются: x² · x³ = x⁵.'],
+  calc: ['Вычисления', 'Проверь арифметику: сначала скобки (разность и сумма), потом умножение.'],
+  smart: ['Выбор формулы', 'a² − b² = (a − b)(a + b), а (a − b)² = a² − 2ab + b². Это разные формулы.'],
+  value: ['Подстановка', 'Подставляй числа в (a − b)(a + b): действий меньше, чем при возведении в квадрат.'],
+  fact: ['Разложение', 'Два квадрата и «−» — разность квадратов; три слагаемых и 2ab — полный квадрат.'],
+  cube: ['Число слагаемых куба', '(a ± b)³ = a³ ± 3a²b + 3ab² ± b³ — четыре слагаемых, а не два.'],
+};
+
+// ================= Разделы тренажёра =================
+const SECTIONS = [
+  { title: 'Раздел 1', text: 'Раскрытие скобок', types: ['expand', 'fill'], ex: () => `(${LA} + ${LB})${PW(2)} = ?` },
+  { title: 'Раздел 2', text: 'Вычисления удобно', types: ['smart', 'value'], ex: () => `47${PW(2)} ${MINUS} 23${PW(2)}` },
+  { title: 'Раздел 3', text: 'Обратные формулы', types: ['fact', 'cube'], ex: () => `9${X}${PW(2)} ${MINUS} 16` },
+];
+
+// ================= Раздатка =================
+// Состав варианта: девять заданий, верные ответы складываются в слово из 9 разных букв
+const KINDS_V1 = [['expand', 'sqsum'], ['expand', 'sqdif'], ['expand', 'diff'], ['fill', 'sqsum'], ['fill', 'sqdif'],
+  ['smart', 'int'], ['smart', 'dec'], ['value', null], ['fact', 'diff']];
+const WORDS_V1 = ['ДЕЛИМОСТЬ', 'МНОЖИТЕЛЬ', 'ПРОДУКТИВ'];
+
+const PRINT = {
+  instr: 'Выполни задание и найди свой ответ в таблице букв. Впиши букву в клеточку под номером задания, и получится слово. '
+    + 'Если ответа нет в таблице, поищи ошибку в решении.',
+  about: 'В каждом варианте девять заданий: три на раскрытие скобок, два на пропущенный одночлен, два на вычисление '
+    + 'удобным способом, одно на значение выражения и одно на разложение на множители. Девять верных ответов '
+    + 'складываются в слово.',
+  ogeAbout: 'Бланк как в ОГЭ: восемь заданий, ответ — число (целое или десятичная дробь). Записывай его в клеточки '
+    + 'справа от номера: каждый символ, включая минус и запятую, — в отдельную клеточку. Задания бланка отличаются от '
+    + 'заданий листа «кодовое слово», поэтому один и тот же номер варианта можно использовать дважды.',
+};
+
+// ================= Бланк ОГЭ =================
+// Ответ — число, которое помещается в клеточки (не длиннее 10 символов). Задания свои: зерна 200+,
+// поэтому лист бланка отличается от листа с кодовым словом при том же номере.
+const OGE_V1 = ['dsq', 'sdec', 'sq', 'cross', 'lin', 'coef', 'cube', 'cancel'];
+function ogeTask(kind, rnd) {
+  if (kind === 'dsq') {           // a² − b² удобным способом
+    const a = int(rnd, 31, 69), b = int(rnd, 11, 29);
+    return { kind, t: [a, b], ans: String(a * a - b * b),
+      ask: `Найдите значение выражения ${a}${PW(2)} ${MINUS} ${b}${PW(2)}, применив формулу сокращённого умножения.` };
+  }
+  if (kind === 'sdec') {          // разность квадратов десятичных дробей
+    const p = int(rnd, 13, 39), q = int(rnd, 1, 9), r = qsub(qmul(Q(p, 10), Q(p, 10)), qmul(Q(q, 10), Q(q, 10)));
+    return { kind, t: [p, q], ans: decStr(r),
+      ask: `Найдите значение выражения ${decStr(Q(p, 10))}${PW(2)} ${MINUS} ${decStr(Q(q, 10))}${PW(2)}.` };
+  }
+  if (kind === 'sq') {            // (a + b)² − b² при b, кратном 10
+    const a = int(rnd, 2, 15), b = 10 * int(rnd, 1, 6);
+    return { kind, t: [a, b], ans: String(a * a + 2 * a * b),
+      ask: `Найдите значение выражения (${LA} + ${LB})${PW(2)} ${MINUS} ${LB}${PW(2)} при ${LA} = ${a}, ${LB} = ${b}.` };
+  }
+  if (kind === 'cross') {         // (a + b)² − (a − b)² = 4ab
+    const a = int(rnd, 2, 15), b = int(rnd, 1, 9);
+    return { kind, t: [a, b], ans: String(4 * a * b),
+      ask: `Найдите значение выражения (${LA} + ${LB})${PW(2)} ${MINUS} (${LA} ${MINUS} ${LB})${PW(2)} при ${LA} = ${a}, ${LB} = ${b}.` };
+  }
+  if (kind === 'lin') {           // (x + c)² − x² = m → линейное уравнение, корень целый
+    const c = int(rnd, 2, 9), x = int(rnd, 2, 12), m = 2 * c * x + c * c;
+    return { kind, t: [c, x], ans: String(x),
+      ask: `Решите уравнение (${X} + ${c})${PW(2)} ${MINUS} ${X}${PW(2)} = ${m}. В ответ запишите корень.` };
+  }
+  if (kind === 'coef') {          // какой одночлен стоит вместо □ — в ответ номер
+    const g = genAB(rnd, 'sqsum', 3, 3), w = crOf(g.A, g.B);
+    const list = shuffle(rnd, [w, { k: w.k / 2, m: w.m }, { k: w.k * 2, m: w.m }, { k: w.k, m: w.m + 1 }]);
+    const no = list.findIndex(z => eqm(z, w)) + 1;
+    return { kind, t: [g.A.k, g.A.m, g.B.k, g.B.m, no], ans: String(no),
+      ask: `Какой из одночленов нужно записать вместо ${VI('□')}, чтобы получилось тождество<br>` +
+        `<span class="nw">(${mono(g.A)} + ${mono(g.B)})${PW(2)} = ${mono(sqOf(g.A))} + ${VI('□')} + ${mono(sqOf(g.B))}?</span><br>` +
+        list.map((z, i) => `<span class="nw">${i + 1}) ${mono(z)}</span>`).join('; ') + '. В ответ запишите номер.' };
+  }
+  if (kind === 'cube') {          // собрать куб разности по формуле и подставить
+    const a = int(rnd, 8, 15), b = int(rnd, 1, 7);
+    return { kind, t: [a, b], ans: String((a - b) ** 3),
+      ask: `Найдите значение выражения ${LA}${PW(3)} ${MINUS} 3${LA}${PW(2)}${LB} + 3${LA}${LB}${PW(2)} ${MINUS} ${LB}${PW(3)} при ${LA} = ${a}, ${LB} = ${b}.` };
+  }
+  // упрощение, после которого буква исчезает: (a − c)² − a(a − 2c) = c²
+  const c = int(rnd, 2, 12), a = int(rnd, 11, 99);
+  return { kind: 'cancel', t: [c, a], ans: String(c * c),
+    ask: `Найдите значение выражения (${LA} ${MINUS} ${c})${PW(2)} ${MINUS} ${LA}(${LA} ${MINUS} ${2 * c}) при ${LA} = ${a}.` };
+}
+
+// ================= На доске =================
+// Квадрат со стороной (a + b): площадь раскладывается на a² + 2ab + b² — почему (a + b)² ≠ a² + b²
+function boardExample(random, old) {
+  if (!random) return { a: CONFIG.board.a, b: CONFIG.board.b };
+  const rnd = mulberry32(((Math.random() * 4294967296) >>> 0));
+  let a, b, guard = 0;
+  do { a = int(rnd, 12, 28); b = int(rnd, 2, 9); } while (++guard < 50 && old.a === a && old.b === b);
+  return { a, b };
+}
+// Подписи на чертеже — SVG-текст: курсив и степень через tspan и «²» (теги <i> и <sup> в SVG не работают)
+const si = v => `<tspan font-style="italic">${v}</tspan>`;
+const SAB = `${si('a')}${si('b')}`;
+// Размеры чертежа: клетчатый квадрат слева (не выше 250 по оси y), под ним скобка и подпись, подписи шагов справа
+const BOARD_SIDE = 250, BOARD_X = 90, BOARD_Y = 52, BOARD_TEXT_X = 540;
+const boardLines = (lines, y0 = 110) => lines.map((l, i) =>
+  `<g class="${l.cls || ''}">${tx(BOARD_TEXT_X, y0 + i * 58, l.t, 'lab s' + (l.lc ? ' ' + l.lc : ''), 'start')}</g>`).join('');
+// сетка клеток поверх цветных частей: заливка — отдельно, линии — через grid с прозрачной заливкой
+const cellLines = (x, y, n, unit) => grid(x, y, n, n, unit, 'gn', 5);
+// Квадрат со стороной (a + b), разрезанный на a², b² и два прямоугольника ab
+function squareScene(a, b, lines = [], opt = {}) {
+  const n = a + b, unit = Math.max(4, Math.floor(BOARD_SIDE / n)), size = n * unit, x = BOARD_X, y = BOARD_Y;
+  const ca = a * unit, cb = b * unit;
+  let s = `<rect class="ge" x="${x}" y="${y}" width="${size}" height="${size}"/>`;
+  if (opt.colorAA) s += `<rect class="gs" x="${x}" y="${y}" width="${ca}" height="${ca}"/>`;
+  if (opt.colorAB) s += `<rect class="gw" x="${x + ca}" y="${y}" width="${cb}" height="${ca}"/><rect class="gw" x="${x}" y="${y + ca}" width="${ca}" height="${cb}"/>`;
+  if (opt.colorBB) s += `<rect class="gs" x="${x + ca}" y="${y + ca}" width="${cb}" height="${cb}"/>`;
+  s += cellLines(x, y, n, unit);
+  if (opt.showSplit) s += `<line class="gf" x1="${x + ca}" x2="${x + ca}" y1="${y}" y2="${y + size}"/><line class="gf" x1="${x}" x2="${x + size}" y1="${y + ca}" y2="${y + ca}"/>`;
+  s += under(x, y + size, size, opt.sideLabel, 'warm');
+  if (opt.markAB) s += tx(x + ca / 2, y - 14, String(a), 'lab acc') + tx(x + ca + cb / 2, y - 14, String(b), 'lab warm');
+  return s + boardLines(lines);
+}
+// Квадрат со стороной a, из которого вырезаны две полосы шириной b: остаётся квадрат (a − b)²
+function diffScene(a, b, lines = []) {
+  const unit = Math.max(4, Math.floor(BOARD_SIDE / a)), size = a * unit, x = BOARD_X, y = BOARD_Y;
+  const ci = (a - b) * unit, cb = b * unit;
+  let s = `<rect class="ge" x="${x}" y="${y}" width="${size}" height="${size}"/>`;
+  s += `<rect class="gs" x="${x}" y="${y}" width="${ci}" height="${ci}"/>`;
+  s += `<rect class="gw" x="${x + ci}" y="${y}" width="${cb}" height="${size}"/><rect class="gw" x="${x}" y="${y + ci}" width="${size}" height="${cb}"/>`;
+  s += cellLines(x, y, a, unit);
+  s += `<rect class="gx" x="${x + ci}" y="${y + ci}" width="${cb}" height="${cb}"/>`;
+  s += under(x, y + size, size, String(a), 'warm');
+  s += tx(x + ci / 2, y - 14, String(a - b), 'lab acc') + tx(x + ci + cb / 2, y - 14, String(b), 'lab warm');
+  return s + boardLines(lines);
+}
+function buildSteps(e) {
+  const { a, b } = e, S = a + b, sq = S * S, trap = a * a + b * b, mid = 2 * a * b, dif = (a - b) * (a - b);
+  const formula = `(${si('a')} + ${si('b')})² = ${si('a')}² + 2${SAB} + ${si('b')}²`;
+  return [
+    { q: `Клетчатый квадрат со стороной ${S}. Как найти его площадь, не считая клетки по одной?`,
+      a: `S = ${S}${PW(2)} = ${sq} клеток. А из чего складывается эта площадь, если сторону разбить на ${a} и ${b}?`,
+      note: `Начало урока: крупный квадрат (${S} × ${S} клеток) — пересчитывать долго. Спросите класс: как узнать площадь, не считая клетки по одной?`,
+      draw: ph => squareScene(a, b, ph ? [{ t: `(${a} + ${b})² = ${sq}`, cls: 'new', lc: 'acc' }] : [], { sideLabel: `сторона ${S}` }),
+      rec: ph => ph ? [`S = (${a} + ${b})${PW(2)} = ${sq}`] : [] },
+    { q: `Разбили сторону ${S} на ${a} и ${b}. На какие фигуры распался квадрат?`,
+      a: `Два квадрата: ${a} × ${a} и ${b} × ${b}, и два одинаковых прямоугольника ${a} × ${b}.`,
+      note: 'Покажите линии разреза. Пусть класс сам назовёт размеры каждой из четырёх фигур.',
+      draw: ph => squareScene(a, b, [], { showSplit: true, markAB: !!ph, sideLabel: `${a} + ${b}` }),
+      rec: () => [] },
+    { q: 'Сложим площади частей. Сколько получится?',
+      a: `<ul><li>${a} · ${a} = ${a * a} — большой квадрат</li><li>${b} · ${b} = ${b * b} — маленький квадрат</li><li>${a} · ${b} = ${a * b} — каждый прямоугольник, их ДВА</li></ul>Вместе: ${a * a} + 2 · ${a * b} + ${b * b} = ${sq}.`,
+      note: 'Подкрасьте части по очереди. Главный акцент: прямоугольников два, их площадь складываем дважды — отсюда «2ab» в формуле.',
+      draw: ph => squareScene(a, b, ph ? [
+        { t: `${a} · ${a} = ${a * a}`, cls: 'new', lc: 'acc' },
+        { t: `2 · ${a} · ${b} = ${mid}`, cls: 'new', lc: 'warm' },
+        { t: `${b} · ${b} = ${b * b}`, cls: 'new', lc: 'acc' },
+        { t: `${a * a} + ${mid} + ${b * b} = ${sq}`, cls: 'new' }] : [],
+      { showSplit: true, colorAA: true, colorAB: true, colorBB: true, markAB: true, sideLabel: `${a} + ${b}` }),
+      rec: ph => ph ? [`${a * a} + 2 · ${a * b} + ${b * b} = ${sq}`] : [] },
+    { q: `Значит, чему равен (${LA} + ${LB})${PW(2)}? Почему нельзя записать просто ${LA}${PW(2)} + ${LB}${PW(2)}?`,
+      a: `(${LA} + ${LB})${PW(2)} = ${LA}${PW(2)} + 2${LA}${LB} + ${LB}${PW(2)}. Если взять только ${LA}${PW(2)} + ${LB}${PW(2)}, получится ${trap} вместо ${sq}: не хватает ровно 2${LA}${LB} = ${mid}.`,
+      note: 'Вывод урока: квадрат суммы — ТРИ слагаемых, средний 2ab — это два прямоугольника. Ловушка (a + b)² = a² + b² рождается прямо на чертеже.',
+      draw: ph => squareScene(a, b, [{ t: formula, lc: 'acc' }].concat(ph ? [
+        { t: `${a}² + ${b}² = ${trap}`, cls: 'new', lc: 'warm' },
+        { t: `${sq} − ${trap} = ${mid} — это 2${SAB}`, cls: 'new', lc: 'warm' }] : []),
+      { showSplit: true, colorAA: true, colorAB: true, colorBB: true, sideLabel: `${a} + ${b}` }),
+      rec: ph => [`(${LA} + ${LB})${PW(2)} = ${LA}${PW(2)} + 2${LA}${LB} + ${LB}${PW(2)}`,
+        ...(ph ? [`(${a} + ${b})${PW(2)} = ${a * a} + ${mid} + ${b * b} = ${sq}`] : [])] },
+    { q: `А если внутри скобки «${MINUS}»? Возьмём квадрат со стороной ${a} и «срежем» с двух сторон полосы шириной ${b}.`,
+      a: `(${LA} ${MINUS} ${LB})${PW(2)} = ${LA}${PW(2)} ${MINUS} 2${LA}${LB} + ${LB}${PW(2)}. Проверка числами: (${a} ${MINUS} ${b})${PW(2)} = ${a * a} ${MINUS} ${mid} + ${b * b} = ${dif}.`,
+      note: 'Из большого квадрата a² вырезали две полосы a·b, но угловой квадратик b² попал в обе полосы — его вычли дважды. Его возвращают: поэтому последний член всегда «+». Спросите: почему (a − b)² = (b − a)²?',
+      draw: ph => diffScene(a, b, [{ t: `(${a} ${MINUS} ${b})² = ${a - b}² = ${dif}`, cls: 'new', lc: 'acc' }].concat(ph ? [
+        { t: `${a}² ${MINUS} 2 · ${a * b} + ${b}²`, cls: 'new', lc: 'warm' },
+        { t: `${a * a} ${MINUS} ${mid} + ${b * b} = ${dif}`, cls: 'new', lc: 'warm' }] : [])),
+      rec: ph => ph ? [`${LA}${PW(2)} ${MINUS} 2${LA}${LB} + ${LB}${PW(2)} = (${LA} ${MINUS} ${LB})${PW(2)}`] : [] },
+  ];
+}
+// превью на сайте крутит шаги до previewUntil (счёт с 0); картинка-превью — шаг poster с показанным ответом
+const BOARD = { previewUntil: 2, poster: 3 };
+
+// Формулы в справке (help.html): ядро вызывает helpInit() при запуске
+function helpInit() {
+  const put = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+  put('helpSqSum', FSQ(1));
+  put('helpSqDif', FSQ(-1));
+  put('helpDiff', FDIF);
+  put('helpCubeSum', FCUBE(1));
+  put('helpCubeDif', FCUBE(-1));
+  put('helpEx1', `(2${X} + 3)${PW(2)} = 4${X}${PW(2)} + 12${X} + 9`);
+  put('helpEx2', `47${PW(2)} ${MINUS} 23${PW(2)} = (47 ${MINUS} 23)(47 + 23) = 24 · 70 = 1680`);
+  put('helpEx3', `(${X} + 5)${PW(2)} ${MINUS} ${X}${PW(2)} = 10${X} + 25`);
+}
+
+// ================= Свои виды ввода =================
+// poly: ответ — несколько одночленов со знаками, mono: ответ — один одночлен, pick: выбор одной из кнопок.
+// Каждое слагаемое: поле коэффициента и поле степени при x (пустое поле = 1); знак — в списке перед слагаемым.
+const monoRow = i => `<span class="mono"><input data-k="k${i}" class="mk" inputmode="numeric" autocomplete="off" aria-label="коэффициент ${i + 1}-го слагаемого">${X}<sup><input data-k="m${i}" class="mp" inputmode="numeric" autocomplete="off" aria-label="степень ${i + 1}-го слагаемого"></sup></span>`;
+const signSelect = i => `<select data-k="s${i}" class="sg" aria-label="знак перед ${i + 1}-м слагаемым"><option value="+">+</option><option value="${MINUS}">${MINUS}</option></select>`;
+const TOPIC_INPUTS = {
+  poly: {
+    html: t => {
+      const n = TYPES[t.type].ans(t).length;
+      return `<div class="inrow polyn"><span class="nw">${TYPES[t.type].text(t)} =</span> ${Array.from({ length: n }, (_, i) => (i ? signSelect(i) : '') + monoRow(i)).join(' ')} ${checkBtn}</div>` +
+        `<p class="hnote">Каждое слагаемое: коэффициент и степень при <i>x</i>. Например, 12<i>x</i>³ — поля «12» и «3»; пустое поле — 1. Знак перед слагаемым выбери в списке.</p>`;
+    },
+    collect: get => collectMonos(get, TYPES[H.task.type].ans(H.task).length, true),
+  },
+  mono: {
+    html: t => `<div class="inrow polyn"><span class="nw">${TYPES[t.type].text(t)}</span></div><div class="inrow polyn">пропущенный одночлен: ${monoRow(0)} ${checkBtn}</div>` +
+      '<p class="hnote">Коэффициент и степень при <i>x</i>; пустое поле — 1.</p>',
+    collect: get => {
+      const r = collectMonos(get, 1, false);
+      return Array.isArray(r) ? r[0] : r;
+    },
+  },
+  pick: {
+    html: t => `<div class="inrow picks">${shuffle(mulberry32(t.o), TYPES[t.type].opts(t))
+      .map(o => `<button type="button" class="choice" data-choice="${o.key}"><span class="nw">${o.html}</span></button>`).join('')}</div>` +
+      '<p class="hnote">Выбери верный ответ.</p>',
+    collect: () => null,
+  },
+};
+function collectMonos(get, n, signs) {
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const ks = get('k' + i).trim(), ms = get('m' + i).trim();
+    if (!ks && !ms) return { empty: true, msg: `Заполни ${n > 1 ? `${i + 1}-е слагаемое` : 'одночлен'}: коэффициент и степень (пустое поле — 1).` };
+    if (!/^\d+$/.test(ks || '1') || !/^\d+$/.test(ms || '1')) return { empty: true, msg: 'В полях только натуральные числа (пустое поле — 1). Знак выбирается в списке.' };
+    out.push({ k: (signs && i && get('s' + i) === MINUS ? -1 : 1) * +(ks || 1), m: +(ms || 1) });
+  }
+  return out;
+}
+
+// ---------- ядро: core/types.js ----------
+// число — ответ: same по умолчанию, ключ и ловушки по умолчанию
+for (const T of Object.values(TYPES)) {
+  if (T.input === 'num' || T.input === 'frac') {
+    T.same = T.same || ((t, v) => qeq(v, T.ans(t)));
+    T.key = T.key || (t => keyQ(T.ans(t)));
+    T.keyHTML = T.keyHTML || (t => htmlQ(T.ans(t)));
+  }
+  if (T.input === 'choice') T.same = T.same || ((t, v) => v === T.ans(t));
+}
+function generate(type, rnd, form, tries = 2000) {
+  for (let k = 0; k < tries; k++) {
+    const t = TYPES[type].gen(rnd, form);
+    if (!TYPES[type].bad?.(t)) return { type, ...t };
+  }
+  throw new Error('Генератор не нашёл задание: ' + type);
+}
+
+// ---------- ядро: core/print.js ----------
+// ================= Раздатка: вариант восстанавливается по номеру =================
+// Тема задаёт состав варианта (KINDS_V1), слова (WORDS_V1) и тексты листа (PRINT).
+// Бланк ОГЭ есть, если тема задала OGE_V1 и ogeTask(kind, rnd).
+const ABC = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ';
+const HAS_OGE = typeof OGE_V1 !== 'undefined';
+const lowerTitle = () => META.title[0].toLowerCase() + META.title.slice(1);
+function makeVariant(num, version = GEN_VERSION) {
+  if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
+  const tasks = [];
+  KINDS_V1.forEach(([type, forms], i) => {
+    const rnd = taskRnd(num, i);
+    let t, guard = 0;
+    do t = generate(type, rnd, Array.isArray(forms) ? pick(rnd, forms) : forms);
+    while (tasks.some(u => TYPES[u.type].key(u) === TYPES[type].key(t)) && ++guard < 200);
+    tasks.push(t);
+  });
+  const rnd = taskRnd(num, 99);
+  const word = pick(rnd, WORDS_V1);
+  const answers = tasks.map(t => TYPES[t.type].key(t));
+  const bank = new Map();   // ответ → { html, letter }
+  tasks.forEach((t, i) => bank.set(answers[i], { key: answers[i], html: TYPES[t.type].keyHTML(t), letter: word[i] }));
+  const decoys = shuffle(rnd, [...ABC].filter(ch => !word.includes(ch)));
+  tasks.forEach(t => (TYPES[t.type].traps?.(t) || []).slice(0, CONFIG.print.traps).forEach(x => {
+    if (!bank.has(x.key)) bank.set(x.key, { ...x, letter: decoys.shift() });
+  }));
+  return { num, version, label: version + '-' + num, tasks, answers, word, bank: shuffle(rnd, [...bank.values()]) };
+}
+
+// Бланк ОГЭ: задания свои (зерна 200+), поэтому один номер даёт разные листы для слова и для бланка
+function makeVariantOGE(num, version = GEN_VERSION) {
+  if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
+  const tasks = OGE_V1.map((kind, i) => ogeTask(kind, taskRnd(num, 200 + i)));
+  return { num, version, label: version + '-' + num, oge: true, tasks, answers: tasks.map(x => x.ans) };
+}
+
+// ================= 🖨 Раздатка =================
+let printNums = [];
+// вид листа из адреса (?mode=print&kind=oge) или с кнопки стартового экрана — важнее сохранённого
+let pendingKind = (HAS_OGE ? ['word', 'oge'] : ['word']).includes(P.get('kind')) ? P.get('kind') : null;
+function newNumbers(count) {
+  const set = new Set();
+  while (set.size < count) set.add(1000 + Math.floor(Math.random() * 9000));
+  return [...set];
+}
+function parseNums(text) {
+  const nums = [], bad = [];
+  for (const part of text.split(/[\s,;]+/).filter(Boolean)) {
+    const m = part.match(/^(?:(\d+)[-–])?(\d{4})$/);
+    if (!m || (m[1] && +m[1] !== GEN_VERSION)) bad.push(part);
+    else if (!nums.includes(+m[2])) nums.push(+m[2]);
+  }
+  return { nums, bad };
+}
+// как задание записано на листе: TYPES[type].sheet, по умолчанию «запись =»
+const sheetTask = t => TYPES[t.type].sheet ? TYPES[t.type].sheet(t) : `${TYPES[t.type].text(t)} =`;
+function sheetHTML(v) {
+  const bank = v.bank.map(x => `<div class="bk"><div>${x.html}</div><div>${x.letter}</div></div>`).join('');
+  const cols = v.tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  const empty = v.tasks.map(() => '<td></td>').join('');
+  return `<div class="sheet">
+    <div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">Вариант ${v.label}</span></div>
+    <h2>${META.title}</h2>
+    <p class="instr">${PRINT.instr}</p>
+    <ol class="tasks">${v.tasks.map((t, i) => `<li class="task"><span class="no">${i + 1})</span>${sheetTask(t)}<div class="cells"></div></li>`).join('')}</ol>
+    <p class="sub-h">Таблица букв</p><div class="bank">${bank}</div>
+    <table class="ans"><tr><th>Задание</th>${cols}</tr><tr class="tall"><th>Ответ</th>${empty}</tr><tr><th>Буква</th>${empty}</tr></table>
+    <div class="word">Слово: ______________________</div>
+  </div>`;
+}
+// бланк: строка «номер задания — клеточки», по символу в клеточку, как в бланке ответов ОГЭ
+const OGE_CELLS = 10;
+const cellsRow = (no, text = '') => `<div class="brow"><b>${no}</b>${[...text.padEnd(OGE_CELLS)].map(ch => `<i>${ch.trim()}</i>`).join('')}</div>`;
+function ogeSheetHTML(v) {
+  return `<div class="sheet oge">
+    <div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">Вариант ${v.label}</span></div>
+    <h2>${META.title} · бланк ответов</h2>
+    <p class="instr">Ответом к каждому заданию является число. Запиши его в бланк ответов справа от номера задания,
+    начиная с первой клеточки. Каждый символ — в отдельной клеточке, минус и запятая тоже.</p>
+    <ol class="tasks">${v.tasks.map((x, i) => `<li class="task"><span class="no">${i + 1}.</span>${x.ask}<div class="cells"></div><div class="otv">Ответ: ______________</div></li>`).join('')}</ol>
+    <div class="bhead"><p class="sub-h">Бланк ответов</p><div class="sample">Образец: ${cellsRow('', '−0,5')}</div></div>
+    <div class="blank">${v.tasks.map((_, i) => cellsRow(i + 1)).join('')}</div>
+  </div>`;
+}
+function ogeKeyHTML(vs) {
+  const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  return `<div class="page key"><h2>Ключ учителя · бланк ответов · ${lowerTitle()}</h2>
+    <table class="key"><tr><th>Вариант</th>${head}</tr>
+    ${vs.map(v => `<tr><td>${v.label}</td>${v.answers.map(a => `<td>${a}</td>`).join('')}</tr>`).join('')}
+    </table><p style="font-size:10pt">Ответ верен, если совпадает с ключом (запятая или точка — одинаково). Ключ всегда можно восстановить
+    по номеру варианта: режим «Раздатка», вид листа «Бланк ответов».</p></div>`;
+}
+function keyHTML(vs) {
+  const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  return `<div class="page key"><h2>Ключ учителя · ${lowerTitle()}</h2>
+    <table class="key"><tr><th>Вариант</th>${head}<th>Слово</th></tr>
+    ${vs.map(v => `<tr><td>${v.label}</td>${v.tasks.map(t => `<td>${TYPES[t.type].keyHTML(t)}</td>`).join('')}<td><b>${v.word}</b></td></tr>`).join('')}
+    </table><p style="font-size:10pt">Слово сложилось — все ответы верны. Ключ всегда можно восстановить по номеру варианта в режиме «Раздатка».</p></div>`;
+}
+// Номера и настройки запоминаются в браузере: напечатал листы, закрыл вкладку — ключ потом
+// печатается по тем же номерам. Без localStorage номера просто будут новыми.
+function renderPrint() {
+  if (!printNums.length) {
+    const saved = parseNums(store.get('printNums') || '').nums;
+    printNums = saved.length ? saved : newNumbers(CONFIG.print.variants);
+    $('pCount').value = printNums.length;
+    $('pSpace').checked = store.get('printSpace') ? store.get('printSpace') === '1' : CONFIG.print.space;
+    $('pTwo').checked = store.get('printTwo') === '1';
+    $('pKind').value = HAS_OGE && store.get('printKind') === 'oge' ? 'oge' : 'word';
+    if (saved.length) $('pMsg').textContent = 'Открыты номера, с которыми вы работали в прошлый раз. Для другого класса нажмите «Новые номера».';
+  }
+  if (pendingKind) { $('pKind').value = pendingKind; pendingKind = null; }
+  $('pNums').value = printNums.map(n => GEN_VERSION + '-' + n).join(', ');
+  drawSheets();
+}
+function drawSheets() {
+  const oge = HAS_OGE && $('pKind').value === 'oge';
+  document.querySelectorAll('[data-kind-set]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.kindSet === $('pKind').value)));
+  const vs = printNums.map(n => oge ? makeVariantOGE(n) : makeVariant(n));
+  const sheet = oge ? ogeSheetHTML : sheetHTML, key = oge ? ogeKeyHTML : keyHTML;
+  const space = $('pSpace').checked, two = $('pTwo').checked && !space;
+  store.set('printNums', printNums.join(','));
+  store.set('printSpace', space ? 1 : 0);
+  store.set('printTwo', $('pTwo').checked ? 1 : 0);
+  store.set('printKind', oge ? 'oge' : 'word');
+  $('pTwo').disabled = space;
+  $('pAbout').textContent = oge ? PRINT.ogeAbout : PRINT.about;
+  let html = '';
+  if (two) for (let i = 0; i < vs.length; i += 2)
+    html += `<div class="page half compact">${sheet(vs[i])}${vs[i + 1] ? sheet(vs[i + 1]) : ''}</div>`;
+  else html = vs.map(v => `<div class="page${space ? '' : ' compact'}">${sheet(v)}</div>`).join('');
+  $('pSheets').innerHTML = (vs.length ? key(vs) : '') + html;
+  return vs;
+}
+function printNow(what) {
+  document.body.classList.remove('print-key', 'print-sheets');
+  document.body.classList.add(what === 'key' ? 'print-key' : 'print-sheets');
+  try { window.print(); } catch {}
+}
+
+// ---------- ядро: core/board.js ----------
+// ================= 🖥 На доске =================
+// На экране — то, что видит класс: короткий вопрос, ответ, чертёж и запись в тетради.
+// Что сказать словами — в подсказке учителю (кнопка «💬 Учителю»).
+const BW = 980, BH = 400;
+const B = { e: null, steps: [], i: 0, phase: 0, timer: 0, notes: false };
+const svg = (inner, label) => `<svg viewBox="0 0 ${BW} ${BH}" role="img" aria-label="${label}" preserveAspectRatio="xMidYMid meet">${inner}</svg>`;
+const tx = (x, y, s, cls = 'lab', anchor = 'middle') => `<text class="${cls}" x="${x}" y="${y}" text-anchor="${anchor}">${s}</text>`;
+const sr = s => `√<tspan class="ov">${s}</tspan>`;   // корень в подписи чертежа
+const ds = x => decStr(x) || `${x.n}/${x.d}`;
+// клетчатый квадрат cols × rows клеток размера c; fill — заливка, every — жирная линия через every клеток
+function grid(x, y, cols, rows, c, fill = 'ge', every = 0) {
+  let s = `<rect class="${fill}" x="${x}" y="${y}" width="${cols * c}" height="${rows * c}"/>`;
+  for (let i = 1; i < cols; i++) s += `<line class="gl${every && i % every === 0 ? ' gk' : ''}" x1="${x + i * c}" x2="${x + i * c}" y1="${y}" y2="${y + rows * c}"/>`;
+  for (let j = 1; j < rows; j++) s += `<line class="gl${every && j % every === 0 ? ' gk' : ''}" x1="${x}" x2="${x + cols * c}" y1="${y + j * c}" y2="${y + j * c}"/>`;
+  return s + `<rect class="gf" x="${x}" y="${y}" width="${cols * c}" height="${rows * c}"/>`;
+}
+// скобка под отрезком и подпись
+const under = (x, y, w, s, cls = '') => `<path class="br ${cls}" d="M${x} ${y + 10}v12H${x + w}v-12"/>` + tx(x + w / 2, y + 62, s, 'lab' + (cls ? ' ' + cls : ''));
+function svgFrac(cx, cy, n, d, cls = '') {
+  const w = Math.max(String(n).length, String(d).length) * 10 + 10;
+  return `<g class="lbl ${cls}"><text x="${cx}" y="${cy - 8}" text-anchor="middle">${n}</text><line x1="${cx - w}" x2="${cx + w}" y1="${cy}" y2="${cy}"/><text x="${cx}" y="${cy + 31}" text-anchor="middle">${d}</text></g>`;
+}
+// числовая прямая от a до b (в десятых), подсветка [h, h + step]
+function numLine(y, a, b, step, labelEvery, hl, cls = '') {
+  const x0 = 90, x1 = 890, k = (x1 - x0) / (b - a);
+  let s = `<line class="axis" x1="${x0 - 20}" x2="${x1 + 20}" y1="${y}" y2="${y}"/>`;
+  const n = Math.round((b - a) / step);
+  for (let i = 0; i <= n; i++) {
+    const v = a + i * step, x = x0 + i * step * k;
+    s += `<line class="tick" x1="${x}" x2="${x}" y1="${y - 12}" y2="${y + 12}"/>`;
+    if (i % labelEvery === 0) s += tx(x, y + 48, String(Math.round(v * 1000) / 1000).replace('.', ',').replace('-', MINUS), 'lab s');
+  }
+  if (hl != null) s += `<line class="seg ${cls}" x1="${x0 + (hl - a) * k}" x2="${x0 + (hl + step - a) * k}" y1="${y}" y2="${y}"/>`;
+  return s;
+}
+
+// пример для показа: тема даёт boardExample(random, прошлый пример) и buildSteps(пример) → шаги
+// {q — вопрос классу, a — ответ, note — подсказка учителю, draw(phase) — SVG или '', rec(phase) — строки тетради}
+function boardNumbers(random) {
+  B.e = boardExample(random, B.e || {});
+  B.steps = buildSteps(B.e);
+  B.i = 0; B.phase = 0;
+}
+function renderBoard() {
+  if (!B.steps.length) boardNumbers(false);
+  const st = B.steps[B.i];
+  $('bCnt').textContent = `Шаг ${B.i + 1} из ${B.steps.length}`;
+  $('bQ').innerHTML = st.q;
+  $('bA').innerHTML = st.a;
+  $('bA').classList.toggle('hide', B.phase === 0);
+  const pic = st.draw(B.phase);
+  $('bStage').innerHTML = pic ? svg(pic, 'Чертёж к шагу') : '';
+  $('bRec').innerHTML = st.rec(B.phase).map(l => `<div class="ln">${l}</div>`).join('');
+  $('bNote').innerHTML = `<b>Учителю</b>${st.note}`;
+  $('bNote').hidden = !B.notes;
+  $('bNotesBtn').setAttribute('aria-pressed', String(B.notes));
+  $('bNext').textContent = B.phase === 0 ? 'Показать ответ' : 'Далее →';
+  $('bNext').disabled = B.i === B.steps.length - 1 && B.phase === 1;
+}
+function boardNext() {
+  if (B.phase === 0) B.phase = 1;
+  else if (B.i < B.steps.length - 1) { B.i++; B.phase = 0; }
+  renderBoard();
+}
+function boardPrev() {
+  if (B.phase === 1) B.phase = 0;
+  else if (B.i > 0) { B.i--; B.phase = 1; }
+  renderBoard();
+}
+function boardGo(i, phase = 0) { B.i = Math.max(0, Math.min(i, B.steps.length - 1)); B.phase = phase ? 1 : 0; renderBoard(); }
+function boardNotes() { B.notes = !B.notes; store.set('notes', B.notes ? 1 : 0); renderBoard(); }
+// превью на сайте: доска сама идёт по шагам до BOARD.previewUntil и начинает сначала
+function boardStartPreview() {
+  $('board').classList.add('preview');
+  B.timer = setInterval(() => {
+    if (B.i >= BOARD.previewUntil && B.phase === 1) boardGo(0, 0);
+    else boardNext();
+  }, CONFIG.board.previewDelay);
+}
+function boardStopPreview() { clearInterval(B.timer); B.timer = 0; }
+// кадр для картинки-превью (npm run posters на сайте): шаг BOARD.poster с показанным ответом
+function boardPoster() { boardStopPreview(); boardGo(BOARD.poster, 1); }
+
+
+// ---------- ядро: core/home.js ----------
+const H = { level: 0, rnd: null, n: 0, score: 0, streak: 0, clean: 0, cats: {}, task: null, hints: 0, hintLevel: 0,
+  wait: false, taskDone: false, repeat: null, finished: false, gain: 0, eqCount: null, history: [] };
+
+function homeSetup() {
+  $('hSetup').hidden = false; $('hPlay').hidden = true; $('hEnd').hidden = true;
+  $('hLevels').innerHTML = SECTIONS.map((S, i) => {
+    const best = +store.get('best' + i) || 0;
+    return `<button type="button" class="level" data-level="${i}"><b>${S.title} →</b><span>${S.text}</span><span class="lex">${S.ex()}</span><small>Рекорд: ${best}</small></button>`;
+  }).join('');
+  $('home').classList.remove('playing');
+  // учителю: ссылка сразу на раздел, чтобы отправить её в чат класса
+  $('hLinks').innerHTML = 'Учителю — ссылка сразу на раздел: ' + SECTIONS.map((S, i) =>
+    `<button type="button" class="linkbtn" data-copy="${i + 1}">раздел ${i + 1}</button>`).join(' ') + ' <span id="hCopied"></span>';
+}
+function levelLink(n) {
+  let loc = location;
+  try { if (window.top !== window && window.top.location.origin === location.origin) loc = window.top.location; } catch {}
+  return `${loc.origin}${loc.pathname}?mode=home&level=${n}&student=1`;
+}
+async function copyLevelLink(n) {
+  const url = levelLink(n);
+  let ok = false;
+  try { await navigator.clipboard.writeText(url); ok = true; } catch {}
+  $('hCopied').innerHTML = ok ? `Скопировано: ${url}` : `Скопируйте ссылку: <b>${url}</b>`;
+}
+function homeStart({ level = H.level, seed } = {}) {
+  Object.assign(H, { level, n: 0, score: 0, streak: 0, clean: 0, cats: {}, repeat: null, finished: false, history: [], last: null,
+    rnd: mulberry32(seed ?? ((Math.random() * 4294967296) >>> 0)) });
+  $('hSetup').hidden = true; $('hEnd').hidden = true; $('hPlay').hidden = false;
+  $('home').classList.add('playing');
+  homeNewTask();
+}
+function homeNewTask() {
+  const types = SECTIONS[H.level].types;
+  // после ошибки — задание того же типа с другими числами; иначе — другой тип, чем в прошлый раз
+  let type = H.repeat;
+  if (!type) { const rest = types.filter(x => x !== H.task?.type); type = pick(H.rnd, rest.length ? rest : types); }
+  const prev = H.task;
+  let t, guard = 0;
+  do t = generate(type, H.rnd);
+  while (prev && JSON.stringify(t) === JSON.stringify(prev) && ++guard < 50);
+  H.task = t;
+  H.n++; H.hints = 0; H.hintLevel = 0; H.wait = false; H.taskDone = false; H.repeat = null; H.eqCount = null; H.last = null;
+  homeRender();
+}
+// Проверка. x: num/frac — {n, d}; choice — строка; eq — {roots: [...]}; est — {lo, hi}
+function homeCheck(x) {
+  if (H.wait || H.finished) return null;
+  if (x == null || x.empty) return { ok: false, empty: true, msg: x?.msg || 'Впиши ответ.' };
+  const t = H.task, T = TYPES[t.type];
+  let r;
+  if (T.same(t, x)) {
+    H.streak++; H.clean++;
+    const mult = Math.min(CONFIG.home.maxMultiplier, 1 + Math.floor((H.streak - 1) / 3));
+    H.gain = Math.max(0, CONFIG.home.points[H.level] - H.hints * CONFIG.home.hintPenalty) * mult;
+    H.score += H.gain;
+    r = { ok: true, msg: T.ok(t) };
+  } else {
+    H.streak = 0; H.gain = 0;
+    r = { ok: false, ...T.wrong(t, x) };
+    H.cats[r.cat] = (H.cats[r.cat] || 0) + 1;
+    H.repeat = t.type;
+  }
+  H.history.push({ n: H.n, type: t.type, ok: r.ok, cat: r.cat });
+  H.wait = true; H.taskDone = true; H.last = r;
+  homeRender(r);
+  return r;
+}
+function homeContinue() {
+  if (!H.wait) return;
+  if (H.n >= CONFIG.home.round) return homeEnd();
+  homeNewTask();
+}
+function homeHint() {
+  if (H.wait || H.finished) return null;
+  const hints = TYPES[H.task.type].hints(H.task);
+  const text = hints[Math.min(H.hintLevel, hints.length - 1)];
+  if (H.hintLevel < hints.length) { H.hints++; H.hintLevel++; }
+  H.lastHint = text;
+  homeRender({ hint: text });
+  return text;
+}
+function homeEnd() {
+  H.finished = true;
+  const key = 'best' + H.level, best = +store.get(key) || 0, record = H.score > best;
+  if (record) store.set(key, H.score);
+  const cats = Object.entries(H.cats).sort((x, y) => y[1] - x[1]);
+  $('hPlay').hidden = true; $('hEnd').hidden = false;
+  $('hEnd').innerHTML = `<div class="card">
+    <h2 style="margin-top:0">Итоги: ${SECTIONS[H.level].title.toLowerCase()}</h2>
+    <p style="font-size:22px">Очки: <b>${H.score}</b>${record ? ' — новый рекорд!' : ` (рекорд: ${Math.max(best, H.score)})`}<br>
+    Без ошибок: <b>${H.clean} из ${CONFIG.home.round}</b></p>
+    <h3>Над чем поработать</h3>
+    ${cats.length ? `<ul class="work">${cats.map(([c, k]) => `<li><b>${CATS[c][0]}</b> — ошибок: ${k}<br>${esc(CATS[c][1])}</li>`).join('')}</ul>`
+      : `<p>Ошибок нет. ${H.level < SECTIONS.length - 1 ? 'Попробуй следующий раздел.' : 'Отличная работа!'}</p>`}
+    <div class="hbtns"><button type="button" class="main" data-act="again">Ещё раз</button>
+    ${H.level < SECTIONS.length - 1 && !cats.length ? `<button type="button" data-act="nextlevel">Следующий раздел</button>` : ''}
+    <button type="button" data-act="setup">Выбрать раздел</button></div></div>`;
+}
+
+const inp = (k, label, cls = '', mode = 'decimal') => `<input data-k="${k}" class="${cls}" inputmode="${mode}" autocomplete="off" aria-label="${label}">`;
+const checkBtn = '<button type="button" class="main check" data-act="check">Проверить</button>';
+// вопрос в тренажёре: TYPES[type].ask, по умолчанию «запись = ?»
+const askHTML = t => TYPES[t.type].ask ? TYPES[t.type].ask(t) : `${TYPES[t.type].text(t)} = ?`;
+// Виды ввода ответа. html(t) — поля, collect(get) — ответ для T.same/T.wrong или { empty, msg }.
+// Тема может добавить свой вид: const TOPIC_INPUTS = { имя: { html, collect } }.
+const readInt = s => { const v = String(s).replace(/\s+/g, ''); return /^\d+$/.test(v) ? +v : null; };
+const INPUTS = {
+  num: {   // число: целое, десятичная или обыкновенная дробь → {n, d}
+    html: t => `<div class="inrow">${TYPES[t.type].text(t)} = ${inp('v', 'ответ', 'wide')} ${checkBtn}</div>`,
+    collect: get => parseQ(get('v')) || { empty: true, msg: get('v').trim() ? 'Не понял число. Пиши, например, 0,3 или 12.' : 'Впиши ответ.' },
+  },
+  frac: {  // дробь этажом, целая часть необязательна → {n, d}
+    html: t => `<div class="inrow">${TYPES[t.type].text(t)} = ${inp('w', 'целая часть', '', 'numeric')} <span class="frac fin">${inp('n', 'числитель', '', 'numeric')}${inp('d', 'знаменатель', '', 'numeric')}</span> ${checkBtn}</div>` +
+      '<p class="hnote">Целую часть можно не писать — подойдёт и неправильная дробь.</p>',
+    collect: get => {
+      const w = get('w').trim() ? readInt(get('w')) : 0, n = readInt(get('n')), d = readInt(get('d'));
+      if (w == null || n == null || !d) return { empty: true, msg: 'Заполни числитель и знаменатель (целую часть — если есть).' };
+      return Q(w * d + n, d);
+    },
+  },
+  choice: {   // кнопки TYPES[type].options = [[значение, подпись]]; ответ — строка, проверка сразу по нажатию
+    html: t => `<div class="inrow">${TYPES[t.type].options.map(([v, l]) => `<button type="button" class="choice" data-choice="${v}">${l}</button>`).join('')}</div>`,
+    collect: () => null,
+  },
+  est: {   // два соседних целых: lo < запись < hi → {lo, hi}
+    html: t => `<div class="inrow">${inp('lo', 'меньшее число', '', 'numeric')} &lt; ${TYPES[t.type].text(t)} &lt; ${inp('hi', 'большее число', '', 'numeric')} ${checkBtn}</div>`,
+    collect: get => { const lo = readInt(get('lo')), hi = readInt(get('hi')); return lo == null || hi == null ? { empty: true, msg: 'Впиши оба числа.' } : { lo, hi }; },
+  },
+  eq: {   // корни уравнения: сначала число корней, потом сами корни (числа или √m) → {roots}
+    html: () => {
+      const c = H.eqCount, b = (n, l) => `<button type="button" data-count="${n}" aria-pressed="${c === n}">${l}</button>`;
+      let html = `<div class="cnts">${b(0, 'Корней нет')}${b(1, 'Один корень')}${b(2, 'Два корня')}</div>`;
+      const sqrtBtn = '<button type="button" class="sqrtbtn" data-act="sqrt" title="Вставить знак корня" aria-label="Вставить знак корня">√</button>';
+      if (c === 0) html += `<div class="inrow">${checkBtn}</div>`;
+      if (c === 1) html += `<div class="inrow"><span class="nw">${X} =</span> ${inp('r1', 'корень', 'wide', 'text')} ${sqrtBtn} ${checkBtn}</div>`;
+      if (c === 2) html += `<div class="inrow"><span class="nw">${X}<sub>1</sub> =</span> ${inp('r1', 'первый корень', 'wide', 'text')} <span class="nw">${X}<sub>2</sub> =</span> ${inp('r2', 'второй корень', 'wide', 'text')} ${sqrtBtn} ${checkBtn}</div>`;
+      if (c) html += '<p class="hnote">Корень можно записать числом (−0,9; 2/3) или со знаком корня: √7, −√7.</p>';
+      return html;
+    },
+    collect: get => {
+      if (H.eqCount == null) return { empty: true, msg: 'Сначала выбери, сколько корней у уравнения.' };
+      const roots = [];
+      for (let i = 1; i <= H.eqCount; i++) {
+        const s = get('r' + i), v = parseVal(s);
+        if (!v) return { empty: true, msg: s.trim() ? `Не понял корень «${esc(s)}». Пиши число (−0,9; 2/3) или корень (√7, −√7).` : 'Впиши корни.' };
+        roots.push(v);
+      }
+      return { roots };
+    },
+  },
+};
+const inputKind = t => (typeof TOPIC_INPUTS !== 'undefined' && TOPIC_INPUTS[TYPES[t.type].input]) || INPUTS[TYPES[t.type].input];
+const inputHTML = t => inputKind(t).html(t);
+function homeRender(fb) {
+  const t = H.task, T = TYPES[t.type];
+  const mult = Math.min(CONFIG.home.maxMultiplier, 1 + Math.floor(H.streak / 3));
+  $('hStats').innerHTML = `<span>Задание <b>${H.n}</b> из ${CONFIG.home.round}</span><span>Очки: <b>${H.score}</b></span>` +
+    `<span>Серия: <b>${H.streak}</b>${mult > 1 ? ` (×${mult})` : ''}</span><span>${SECTIONS[H.level].title}</span>`;
+  $('hTask').innerHTML = askHTML(t);
+  $('hPen').textContent = CONFIG.home.hintPenalty;
+  $('hStep').innerHTML = H.wait ? '' : inputHTML(t);
+  let html = '';
+  if (fb && fb.hint) html = `<div class="fb info"><span class="tag">Подсказка</span>${fb.hint}</div>`;
+  else if (fb && fb.empty) html = `<div class="fb info">${fb.msg}</div>`;
+  else if (fb) html = `<div class="fb ${fb.ok ? 'ok' : 'bad'}"><span class="tag">${fb.ok ? `Верно! +${H.gain}` : 'Ошибка'}</span>${fb.msg}</div>`;
+  if (H.taskDone && !fb?.ok) html += `<div class="fb info"><span class="tag">Ответ</span>${answerHTML(t)}. Дальше — такое же задание с другими числами.</div>`;
+  $('hFb').innerHTML = html;
+  $('hHint').hidden = H.wait; $('hNext').hidden = !H.wait;
+  $('hNext').textContent = H.n >= CONFIG.home.round ? 'Итоги →' : 'Следующее задание →';
+  if (!PREVIEW) {
+    const first = $('hStep').querySelector('input');
+    if (first) first.focus(); else if (H.wait) $('hNext').focus();
+  }
+}
+// верный ответ после ошибки: TYPES[type].answer, по умолчанию «запись = ответ»
+const answerHTML = t => TYPES[t.type].answer ? TYPES[t.type].answer(t) : `${TYPES[t.type].text(t)} = ${TYPES[t.type].keyHTML(t)}`;
+function homeCollect() {
+  const get = k => $('hStep').querySelector(`[data-k="${k}"]`)?.value ?? '';
+  return inputKind(H.task).collect(get);
+}
+function homeCheckClick(x = homeCollect()) { const r = homeCheck(x); if (r && r.empty) homeRender(r); }
+
+
+// ---------- ядро: core/boot.js ----------
+// ================= Управление =================
+let lastInput = null;
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-go],[data-act],[data-level],[data-copy],[data-choice],[data-count],[data-kind-set]');
+  if (!el) return;
+  if (el.dataset.go) { if (el.dataset.kind) pendingKind = el.dataset.kind; return show(el.dataset.go); }
+  if (el.dataset.kindSet) { $('pKind').value = el.dataset.kindSet; return drawSheets(); }
+  if (el.dataset.level) { H.level = +el.dataset.level; return homeStart(); }
+  if (el.dataset.copy) return copyLevelLink(+el.dataset.copy);
+  if (el.dataset.choice) return homeCheckClick(el.dataset.choice);
+  if (el.dataset.count) { H.eqCount = +el.dataset.count; return homeRender(); }
+  const act = el.dataset.act;
+  if (act === 'menu') { if (document.fullscreenElement) toggleFull(); show('start'); }
+  if (act === 'next') boardNext();
+  if (act === 'prev') boardPrev();
+  if (act === 'restart') boardGo(0, 0);
+  if (act === 'numbers') { boardNumbers(true); renderBoard(); }
+  if (act === 'theme') toggleTheme();
+  if (act === 'full') toggleFull();
+  if (act === 'notes') boardNotes();
+  if (act === 'check') homeCheckClick();
+  if (act === 'sqrt') {
+    const i = lastInput && $('hStep').contains(lastInput) ? lastInput : $('hStep').querySelector('input');
+    if (i) { const p = i.selectionStart ?? i.value.length; i.value = i.value.slice(0, p) + '√' + i.value.slice(p); i.focus(); i.setSelectionRange?.(p + 1, p + 1); }
+  }
+  if (act === 'help') $('help').hidden = false;
+  if (act === 'help-close') $('help').hidden = true;
+  if (act === 'again') homeStart();
+  if (act === 'nextlevel') { H.level++; homeStart(); }
+  if (act === 'setup') homeSetup();
+});
+$('hStep').addEventListener('focusin', e => { if (e.target.matches('input')) lastInput = e.target; });
+$('help').addEventListener('click', e => { if (e.target === $('help')) $('help').hidden = true; });
+$('themeBtn').addEventListener('click', toggleTheme);
+$('hHint').addEventListener('click', homeHint);
+$('hNext').addEventListener('click', homeContinue);
+// открылась клавиатура телефона — подтягиваем «Проверить» в видимую часть экрана
+window.visualViewport?.addEventListener('resize', () => {
+  if (screen === 'home' && !PREVIEW) $('hStep').querySelector('.check')?.scrollIntoView({ block: 'nearest' });
+});
+$('hStep').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); homeCheckClick(); } });
+$('pNew').addEventListener('click', () => { $('pMsg').textContent = ''; printNums = newNumbers(Math.max(1, Math.min(40, +$('pCount').value || CONFIG.print.variants))); renderPrint(); });
+$('pCount').addEventListener('change', () => $('pNew').click());
+$('pSpace').addEventListener('change', drawSheets);
+$('pTwo').addEventListener('change', drawSheets);
+$('pNums').addEventListener('change', () => {
+  const { nums, bad } = parseNums($('pNums').value);
+  $('pMsg').innerHTML = bad.length ? `<span class="err">Не понял номера: ${esc(bad.join(', '))}. Номер — как на листе, например ${GEN_VERSION}-4817.</span>` : '';
+  if (nums.length) { printNums = nums.slice(0, 40); $('pCount').value = printNums.length; drawSheets(); }
+});
+$('pPrint').addEventListener('click', () => printNow('sheets'));
+$('pPrintKey').addEventListener('click', () => printNow('key'));
+addEventListener('afterprint', () => document.body.classList.remove('print-key', 'print-sheets'));
+
+document.addEventListener('keydown', e => {
+  if (e.target.matches?.('input') && e.key !== 'Escape') return;
+  if (e.key === 'Escape') {
+    if (!$('help').hidden) { $('help').hidden = true; return; }
+    if (screen !== 'start' && !STUDENT) show('start');
+    return;
+  }
+  if (screen === 'home' && e.key === 'Enter' && H.wait) { e.preventDefault(); homeContinue(); return; }
+  if (screen !== 'board') return;
+  if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); boardNext(); }
+  else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); boardPrev(); }
+  else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') toggleFull();
+});
+
+// ================= Запуск =================
+(() => {
+  const th = store.get('theme');
+  if (th === 'dark' || th === 'light') document.documentElement.dataset.theme = th;
+  B.notes = store.get('notes') === '1';
+  const back = siteHref();
+  if (back) { $('toSite').href = back; $('toSite').hidden = false; }
+  if (typeof helpInit === 'function') helpInit();   // тема дорисовывает формулы в справке
+  const lvl = +P.get('level');
+  if (STUDENT) document.body.classList.add('student');
+  if (PREVIEW) { show('board'); boardStartPreview(); }
+  else if ((MODE === 'home' || STUDENT) && lvl >= 1 && lvl <= SECTIONS.length) {
+    H.level = lvl - 1;
+    show('home'); homeStart();
+  } else show(STUDENT ? 'home' : MODE || 'start');
+})();
+
+// Для автотестов и снимка превью
+window.APP = {
+  SLUG, META, CONFIG, GEN_VERSION, TYPES, SECTIONS, KINDS_V1, WORDS_V1,
+  OGE_V1: HAS_OGE ? OGE_V1 : undefined, makeVariantOGE: HAS_OGE ? makeVariantOGE : undefined,
+  Q, qeq, decStr, keyQ, parseQ, parseVal, eqRoots, generate, makeVariant, taskRnd, mulberry32, parseNums,
+  STUDENT, show, get screen() { return screen; },
+  board: { get steps() { return B.steps; }, get i() { return B.i; }, get phase() { return B.phase; }, get e() { return B.e; },
+    next: boardNext, prev: boardPrev, go: boardGo, numbers: random => { boardNumbers(random); renderBoard(); }, poster: boardPoster },
+  print: { draw: drawSheets, set nums(v) { printNums = v; } },
+  home: { state: H, start: homeStart, check: homeCheck, hint: homeHint, next: homeContinue, collect: homeCollect,
+    setCount: n => { H.eqCount = n; homeRender(); } },
+};
+
+</script>
+</body>
+</html>
