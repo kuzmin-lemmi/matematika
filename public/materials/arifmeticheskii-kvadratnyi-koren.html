@@ -1,4 +1,6 @@
 <!doctype html>
+<!-- Собрано конструктором «Матшага» (D:\Конструктор математика) из materials/arifmeticheskii-kvadratnyi-koren/. Не правь этот файл руками:
+     правь тему или ядро и пересобери — npm run build -- arifmeticheskii-kvadratnyi-koren. -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -284,6 +286,7 @@ body.student [data-act="menu"],body.student #hLinks{display:none !important}
   .bbar{font-size:18px}
   .bctl button{font-size:18px;min-height:48px}
 }
+
 </style>
 </head>
 <body>
@@ -418,34 +421,11 @@ body.student [data-act="menu"],body.student #hLinks{display:none !important}
 
 <script>
 'use strict';
-// ================= Параметры: учитель может поменять их за минуту =================
-const CONFIG = {
-  maxRoot: 20,              // таблица квадратов в заданиях: до 20²
-  board: {
-    side: 5,                // первый пример: квадрат площадью 25
-    trap: 4,                // ловушка «√16 = ±4» и график x² = 16
-    neg: 9,                 // «существует ли √(−9)»
-    dec: 6,                 // площадь 0,36 — сторона 0,6 (в десятых)
-    frac: [5, 3],           // √(2 7/9) = 5/3: сторона 5 клеток, единица — 3 клетки
-    approx: 2,              // оценка √2 между целыми, десятыми и сотыми
-    triple: [3, 4, 5],      // ловушка √(9 + 16) ≠ 3 + 4
-    previewDelay: 1700,     // превью на сайте: пауза между шагами, мс
-  },
-  print: {
-    variants: 25,           // сколько вариантов печатать по умолчанию
-    traps: 2,               // сколько ответов-ловушек на задание в таблице букв
-    space: true,            // сетка для решения под каждым заданием
-  },
-  home: {
-    round: 10,              // заданий в тренировке
-    points: [10, 15, 15, 15],   // очки за задание по разделам
-    hintPenalty: 3,         // штраф за подсказку
-    maxMultiplier: 3,       // множитель за серию: +1 за каждые 3 задания подряд без ошибок
-  },
-};
-// Версия генератора — первая часть номера варианта «1-4817». Изменил генератор или состав
-// заданий раздатки — увеличь версию и оставь старую ветку, пока на неё есть напечатанные листы.
-const GEN_VERSION = 1;
+// Материал «Арифметический квадратный корень». Собран конструктором «Матшага» из materials/arifmeticheskii-kvadratnyi-koren/ и core/.
+const SLUG = "arifmeticheskii-kvadratnyi-koren";
+const META = {"title":"Арифметический квадратный корень","description":"Арифметический квадратный корень: показ на доске, раздатка с кодовым словом и тренажёр с разбором ошибок. Определение, вычисление, уравнение x² = a, оценка корня. 8 класс.","kicker":"8 класс · Макарычев и др. · Алгебра","lead":"Одна тема в трёх режимах: показ на доске, раздатка (кодовое слово или бланк как в ОГЭ) и тренажёр, который объясняет каждую ошибку.","modeBoard":"Корень — сторона квадрата с данной площадью. Ловушки «√16 = ±4» и «√0,09 = 0,03», оценка √2, уравнение x² = a.","modePrint":"У каждого свой вариант, ключ — по номеру варианта.","modeHome":"Вычисление корней, уравнение x² = a, оценка и сравнение. Разбор каждой ошибки.","printTitle":"Раздатка: арифметический квадратный корень","homeTitle":"Тренировка: квадратный корень","homeIntro":"Выбери раздел — и начнём. В каждом 10 заданий, после ошибки — разбор и такое же задание с другими числами."};
+// ---------- ядро: core/shell.js ----------
+// Общие константы, адрес материала, хранилище настроек. SLUG и META вставляет сборка.
 const MINUS = '−';
 
 const P = new URLSearchParams(location.search);
@@ -455,10 +435,50 @@ const PREVIEW = P.get('preview') === '1';
 const STUDENT = P.get('student') === '1';
 const $ = id => document.getElementById(id);
 const store = {
-  get(k) { try { return localStorage.getItem('matshag:arifmeticheskii-kvadratnyi-koren:' + k); } catch { return null; } },
-  set(k, v) { try { localStorage.setItem('matshag:arifmeticheskii-kvadratnyi-koren:' + k, String(v)); } catch {} },
+  get(k) { try { return localStorage.getItem('matshag:' + SLUG + ':' + k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem('matshag:' + SLUG + ':' + k, String(v)); } catch {} },
 };
 
+// Ссылка «← Назад на сайт» на стартовом экране: материал открыт с сайта (/zapusk/<slug>/ или /materials/<slug>.html)
+// ведёт на страницу материала /item/<slug>/. Скачанный файл и ссылка для учеников её не показывают.
+function siteHref() {
+  if (STUDENT || location.protocol === 'file:') return '';
+  let top = location;
+  try { if (window.top !== window && window.top.location.origin === location.origin) top = window.top.location; } catch {}
+  const z = top.pathname.match(/^(.*\/)zapusk\/([a-z0-9-]+)\/?$/);
+  if (z) return `${top.origin}${z[1]}item/${z[2]}/`;
+  const m = location.pathname.match(/^(.*\/)materials\/([a-z0-9-]+)\.html$/);
+  return m ? `${location.origin}${m[1]}item/${m[2]}/` : '';
+}
+
+// ================= Экраны =================
+let screen = null;
+function show(name) {
+  if (STUDENT && name !== 'home') return;
+  boardStopPreview();
+  screen = name;
+  ['start', 'board', 'print', 'home'].forEach(s => { $(s).hidden = s !== name; });
+  $('help').hidden = true;
+  if (name === 'board') renderBoard();
+  if (name === 'print') renderPrint();
+  if (name === 'home') homeSetup();
+}
+function toggleTheme() {
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+  store.set('theme', document.documentElement.dataset.theme);
+}
+async function toggleFull() {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch {}
+}
+
+
+// ---------- ядро: core/math.js ----------
 // ================= Точная арифметика: числа — несократимые дроби {n, d} =================
 const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b, a % b]; return a; };
 const Q = (n, d = 1) => { if (d < 0) { n = -n; d = -d; } const g = gcd(n, d) || 1; return { n: n / g, d: d / g }; };
@@ -570,6 +590,38 @@ function parseVal(s) {
   return r != null ? V.q(Q(sign * r)) : { m: under, s: sign };
 }
 
+// ---------- тема: materials/arifmeticheskii-kvadratnyi-koren/topic.js ----------
+// Тема «Арифметический квадратный корень» (8 класс, Макарычев). Только содержание — каркас даёт ядро (core/).
+// Что тема обязана задать — ИНСТРУКЦИЯ.md, раздел «Из чего состоит тема».
+// ================= Параметры: учитель может поменять их за минуту =================
+const CONFIG = {
+  maxRoot: 20,              // таблица квадратов в заданиях: до 20²
+  board: {
+    side: 5,                // первый пример: квадрат площадью 25
+    trap: 4,                // ловушка «√16 = ±4» и график x² = 16
+    neg: 9,                 // «существует ли √(−9)»
+    dec: 6,                 // площадь 0,36 — сторона 0,6 (в десятых)
+    frac: [5, 3],           // √(2 7/9) = 5/3: сторона 5 клеток, единица — 3 клетки
+    approx: 2,              // оценка √2 между целыми, десятыми и сотыми
+    triple: [3, 4, 5],      // ловушка √(9 + 16) ≠ 3 + 4
+    previewDelay: 1700,     // превью на сайте: пауза между шагами, мс
+  },
+  print: {
+    variants: 25,           // сколько вариантов печатать по умолчанию
+    traps: 2,               // сколько ответов-ловушек на задание в таблице букв
+    space: true,            // сетка для решения под каждым заданием
+  },
+  home: {
+    round: 10,              // заданий в тренировке
+    points: [10, 15, 15, 15],   // очки за задание по разделам
+    hintPenalty: 3,         // штраф за подсказку
+    maxMultiplier: 3,       // множитель за серию: +1 за каждые 3 задания подряд без ошибок
+  },
+};
+// Версия генератора — первая часть номера варианта «1-4817». Изменил генератор или состав
+// заданий раздатки — увеличь версию и оставь старую ветку, пока на неё есть напечатанные листы.
+const GEN_VERSION = 1;
+
 // ================= Типы заданий =================
 // input: num — число, frac — дробь, choice — выбор, eq — корни уравнения, est — два числа.
 // text — запись задания, ask — вопрос в тренажёре, ans — ответ, same — верен ли ответ,
@@ -662,6 +714,8 @@ const TYPES = {
   },
   meaning: {
     input: 'choice', title: 'Имеет ли смысл выражение', options: yesNo,
+    ask: t => `Имеет ли смысл выражение ${TYPES.meaning.text(t)}?`,
+    answer: t => TYPES.meaning.ans(t) === 'yes' ? 'имеет смысл' : 'не имеет смысла',
     gen: rnd => {
       const form = pick(rnd, ['neg', 'out', 'sqneg', 'negsq', 'diff']);
       const m = int(rnd, 2, 25), p = int(rnd, 2, 40), q = int(rnd, 2, 40);
@@ -776,6 +830,9 @@ const TYPES = {
   },
   eq: {
     input: 'eq', title: 'Уравнение x² = a',
+    ask: t => `Реши уравнение ${TYPES.eq.text(t)}`,
+    sheet: t => `Реши уравнение ${TYPES.eq.text(t)}`,
+    answer: t => eqHTML(TYPES.eq.ans(t), TYPES.eq.style(t)),
     // a — чему равен x² после переноса; text — запись уравнения; alt — x² при ошибке в переносе
     gen: (rnd, form) => {
       form = form || pick(rnd, ['sq', 'sq', 'dec', 'frac', 'zero', 'neg', 'irr', 'shift', 'shift']);
@@ -851,6 +908,9 @@ const TYPES = {
   },
   est: {
     input: 'est', title: 'Оценка корня',
+    ask: t => `Между какими соседними целыми числами лежит ${TYPES.est.text(t)}?`,
+    sheet: t => `Между какими соседними целыми числами лежит ${TYPES.est.text(t)}?`,
+    answer: t => { const { lo, hi } = TYPES.est.ans(t); return `${lo} &lt; ${TYPES.est.text(t)} &lt; ${hi}`; },
     gen: rnd => ({ a: int(rnd, 2, 150) }),
     bad: t => isqrt(t.a) != null,
     text: t => RT(t.a),
@@ -869,6 +929,9 @@ const TYPES = {
   },
   cmp: {
     input: 'choice', title: 'Сравнение', options: [['<', '&lt;'], ['=', '='], ['>', '&gt;']],
+    ask: t => `Сравни: ${TYPES.cmp.text(t)}`,
+    sheet: t => `Сравни: ${t.L.html} и ${t.R.html}`,
+    answer: t => `${t.L.html} ${esc(TYPES.cmp.ans(t))} ${t.R.html}`,
     // L и R: html — запись, sq — квадрат (оба числа положительны, сравниваем квадраты)
     gen: rnd => {
       const form = pick(rnd, ['A', 'A', 'B', 'C']);
@@ -899,22 +962,7 @@ const TYPES = {
     hints: t => ['Возведи оба числа в квадрат и сравни квадраты.', `${t.L.line}.`],
   },
 };
-// число — ответ: same по умолчанию, ключ и ловушки по умолчанию
-for (const T of Object.values(TYPES)) {
-  if (T.input === 'num' || T.input === 'frac') {
-    T.same = T.same || ((t, v) => qeq(v, T.ans(t)));
-    T.key = T.key || (t => keyQ(T.ans(t)));
-    T.keyHTML = T.keyHTML || (t => htmlQ(T.ans(t)));
-  }
-  if (T.input === 'choice') T.same = T.same || ((t, v) => v === T.ans(t));
-}
-function generate(type, rnd, form, tries = 2000) {
-  for (let k = 0; k < tries; k++) {
-    const t = TYPES[type].gen(rnd, form);
-    if (!TYPES[type].bad?.(t)) return { type, ...t };
-  }
-  throw new Error('Генератор не нашёл задание: ' + type);
-}
+
 const SECTIONS = [
   { title: 'Раздел 1', text: 'Вычисли корень', types: ['table', 'dec', 'fraction'], ex: () => `${RT('0,09')} = ?` },
   { title: 'Раздел 2', text: 'Определение и выражения', types: ['meaning', 'square', 'expr', 'sum'], ex: () => `(${RT(7)})² = ?` },
@@ -927,28 +975,6 @@ const SECTIONS = [
 const KINDS_V1 = [['dec'], ['fraction', 'mixed'], ['expr'], ['square'], ['eq', ['sq', 'dec', 'frac']],
   ['eq', ['neg', 'irr', 'shift', 'shift']], ['est'], ['cmp']];
 const WORDS_V1 = ['ПАРУСНИК', 'ЛИСТОПАД', 'ЖУРАВЛИК', 'ГРУЗОВИК', 'СНЕГОВИК', 'ГОЛУБИКА', 'ПЕРЧАТКИ', 'ПОЛЯРНИК', 'ХРУСТАЛЬ'];
-const ABC = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ';
-function makeVariant(num, version = GEN_VERSION) {
-  if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
-  const tasks = [];
-  KINDS_V1.forEach(([type, forms], i) => {
-    const rnd = taskRnd(num, i);
-    let t, guard = 0;
-    do t = generate(type, rnd, Array.isArray(forms) ? pick(rnd, forms) : forms);
-    while (tasks.some(u => TYPES[u.type].key(u) === TYPES[type].key(t)) && ++guard < 200);
-    tasks.push(t);
-  });
-  const rnd = taskRnd(num, 99);
-  const word = pick(rnd, WORDS_V1);
-  const answers = tasks.map(t => TYPES[t.type].key(t));
-  const bank = new Map();   // ответ → { html, letter }
-  tasks.forEach((t, i) => bank.set(answers[i], { key: answers[i], html: TYPES[t.type].keyHTML(t), letter: word[i] }));
-  const decoys = shuffle(rnd, [...ABC].filter(ch => !word.includes(ch)));
-  tasks.forEach(t => (TYPES[t.type].traps?.(t) || []).slice(0, CONFIG.print.traps).forEach(x => {
-    if (!bank.has(x.key)) bank.set(x.key, { ...x, letter: decoys.shift() });
-  }));
-  return { num, version, label: version + '-' + num, tasks, answers, word, bank: shuffle(rnd, [...bank.values()]) };
-}
 
 // Бланк ответов в стиле ОГЭ, версия 1: ответ — целое число, конечная десятичная дробь или номер.
 // Задания свои (зерна 200+), поэтому один номер даёт разные листы для слова и для бланка.
@@ -983,72 +1009,7 @@ function ogeTask(kind, rnd) {
       ask: `Какое из чисел наибольшее? ${sqs.map((s, i) => `<span class="nw">${i + 1}) ${show(s)}</span>`).join('; ')}. В ответ запишите номер этого числа.` };
   }
 }
-function makeVariantOGE(num, version = GEN_VERSION) {
-  if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
-  const tasks = OGE_V1.map((kind, i) => ogeTask(kind, taskRnd(num, 200 + i)));
-  return { num, version, label: version + '-' + num, oge: true, tasks, answers: tasks.map(x => x.ans) };
-}
 
-// Ссылка «← Назад на сайт» на стартовом экране: материал открыт с сайта (/zapusk/<slug>/ или /materials/<slug>.html)
-// ведёт на страницу материала /item/<slug>/. Скачанный файл и ссылка для учеников её не показывают.
-function siteHref() {
-  if (STUDENT || location.protocol === 'file:') return '';
-  let top = location;
-  try { if (window.top !== window && window.top.location.origin === location.origin) top = window.top.location; } catch {}
-  const z = top.pathname.match(/^(.*\/)zapusk\/([a-z0-9-]+)\/?$/);
-  if (z) return `${top.origin}${z[1]}item/${z[2]}/`;
-  const m = location.pathname.match(/^(.*\/)materials\/([a-z0-9-]+)\.html$/);
-  return m ? `${location.origin}${m[1]}item/${m[2]}/` : '';
-}
-
-// ================= Экраны =================
-let screen = null;
-function show(name) {
-  if (STUDENT && name !== 'home') return;
-  boardStopPreview();
-  screen = name;
-  ['start', 'board', 'print', 'home'].forEach(s => { $(s).hidden = s !== name; });
-  $('help').hidden = true;
-  if (name === 'board') renderBoard();
-  if (name === 'print') renderPrint();
-  if (name === 'home') homeSetup();
-}
-function toggleTheme() {
-  const dark = document.documentElement.dataset.theme
-    ? document.documentElement.dataset.theme === 'dark'
-    : matchMedia('(prefers-color-scheme: dark)').matches;
-  document.documentElement.dataset.theme = dark ? 'light' : 'dark';
-  store.set('theme', document.documentElement.dataset.theme);
-}
-async function toggleFull() {
-  try {
-    if (document.fullscreenElement) await document.exitFullscreen();
-    else await document.documentElement.requestFullscreen();
-  } catch {}
-}
-
-// ================= 🖥 На доске =================
-// На экране — то, что видит класс: короткий вопрос, ответ, чертёж и запись в тетради.
-// Что сказать словами — в подсказке учителю (кнопка «💬 Учителю»).
-const BW = 980, BH = 400;
-const B = { e: null, steps: [], i: 0, phase: 0, timer: 0, notes: false };
-const svg = (inner, label) => `<svg viewBox="0 0 ${BW} ${BH}" role="img" aria-label="${label}" preserveAspectRatio="xMidYMid meet">${inner}</svg>`;
-const tx = (x, y, s, cls = 'lab', anchor = 'middle') => `<text class="${cls}" x="${x}" y="${y}" text-anchor="${anchor}">${s}</text>`;
-const sr = s => `√<tspan class="ov">${s}</tspan>`;   // корень в подписи чертежа
-const ds = x => decStr(x) || `${x.n}/${x.d}`;
-// клетчатый квадрат cols × rows клеток размера c; fill — заливка, every — жирная линия через every клеток
-function grid(x, y, cols, rows, c, fill = 'ge', every = 0) {
-  let s = `<rect class="${fill}" x="${x}" y="${y}" width="${cols * c}" height="${rows * c}"/>`;
-  for (let i = 1; i < cols; i++) s += `<line class="gl${every && i % every === 0 ? ' gk' : ''}" x1="${x + i * c}" x2="${x + i * c}" y1="${y}" y2="${y + rows * c}"/>`;
-  for (let j = 1; j < rows; j++) s += `<line class="gl${every && j % every === 0 ? ' gk' : ''}" x1="${x}" x2="${x + cols * c}" y1="${y + j * c}" y2="${y + j * c}"/>`;
-  return s + `<rect class="gf" x="${x}" y="${y}" width="${cols * c}" height="${rows * c}"/>`;
-}
-// скобка под отрезком и подпись
-const under = (x, y, w, s, cls = '') => `<path class="br ${cls}" d="M${x} ${y + 10}v12H${x + w}v-12"/>` + tx(x + w / 2, y + 62, s, 'lab' + (cls ? ' ' + cls : ''));
-function svgFrac(cx, cy, n, d, cls = '') {
-  const w = Math.max(String(n).length, String(d).length) * 10 + 10;
-  return `<g class="lbl ${cls}"><text x="${cx}" y="${cy - 8}" text-anchor="middle">${n}</text><line x1="${cx - w}" x2="${cx + w}" y1="${cy}" y2="${cy}"/><text x="${cx}" y="${cy + 31}" text-anchor="middle">${d}</text></g>`;
-}
 // квадрат k × k клеток слева, справа — строки подписей
 function squareScene(k, side, lines = [], opt = {}) {
   const c = Math.min(46, 300 / k), size = k * c, x = 120, y = (BH - size) / 2 - 24;
@@ -1072,19 +1033,6 @@ function parabola(lines) {
     if (c === 0) s += `<circle class="dot" cx="${PX(0)}" cy="${PY(0)}" r="11"/>`;
     s += '</g>';
   });
-  return s;
-}
-// числовая прямая от a до b (в десятых), подсветка [h, h + step]
-function numLine(y, a, b, step, labelEvery, hl, cls = '') {
-  const x0 = 90, x1 = 890, k = (x1 - x0) / (b - a);
-  let s = `<line class="axis" x1="${x0 - 20}" x2="${x1 + 20}" y1="${y}" y2="${y}"/>`;
-  const n = Math.round((b - a) / step);
-  for (let i = 0; i <= n; i++) {
-    const v = a + i * step, x = x0 + i * step * k;
-    s += `<line class="tick" x1="${x}" x2="${x}" y1="${y - 12}" y2="${y + 12}"/>`;
-    if (i % labelEvery === 0) s += tx(x, y + 48, String(Math.round(v * 1000) / 1000).replace('.', ','), 'lab s');
-  }
-  if (hl != null) s += `<line class="seg ${cls}" x1="${x0 + (hl - a) * k}" x2="${x0 + (hl + step - a) * k}" y1="${y}" y2="${y}"/>`;
   return s;
 }
 
@@ -1226,19 +1174,259 @@ function buildSteps(e) {
   return steps;
 }
 
-function boardNumbers(random) {
+// Пример для доски: random = false — числа из CONFIG.board, true — «Другие числа» (old — прошлый пример)
+function boardExample(random, old) {
   const C = CONFIG.board;
-  if (!random) B.e = { side: C.side, trap: C.trap, neg: C.neg, dec: C.dec, frac: C.frac, approx: C.approx, triple: C.triple };
-  else {
-    const rnd = mulberry32((Math.random() * 4294967296) >>> 0), old = B.e || {};
+  if (!random) return { side: C.side, trap: C.trap, neg: C.neg, dec: C.dec, frac: C.frac, approx: C.approx, triple: C.triple };
+  {
+    const rnd = mulberry32((Math.random() * 4294967296) >>> 0);
     const other = (lo, hi, prev) => { let v; do v = int(rnd, lo, hi); while (v === prev); return v; };
     const side = other(4, 9, old.side);
     let trap; do trap = int(rnd, 3, 6); while (trap === side);
     let approx; do approx = int(rnd, 2, 47); while (isqrt(approx) != null || approx === old.approx);
-    B.e = { side, trap, neg: pick(rnd, [4, 9]), dec: other(2, 9, old.dec),
+    return { side, trap, neg: pick(rnd, [4, 9]), dec: other(2, 9, old.dec),
       frac: pick(rnd, [[5, 3], [7, 4], [5, 2], [7, 3], [8, 3], [9, 4], [7, 2]]), approx,
       triple: pick(rnd, [[3, 4, 5], [6, 8, 10], [5, 12, 13]]) };
   }
+}
+// превью на сайте крутит шаги 1–10 (шаги с 0); картинка-превью — шаг 8 «площадь 2» с ответом
+const BOARD = { previewUntil: 9, poster: 7 };
+
+// Тексты листа раздатки: инструкция ученику и описание состава для учителя (под кнопками печати)
+const PRINT = {
+  instr: `Дробь в ответе — несократимая, у неправильной выдели целую часть. Ответ к уравнению: ±0,9; 0 или «нет корней».
+    В задании 7 запиши два числа, в задании 8 — знак &lt; или &gt;. Найди ответ в таблице букв и впиши букву — получится слово.
+    Нет ответа в таблице или слово не сложилось — ищи ошибку.`,
+  about: 'В каждом варианте 8 заданий: корень из десятичной дроби, из смешанного числа, значение выражения, квадрат корня, два уравнения x² = a, оценка корня целыми числами и сравнение. Верные ответы складываются в слово.',
+  ogeAbout: 'В бланке 8 заданий с кратким ответом, как в ОГЭ: корень из десятичной дроби и из смешанного числа, значение выражения, квадрат корня, два уравнения (в ответ — больший или меньший корень), оценка корня и выбор наибольшего числа. Ответ — число, оно вписывается в клеточки бланка.',
+};
+
+const CATS = {
+  sign:    ['Знак корня', 'Арифметический корень — неотрицательное число: √25 = 5, а не ±5 и не −5.'],
+  decimal: ['Запятая в корне из десятичной дроби', 'В квадрате десятичной дроби знаков после запятой вдвое больше: √0,09 = 0,3, потому что 0,3² = 0,09.'],
+  frac:    ['Корень из дроби', 'Смешанное число переведи в неправильную дробь, потом извлеки корень из числителя и из знаменателя.'],
+  meaning: ['Когда корень имеет смысл', 'Под знаком корня должно быть неотрицательное число. Сначала вычисли подкоренное выражение.'],
+  square:  ['Квадрат корня', '(√a)² = a по определению; в выражении (k√a)² в квадрат возводятся оба множителя.'],
+  sumRoot: ['Корень из суммы', '√(a + b) ≠ √a + √b: сначала вычисли выражение под корнем.'],
+  eqTwo:   ['Второй корень уравнения', 'При a > 0 у уравнения x² = a два корня: √a и −√a.'],
+  eqNone:  ['Уравнение без корней', 'Квадрат числа не бывает отрицательным: при a < 0 у x² = a корней нет.'],
+  eqCount: ['Число корней', 'x² = a: при a > 0 — два корня, при a = 0 — один, при a < 0 — ни одного.'],
+  eqShift: ['Перенос слагаемого', 'Число переносят в другую часть уравнения с противоположным знаком.'],
+  est:     ['Оценка корня', 'Найди соседние квадраты: 8² = 64 < 73 < 81 = 9², значит 8 < √73 < 9.'],
+  cmp:     ['Сравнение', 'Положительные числа сравнивай по квадратам: 7² = 49 < 50, значит 7 < √50.'],
+  calc:    ['Вычисления', 'Проверяй ответ возведением в квадрат.'],
+};
+
+// Формулы в справке (help.html): ядро вызывает helpInit() при запуске
+function helpInit() {
+  const ra = RT('<i>a</i>');
+  ['helpRa', 'helpRa2', 'helpRa3', 'helpRa4'].forEach(id => { $(id).innerHTML = ra; });
+  $('helpSq').innerHTML = `(${ra})² = <i>a</i>`;
+  $('helpEx1').innerHTML = `Например, ${RT(49)} = 7, потому что 7 ≥ 0 и 7² = 49. Число ${MINUS}7 тоже даёт 49 в квадрате, но ${RT(49)} ≠ ${MINUS}7.`;
+  $('helpEx2').innerHTML = `${RT('0,09')} = 0,3`;
+  $('helpEx3').innerHTML = `${RT(M({ w: 2, n: 7, d: 9 }), true)} = ${RT(F({ n: 25, d: 9 }), true)} = ${F({ n: 5, d: 3 })} = ${M({ w: 1, n: 2, d: 3 })}`;
+  $('helpEx4').innerHTML = RT(73);
+}
+
+// ---------- ядро: core/types.js ----------
+// число — ответ: same по умолчанию, ключ и ловушки по умолчанию
+for (const T of Object.values(TYPES)) {
+  if (T.input === 'num' || T.input === 'frac') {
+    T.same = T.same || ((t, v) => qeq(v, T.ans(t)));
+    T.key = T.key || (t => keyQ(T.ans(t)));
+    T.keyHTML = T.keyHTML || (t => htmlQ(T.ans(t)));
+  }
+  if (T.input === 'choice') T.same = T.same || ((t, v) => v === T.ans(t));
+}
+function generate(type, rnd, form, tries = 2000) {
+  for (let k = 0; k < tries; k++) {
+    const t = TYPES[type].gen(rnd, form);
+    if (!TYPES[type].bad?.(t)) return { type, ...t };
+  }
+  throw new Error('Генератор не нашёл задание: ' + type);
+}
+
+// ---------- ядро: core/print.js ----------
+// ================= Раздатка: вариант восстанавливается по номеру =================
+// Тема задаёт состав варианта (KINDS_V1), слова (WORDS_V1) и тексты листа (PRINT).
+// Бланк ОГЭ есть, если тема задала OGE_V1 и ogeTask(kind, rnd).
+const ABC = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ';
+const HAS_OGE = typeof OGE_V1 !== 'undefined';
+const lowerTitle = () => META.title[0].toLowerCase() + META.title.slice(1);
+function makeVariant(num, version = GEN_VERSION) {
+  if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
+  const tasks = [];
+  KINDS_V1.forEach(([type, forms], i) => {
+    const rnd = taskRnd(num, i);
+    let t, guard = 0;
+    do t = generate(type, rnd, Array.isArray(forms) ? pick(rnd, forms) : forms);
+    while (tasks.some(u => TYPES[u.type].key(u) === TYPES[type].key(t)) && ++guard < 200);
+    tasks.push(t);
+  });
+  const rnd = taskRnd(num, 99);
+  const word = pick(rnd, WORDS_V1);
+  const answers = tasks.map(t => TYPES[t.type].key(t));
+  const bank = new Map();   // ответ → { html, letter }
+  tasks.forEach((t, i) => bank.set(answers[i], { key: answers[i], html: TYPES[t.type].keyHTML(t), letter: word[i] }));
+  const decoys = shuffle(rnd, [...ABC].filter(ch => !word.includes(ch)));
+  tasks.forEach(t => (TYPES[t.type].traps?.(t) || []).slice(0, CONFIG.print.traps).forEach(x => {
+    if (!bank.has(x.key)) bank.set(x.key, { ...x, letter: decoys.shift() });
+  }));
+  return { num, version, label: version + '-' + num, tasks, answers, word, bank: shuffle(rnd, [...bank.values()]) };
+}
+
+// Бланк ОГЭ: задания свои (зерна 200+), поэтому один номер даёт разные листы для слова и для бланка
+function makeVariantOGE(num, version = GEN_VERSION) {
+  if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
+  const tasks = OGE_V1.map((kind, i) => ogeTask(kind, taskRnd(num, 200 + i)));
+  return { num, version, label: version + '-' + num, oge: true, tasks, answers: tasks.map(x => x.ans) };
+}
+
+// ================= 🖨 Раздатка =================
+let printNums = [];
+// вид листа из адреса (?mode=print&kind=oge) или с кнопки стартового экрана — важнее сохранённого
+let pendingKind = (HAS_OGE ? ['word', 'oge'] : ['word']).includes(P.get('kind')) ? P.get('kind') : null;
+function newNumbers(count) {
+  const set = new Set();
+  while (set.size < count) set.add(1000 + Math.floor(Math.random() * 9000));
+  return [...set];
+}
+function parseNums(text) {
+  const nums = [], bad = [];
+  for (const part of text.split(/[\s,;]+/).filter(Boolean)) {
+    const m = part.match(/^(?:(\d+)[-–])?(\d{4})$/);
+    if (!m || (m[1] && +m[1] !== GEN_VERSION)) bad.push(part);
+    else if (!nums.includes(+m[2])) nums.push(+m[2]);
+  }
+  return { nums, bad };
+}
+// как задание записано на листе: TYPES[type].sheet, по умолчанию «запись =»
+const sheetTask = t => TYPES[t.type].sheet ? TYPES[t.type].sheet(t) : `${TYPES[t.type].text(t)} =`;
+function sheetHTML(v) {
+  const bank = v.bank.map(x => `<div class="bk"><div>${x.html}</div><div>${x.letter}</div></div>`).join('');
+  const cols = v.tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  const empty = v.tasks.map(() => '<td></td>').join('');
+  return `<div class="sheet">
+    <div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">Вариант ${v.label}</span></div>
+    <h2>${META.title}</h2>
+    <p class="instr">${PRINT.instr}</p>
+    <ol class="tasks">${v.tasks.map((t, i) => `<li class="task"><span class="no">${i + 1})</span>${sheetTask(t)}<div class="cells"></div></li>`).join('')}</ol>
+    <p class="sub-h">Таблица букв</p><div class="bank">${bank}</div>
+    <table class="ans"><tr><th>Задание</th>${cols}</tr><tr class="tall"><th>Ответ</th>${empty}</tr><tr><th>Буква</th>${empty}</tr></table>
+    <div class="word">Слово: ______________________</div>
+  </div>`;
+}
+// бланк: строка «номер задания — клеточки», по символу в клеточку, как в бланке ответов ОГЭ
+const OGE_CELLS = 10;
+const cellsRow = (no, text = '') => `<div class="brow"><b>${no}</b>${[...text.padEnd(OGE_CELLS)].map(ch => `<i>${ch.trim()}</i>`).join('')}</div>`;
+function ogeSheetHTML(v) {
+  return `<div class="sheet oge">
+    <div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">Вариант ${v.label}</span></div>
+    <h2>${META.title} · бланк ответов</h2>
+    <p class="instr">Ответом к каждому заданию является число. Запиши его в бланк ответов справа от номера задания,
+    начиная с первой клеточки. Каждый символ — в отдельной клеточке, минус и запятая тоже.</p>
+    <ol class="tasks">${v.tasks.map((x, i) => `<li class="task"><span class="no">${i + 1}.</span>${x.ask}<div class="cells"></div><div class="otv">Ответ: ______________</div></li>`).join('')}</ol>
+    <div class="bhead"><p class="sub-h">Бланк ответов</p><div class="sample">Образец: ${cellsRow('', '−0,5')}</div></div>
+    <div class="blank">${v.tasks.map((_, i) => cellsRow(i + 1)).join('')}</div>
+  </div>`;
+}
+function ogeKeyHTML(vs) {
+  const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  return `<div class="page key"><h2>Ключ учителя · бланк ответов · ${lowerTitle()}</h2>
+    <table class="key"><tr><th>Вариант</th>${head}</tr>
+    ${vs.map(v => `<tr><td>${v.label}</td>${v.answers.map(a => `<td>${a}</td>`).join('')}</tr>`).join('')}
+    </table><p style="font-size:10pt">Ответ верен, если совпадает с ключом (запятая или точка — одинаково). Ключ всегда можно восстановить
+    по номеру варианта: режим «Раздатка», вид листа «Бланк ответов».</p></div>`;
+}
+function keyHTML(vs) {
+  const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  return `<div class="page key"><h2>Ключ учителя · ${lowerTitle()}</h2>
+    <table class="key"><tr><th>Вариант</th>${head}<th>Слово</th></tr>
+    ${vs.map(v => `<tr><td>${v.label}</td>${v.tasks.map(t => `<td>${TYPES[t.type].keyHTML(t)}</td>`).join('')}<td><b>${v.word}</b></td></tr>`).join('')}
+    </table><p style="font-size:10pt">Слово сложилось — все ответы верны. Ключ всегда можно восстановить по номеру варианта в режиме «Раздатка».</p></div>`;
+}
+// Номера и настройки запоминаются в браузере: напечатал листы, закрыл вкладку — ключ потом
+// печатается по тем же номерам. Без localStorage номера просто будут новыми.
+function renderPrint() {
+  if (!printNums.length) {
+    const saved = parseNums(store.get('printNums') || '').nums;
+    printNums = saved.length ? saved : newNumbers(CONFIG.print.variants);
+    $('pCount').value = printNums.length;
+    $('pSpace').checked = store.get('printSpace') ? store.get('printSpace') === '1' : CONFIG.print.space;
+    $('pTwo').checked = store.get('printTwo') === '1';
+    $('pKind').value = HAS_OGE && store.get('printKind') === 'oge' ? 'oge' : 'word';
+    if (saved.length) $('pMsg').textContent = 'Открыты номера, с которыми вы работали в прошлый раз. Для другого класса нажмите «Новые номера».';
+  }
+  if (pendingKind) { $('pKind').value = pendingKind; pendingKind = null; }
+  $('pNums').value = printNums.map(n => GEN_VERSION + '-' + n).join(', ');
+  drawSheets();
+}
+function drawSheets() {
+  const oge = HAS_OGE && $('pKind').value === 'oge';
+  document.querySelectorAll('[data-kind-set]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.kindSet === $('pKind').value)));
+  const vs = printNums.map(n => oge ? makeVariantOGE(n) : makeVariant(n));
+  const sheet = oge ? ogeSheetHTML : sheetHTML, key = oge ? ogeKeyHTML : keyHTML;
+  const space = $('pSpace').checked, two = $('pTwo').checked && !space;
+  store.set('printNums', printNums.join(','));
+  store.set('printSpace', space ? 1 : 0);
+  store.set('printTwo', $('pTwo').checked ? 1 : 0);
+  store.set('printKind', oge ? 'oge' : 'word');
+  $('pTwo').disabled = space;
+  $('pAbout').textContent = oge ? PRINT.ogeAbout : PRINT.about;
+  let html = '';
+  if (two) for (let i = 0; i < vs.length; i += 2)
+    html += `<div class="page half compact">${sheet(vs[i])}${vs[i + 1] ? sheet(vs[i + 1]) : ''}</div>`;
+  else html = vs.map(v => `<div class="page${space ? '' : ' compact'}">${sheet(v)}</div>`).join('');
+  $('pSheets').innerHTML = (vs.length ? key(vs) : '') + html;
+  return vs;
+}
+function printNow(what) {
+  document.body.classList.remove('print-key', 'print-sheets');
+  document.body.classList.add(what === 'key' ? 'print-key' : 'print-sheets');
+  try { window.print(); } catch {}
+}
+
+// ---------- ядро: core/board.js ----------
+// ================= 🖥 На доске =================
+// На экране — то, что видит класс: короткий вопрос, ответ, чертёж и запись в тетради.
+// Что сказать словами — в подсказке учителю (кнопка «💬 Учителю»).
+const BW = 980, BH = 400;
+const B = { e: null, steps: [], i: 0, phase: 0, timer: 0, notes: false };
+const svg = (inner, label) => `<svg viewBox="0 0 ${BW} ${BH}" role="img" aria-label="${label}" preserveAspectRatio="xMidYMid meet">${inner}</svg>`;
+const tx = (x, y, s, cls = 'lab', anchor = 'middle') => `<text class="${cls}" x="${x}" y="${y}" text-anchor="${anchor}">${s}</text>`;
+const sr = s => `√<tspan class="ov">${s}</tspan>`;   // корень в подписи чертежа
+const ds = x => decStr(x) || `${x.n}/${x.d}`;
+// клетчатый квадрат cols × rows клеток размера c; fill — заливка, every — жирная линия через every клеток
+function grid(x, y, cols, rows, c, fill = 'ge', every = 0) {
+  let s = `<rect class="${fill}" x="${x}" y="${y}" width="${cols * c}" height="${rows * c}"/>`;
+  for (let i = 1; i < cols; i++) s += `<line class="gl${every && i % every === 0 ? ' gk' : ''}" x1="${x + i * c}" x2="${x + i * c}" y1="${y}" y2="${y + rows * c}"/>`;
+  for (let j = 1; j < rows; j++) s += `<line class="gl${every && j % every === 0 ? ' gk' : ''}" x1="${x}" x2="${x + cols * c}" y1="${y + j * c}" y2="${y + j * c}"/>`;
+  return s + `<rect class="gf" x="${x}" y="${y}" width="${cols * c}" height="${rows * c}"/>`;
+}
+// скобка под отрезком и подпись
+const under = (x, y, w, s, cls = '') => `<path class="br ${cls}" d="M${x} ${y + 10}v12H${x + w}v-12"/>` + tx(x + w / 2, y + 62, s, 'lab' + (cls ? ' ' + cls : ''));
+function svgFrac(cx, cy, n, d, cls = '') {
+  const w = Math.max(String(n).length, String(d).length) * 10 + 10;
+  return `<g class="lbl ${cls}"><text x="${cx}" y="${cy - 8}" text-anchor="middle">${n}</text><line x1="${cx - w}" x2="${cx + w}" y1="${cy}" y2="${cy}"/><text x="${cx}" y="${cy + 31}" text-anchor="middle">${d}</text></g>`;
+}
+// числовая прямая от a до b (в десятых), подсветка [h, h + step]
+function numLine(y, a, b, step, labelEvery, hl, cls = '') {
+  const x0 = 90, x1 = 890, k = (x1 - x0) / (b - a);
+  let s = `<line class="axis" x1="${x0 - 20}" x2="${x1 + 20}" y1="${y}" y2="${y}"/>`;
+  const n = Math.round((b - a) / step);
+  for (let i = 0; i <= n; i++) {
+    const v = a + i * step, x = x0 + i * step * k;
+    s += `<line class="tick" x1="${x}" x2="${x}" y1="${y - 12}" y2="${y + 12}"/>`;
+    if (i % labelEvery === 0) s += tx(x, y + 48, String(Math.round(v * 1000) / 1000).replace('.', ',').replace('-', MINUS), 'lab s');
+  }
+  if (hl != null) s += `<line class="seg ${cls}" x1="${x0 + (hl - a) * k}" x2="${x0 + (hl + step - a) * k}" y1="${y}" y2="${y}"/>`;
+  return s;
+}
+
+// пример для показа: тема даёт boardExample(random, прошлый пример) и buildSteps(пример) → шаги
+// {q — вопрос классу, a — ответ, note — подсказка учителю, draw(phase) — SVG или '', rec(phase) — строки тетради}
+function boardNumbers(random) {
+  B.e = boardExample(random, B.e || {});
   B.steps = buildSteps(B.e);
   B.i = 0; B.phase = 0;
 }
@@ -1270,146 +1458,20 @@ function boardPrev() {
 }
 function boardGo(i, phase = 0) { B.i = Math.max(0, Math.min(i, B.steps.length - 1)); B.phase = phase ? 1 : 0; renderBoard(); }
 function boardNotes() { B.notes = !B.notes; store.set('notes', B.notes ? 1 : 0); renderBoard(); }
-// превью на сайте: доска сама идёт по шагам с чертежами
+// превью на сайте: доска сама идёт по шагам до BOARD.previewUntil и начинает сначала
 function boardStartPreview() {
   $('board').classList.add('preview');
   B.timer = setInterval(() => {
-    if (B.i >= 9 && B.phase === 1) boardGo(0, 0);
+    if (B.i >= BOARD.previewUntil && B.phase === 1) boardGo(0, 0);
     else boardNext();
   }, CONFIG.board.previewDelay);
 }
 function boardStopPreview() { clearInterval(B.timer); B.timer = 0; }
-function boardPoster() { boardStopPreview(); boardGo(7, 1); }
+// кадр для картинки-превью (npm run posters на сайте): шаг BOARD.poster с показанным ответом
+function boardPoster() { boardStopPreview(); boardGo(BOARD.poster, 1); }
 
-// ================= 🖨 Раздатка =================
-let printNums = [];
-// вид листа из адреса (?mode=print&kind=oge) или с кнопки стартового экрана — важнее сохранённого
-let pendingKind = ['word', 'oge'].includes(P.get('kind')) ? P.get('kind') : null;
-function newNumbers(count) {
-  const set = new Set();
-  while (set.size < count) set.add(1000 + Math.floor(Math.random() * 9000));
-  return [...set];
-}
-function parseNums(text) {
-  const nums = [], bad = [];
-  for (const part of text.split(/[\s,;]+/).filter(Boolean)) {
-    const m = part.match(/^(?:(\d+)[-–])?(\d{4})$/);
-    if (!m || (m[1] && +m[1] !== GEN_VERSION)) bad.push(part);
-    else if (!nums.includes(+m[2])) nums.push(+m[2]);
-  }
-  return { nums, bad };
-}
-function sheetTask(t) {
-  const T = TYPES[t.type];
-  if (t.type === 'eq') return `Реши уравнение ${T.text(t)}`;
-  if (t.type === 'est') return `Между какими соседними целыми числами лежит ${T.text(t)}?`;
-  if (t.type === 'cmp') return `Сравни: ${t.L.html} и ${t.R.html}`;
-  return `${T.text(t)} =`;
-}
-function sheetHTML(v) {
-  const bank = v.bank.map(x => `<div class="bk"><div>${x.html}</div><div>${x.letter}</div></div>`).join('');
-  const cols = v.tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
-  const empty = v.tasks.map(() => '<td></td>').join('');
-  return `<div class="sheet">
-    <div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">Вариант ${v.label}</span></div>
-    <h2>Арифметический квадратный корень</h2>
-    <p class="instr">Дробь в ответе — несократимая, у неправильной выдели целую часть. Ответ к уравнению: ±0,9; 0 или «нет корней».
-    В задании 7 запиши два числа, в задании 8 — знак &lt; или &gt;. Найди ответ в таблице букв и впиши букву — получится слово.
-    Нет ответа в таблице или слово не сложилось — ищи ошибку.</p>
-    <ol class="tasks">${v.tasks.map((t, i) => `<li class="task"><span class="no">${i + 1})</span>${sheetTask(t)}<div class="cells"></div></li>`).join('')}</ol>
-    <p class="sub-h">Таблица букв</p><div class="bank">${bank}</div>
-    <table class="ans"><tr><th>Задание</th>${cols}</tr><tr class="tall"><th>Ответ</th>${empty}</tr><tr><th>Буква</th>${empty}</tr></table>
-    <div class="word">Слово: ______________________</div>
-  </div>`;
-}
-// бланк: строка «номер задания — клеточки», по символу в клеточку, как в бланке ответов ОГЭ
-const OGE_CELLS = 10;
-const cellsRow = (no, text = '') => `<div class="brow"><b>${no}</b>${[...text.padEnd(OGE_CELLS)].map(ch => `<i>${ch.trim()}</i>`).join('')}</div>`;
-function ogeSheetHTML(v) {
-  return `<div class="sheet oge">
-    <div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">Вариант ${v.label}</span></div>
-    <h2>Арифметический квадратный корень · бланк ответов</h2>
-    <p class="instr">Ответом к каждому заданию является число. Запиши его в бланк ответов справа от номера задания,
-    начиная с первой клеточки. Каждый символ — в отдельной клеточке, минус и запятая тоже.</p>
-    <ol class="tasks">${v.tasks.map((x, i) => `<li class="task"><span class="no">${i + 1}.</span>${x.ask}<div class="cells"></div><div class="otv">Ответ: ______________</div></li>`).join('')}</ol>
-    <div class="bhead"><p class="sub-h">Бланк ответов</p><div class="sample">Образец: ${cellsRow('', '−0,5')}</div></div>
-    <div class="blank">${v.tasks.map((_, i) => cellsRow(i + 1)).join('')}</div>
-  </div>`;
-}
-function ogeKeyHTML(vs) {
-  const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
-  return `<div class="page key"><h2>Ключ учителя · бланк ответов · арифметический квадратный корень</h2>
-    <table class="key"><tr><th>Вариант</th>${head}</tr>
-    ${vs.map(v => `<tr><td>${v.label}</td>${v.answers.map(a => `<td>${a}</td>`).join('')}</tr>`).join('')}
-    </table><p style="font-size:10pt">Ответ верен, если совпадает с ключом (запятая или точка — одинаково). Ключ всегда можно восстановить
-    по номеру варианта: режим «Раздатка», вид листа «Бланк ответов».</p></div>`;
-}
-function keyHTML(vs) {
-  const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
-  return `<div class="page key"><h2>Ключ учителя · арифметический квадратный корень</h2>
-    <table class="key"><tr><th>Вариант</th>${head}<th>Слово</th></tr>
-    ${vs.map(v => `<tr><td>${v.label}</td>${v.tasks.map(t => `<td>${TYPES[t.type].keyHTML(t)}</td>`).join('')}<td><b>${v.word}</b></td></tr>`).join('')}
-    </table><p style="font-size:10pt">Слово сложилось — все ответы верны. Ключ всегда можно восстановить по номеру варианта в режиме «Раздатка».</p></div>`;
-}
-// Номера и настройки запоминаются в браузере: напечатал листы, закрыл вкладку — ключ потом
-// печатается по тем же номерам. Без localStorage номера просто будут новыми.
-function renderPrint() {
-  if (!printNums.length) {
-    const saved = parseNums(store.get('printNums') || '').nums;
-    printNums = saved.length ? saved : newNumbers(CONFIG.print.variants);
-    $('pCount').value = printNums.length;
-    $('pSpace').checked = store.get('printSpace') ? store.get('printSpace') === '1' : CONFIG.print.space;
-    $('pTwo').checked = store.get('printTwo') === '1';
-    $('pKind').value = store.get('printKind') === 'oge' ? 'oge' : 'word';
-    if (saved.length) $('pMsg').textContent = 'Открыты номера, с которыми вы работали в прошлый раз. Для другого класса нажмите «Новые номера».';
-  }
-  if (pendingKind) { $('pKind').value = pendingKind; pendingKind = null; }
-  $('pNums').value = printNums.map(n => GEN_VERSION + '-' + n).join(', ');
-  drawSheets();
-}
-function drawSheets() {
-  const oge = $('pKind').value === 'oge';
-  document.querySelectorAll('[data-kind-set]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.kindSet === $('pKind').value)));
-  const vs = printNums.map(n => oge ? makeVariantOGE(n) : makeVariant(n));
-  const sheet = oge ? ogeSheetHTML : sheetHTML, key = oge ? ogeKeyHTML : keyHTML;
-  const space = $('pSpace').checked, two = $('pTwo').checked && !space;
-  store.set('printNums', printNums.join(','));
-  store.set('printSpace', space ? 1 : 0);
-  store.set('printTwo', $('pTwo').checked ? 1 : 0);
-  store.set('printKind', oge ? 'oge' : 'word');
-  $('pTwo').disabled = space;
-  $('pAbout').textContent = oge
-    ? 'В бланке 8 заданий с кратким ответом, как в ОГЭ: корень из десятичной дроби и из смешанного числа, значение выражения, квадрат корня, два уравнения (в ответ — больший или меньший корень), оценка корня и выбор наибольшего числа. Ответ — число, оно вписывается в клеточки бланка.'
-    : 'В каждом варианте 8 заданий: корень из десятичной дроби, из смешанного числа, значение выражения, квадрат корня, два уравнения x² = a, оценка корня целыми числами и сравнение. Верные ответы складываются в слово.';
-  let html = '';
-  if (two) for (let i = 0; i < vs.length; i += 2)
-    html += `<div class="page half compact">${sheet(vs[i])}${vs[i + 1] ? sheet(vs[i + 1]) : ''}</div>`;
-  else html = vs.map(v => `<div class="page${space ? '' : ' compact'}">${sheet(v)}</div>`).join('');
-  $('pSheets').innerHTML = (vs.length ? key(vs) : '') + html;
-  return vs;
-}
-function printNow(what) {
-  document.body.classList.remove('print-key', 'print-sheets');
-  document.body.classList.add(what === 'key' ? 'print-key' : 'print-sheets');
-  try { window.print(); } catch {}
-}
 
-// ================= 🏠 Тренировка =================
-const CATS = {
-  sign:    ['Знак корня', 'Арифметический корень — неотрицательное число: √25 = 5, а не ±5 и не −5.'],
-  decimal: ['Запятая в корне из десятичной дроби', 'В квадрате десятичной дроби знаков после запятой вдвое больше: √0,09 = 0,3, потому что 0,3² = 0,09.'],
-  frac:    ['Корень из дроби', 'Смешанное число переведи в неправильную дробь, потом извлеки корень из числителя и из знаменателя.'],
-  meaning: ['Когда корень имеет смысл', 'Под знаком корня должно быть неотрицательное число. Сначала вычисли подкоренное выражение.'],
-  square:  ['Квадрат корня', '(√a)² = a по определению; в выражении (k√a)² в квадрат возводятся оба множителя.'],
-  sumRoot: ['Корень из суммы', '√(a + b) ≠ √a + √b: сначала вычисли выражение под корнем.'],
-  eqTwo:   ['Второй корень уравнения', 'При a > 0 у уравнения x² = a два корня: √a и −√a.'],
-  eqNone:  ['Уравнение без корней', 'Квадрат числа не бывает отрицательным: при a < 0 у x² = a корней нет.'],
-  eqCount: ['Число корней', 'x² = a: при a > 0 — два корня, при a = 0 — один, при a < 0 — ни одного.'],
-  eqShift: ['Перенос слагаемого', 'Число переносят в другую часть уравнения с противоположным знаком.'],
-  est:     ['Оценка корня', 'Найди соседние квадраты: 8² = 64 < 73 < 81 = 9², значит 8 < √73 < 9.'],
-  cmp:     ['Сравнение', 'Положительные числа сравнивай по квадратам: 7² = 49 < 50, значит 7 < √50.'],
-  calc:    ['Вычисления', 'Проверяй ответ возведением в квадрат.'],
-};
+// ---------- ядро: core/home.js ----------
 const H = { level: 0, rnd: null, n: 0, score: 0, streak: 0, clean: 0, cats: {}, task: null, hints: 0, hintLevel: 0,
   wait: false, taskDone: false, repeat: null, finished: false, gain: 0, eqCount: null, history: [] };
 
@@ -1512,31 +1574,58 @@ function homeEnd() {
 
 const inp = (k, label, cls = '', mode = 'decimal') => `<input data-k="${k}" class="${cls}" inputmode="${mode}" autocomplete="off" aria-label="${label}">`;
 const checkBtn = '<button type="button" class="main check" data-act="check">Проверить</button>';
-function askHTML(t) {
-  const T = TYPES[t.type];
-  if (t.type === 'meaning') return `Имеет ли смысл выражение ${T.text(t)}?`;
-  if (t.type === 'eq') return `Реши уравнение ${T.text(t)}`;
-  if (t.type === 'est') return `Между какими соседними целыми числами лежит ${T.text(t)}?`;
-  if (t.type === 'cmp') return `Сравни: ${T.text(t)}`;
-  return `${T.text(t)} = ?`;
-}
-function inputHTML(t) {
-  const T = TYPES[t.type];
-  if (T.input === 'num') return `<div class="inrow">${T.text(t)} = ${inp('v', 'ответ', 'wide')} ${checkBtn}</div>`;
-  if (T.input === 'frac') return `<div class="inrow">${T.text(t)} = ${inp('w', 'целая часть', '', 'numeric')} <span class="frac fin">${inp('n', 'числитель', '', 'numeric')}${inp('d', 'знаменатель', '', 'numeric')}</span> ${checkBtn}</div>` +
-    '<p class="hnote">Целую часть можно не писать — подойдёт и неправильная дробь.</p>';
-  if (T.input === 'choice') return `<div class="inrow">${T.options.map(([v, l]) => `<button type="button" class="choice" data-choice="${v}">${l}</button>`).join('')}</div>`;
-  if (T.input === 'est') return `<div class="inrow">${inp('lo', 'меньшее число', '', 'numeric')} &lt; ${T.text(t)} &lt; ${inp('hi', 'большее число', '', 'numeric')} ${checkBtn}</div>`;
-  // уравнение: сначала число корней, потом сами корни
-  const c = H.eqCount, b = (n, l) => `<button type="button" data-count="${n}" aria-pressed="${c === n}">${l}</button>`;
-  let html = `<div class="cnts">${b(0, 'Корней нет')}${b(1, 'Один корень')}${b(2, 'Два корня')}</div>`;
-  const sqrtBtn = '<button type="button" class="sqrtbtn" data-act="sqrt" title="Вставить знак корня" aria-label="Вставить знак корня">√</button>';
-  if (c === 0) html += `<div class="inrow">${checkBtn}</div>`;
-  if (c === 1) html += `<div class="inrow"><span class="nw">${X} =</span> ${inp('r1', 'корень', 'wide', 'text')} ${sqrtBtn} ${checkBtn}</div>`;
-  if (c === 2) html += `<div class="inrow"><span class="nw">${X}<sub>1</sub> =</span> ${inp('r1', 'первый корень', 'wide', 'text')} <span class="nw">${X}<sub>2</sub> =</span> ${inp('r2', 'второй корень', 'wide', 'text')} ${sqrtBtn} ${checkBtn}</div>`;
-  if (c) html += '<p class="hnote">Корень можно записать числом (−0,9; 2/3) или со знаком корня: √7, −√7.</p>';
-  return html;
-}
+// вопрос в тренажёре: TYPES[type].ask, по умолчанию «запись = ?»
+const askHTML = t => TYPES[t.type].ask ? TYPES[t.type].ask(t) : `${TYPES[t.type].text(t)} = ?`;
+// Виды ввода ответа. html(t) — поля, collect(get) — ответ для T.same/T.wrong или { empty, msg }.
+// Тема может добавить свой вид: const TOPIC_INPUTS = { имя: { html, collect } }.
+const readInt = s => { const v = String(s).replace(/\s+/g, ''); return /^\d+$/.test(v) ? +v : null; };
+const INPUTS = {
+  num: {   // число: целое, десятичная или обыкновенная дробь → {n, d}
+    html: t => `<div class="inrow">${TYPES[t.type].text(t)} = ${inp('v', 'ответ', 'wide')} ${checkBtn}</div>`,
+    collect: get => parseQ(get('v')) || { empty: true, msg: get('v').trim() ? 'Не понял число. Пиши, например, 0,3 или 12.' : 'Впиши ответ.' },
+  },
+  frac: {  // дробь этажом, целая часть необязательна → {n, d}
+    html: t => `<div class="inrow">${TYPES[t.type].text(t)} = ${inp('w', 'целая часть', '', 'numeric')} <span class="frac fin">${inp('n', 'числитель', '', 'numeric')}${inp('d', 'знаменатель', '', 'numeric')}</span> ${checkBtn}</div>` +
+      '<p class="hnote">Целую часть можно не писать — подойдёт и неправильная дробь.</p>',
+    collect: get => {
+      const w = get('w').trim() ? readInt(get('w')) : 0, n = readInt(get('n')), d = readInt(get('d'));
+      if (w == null || n == null || !d) return { empty: true, msg: 'Заполни числитель и знаменатель (целую часть — если есть).' };
+      return Q(w * d + n, d);
+    },
+  },
+  choice: {   // кнопки TYPES[type].options = [[значение, подпись]]; ответ — строка, проверка сразу по нажатию
+    html: t => `<div class="inrow">${TYPES[t.type].options.map(([v, l]) => `<button type="button" class="choice" data-choice="${v}">${l}</button>`).join('')}</div>`,
+    collect: () => null,
+  },
+  est: {   // два соседних целых: lo < запись < hi → {lo, hi}
+    html: t => `<div class="inrow">${inp('lo', 'меньшее число', '', 'numeric')} &lt; ${TYPES[t.type].text(t)} &lt; ${inp('hi', 'большее число', '', 'numeric')} ${checkBtn}</div>`,
+    collect: get => { const lo = readInt(get('lo')), hi = readInt(get('hi')); return lo == null || hi == null ? { empty: true, msg: 'Впиши оба числа.' } : { lo, hi }; },
+  },
+  eq: {   // корни уравнения: сначала число корней, потом сами корни (числа или √m) → {roots}
+    html: () => {
+      const c = H.eqCount, b = (n, l) => `<button type="button" data-count="${n}" aria-pressed="${c === n}">${l}</button>`;
+      let html = `<div class="cnts">${b(0, 'Корней нет')}${b(1, 'Один корень')}${b(2, 'Два корня')}</div>`;
+      const sqrtBtn = '<button type="button" class="sqrtbtn" data-act="sqrt" title="Вставить знак корня" aria-label="Вставить знак корня">√</button>';
+      if (c === 0) html += `<div class="inrow">${checkBtn}</div>`;
+      if (c === 1) html += `<div class="inrow"><span class="nw">${X} =</span> ${inp('r1', 'корень', 'wide', 'text')} ${sqrtBtn} ${checkBtn}</div>`;
+      if (c === 2) html += `<div class="inrow"><span class="nw">${X}<sub>1</sub> =</span> ${inp('r1', 'первый корень', 'wide', 'text')} <span class="nw">${X}<sub>2</sub> =</span> ${inp('r2', 'второй корень', 'wide', 'text')} ${sqrtBtn} ${checkBtn}</div>`;
+      if (c) html += '<p class="hnote">Корень можно записать числом (−0,9; 2/3) или со знаком корня: √7, −√7.</p>';
+      return html;
+    },
+    collect: get => {
+      if (H.eqCount == null) return { empty: true, msg: 'Сначала выбери, сколько корней у уравнения.' };
+      const roots = [];
+      for (let i = 1; i <= H.eqCount; i++) {
+        const s = get('r' + i), v = parseVal(s);
+        if (!v) return { empty: true, msg: s.trim() ? `Не понял корень «${esc(s)}». Пиши число (−0,9; 2/3) или корень (√7, −√7).` : 'Впиши корни.' };
+        roots.push(v);
+      }
+      return { roots };
+    },
+  },
+};
+const inputKind = t => (typeof TOPIC_INPUTS !== 'undefined' && TOPIC_INPUTS[TYPES[t.type].input]) || INPUTS[TYPES[t.type].input];
+const inputHTML = t => inputKind(t).html(t);
 function homeRender(fb) {
   const t = H.task, T = TYPES[t.type];
   const mult = Math.min(CONFIG.home.maxMultiplier, 1 + Math.floor(H.streak / 3));
@@ -1558,45 +1647,16 @@ function homeRender(fb) {
     if (first) first.focus(); else if (H.wait) $('hNext').focus();
   }
 }
-function answerHTML(t) {
-  const T = TYPES[t.type];
-  if (t.type === 'eq') return eqHTML(T.ans(t), T.style(t));
-  if (t.type === 'est') { const { lo, hi } = T.ans(t); return `${lo} &lt; ${T.text(t)} &lt; ${hi}`; }
-  if (t.type === 'cmp') return `${t.L.html} ${esc(T.ans(t))} ${t.R.html}`;
-  if (t.type === 'meaning') return T.ans(t) === 'yes' ? 'имеет смысл' : 'не имеет смысла';
-  return `${T.text(t)} = ${T.keyHTML(t)}`;
-}
-const readInt = s => { const v = String(s).replace(/\s+/g, ''); return /^\d+$/.test(v) ? +v : null; };
+// верный ответ после ошибки: TYPES[type].answer, по умолчанию «запись = ответ»
+const answerHTML = t => TYPES[t.type].answer ? TYPES[t.type].answer(t) : `${TYPES[t.type].text(t)} = ${TYPES[t.type].keyHTML(t)}`;
 function homeCollect() {
-  const t = H.task, kind = TYPES[t.type].input;
   const get = k => $('hStep').querySelector(`[data-k="${k}"]`)?.value ?? '';
-  if (kind === 'num') {
-    const v = parseQ(get('v'));
-    return v || { empty: true, msg: get('v').trim() ? 'Не понял число. Пиши, например, 0,3 или 12.' : 'Впиши ответ.' };
-  }
-  if (kind === 'frac') {
-    const w = get('w').trim() ? readInt(get('w')) : 0, n = readInt(get('n')), d = readInt(get('d'));
-    if (w == null || n == null || !d) return { empty: true, msg: 'Заполни числитель и знаменатель (целую часть — если есть).' };
-    return Q(w * d + n, d);
-  }
-  if (kind === 'est') {
-    const lo = readInt(get('lo')), hi = readInt(get('hi'));
-    return lo == null || hi == null ? { empty: true, msg: 'Впиши оба числа.' } : { lo, hi };
-  }
-  if (kind === 'eq') {
-    if (H.eqCount == null) return { empty: true, msg: 'Сначала выбери, сколько корней у уравнения.' };
-    const roots = [];
-    for (let i = 1; i <= H.eqCount; i++) {
-      const s = get('r' + i), v = parseVal(s);
-      if (!v) return { empty: true, msg: s.trim() ? `Не понял корень «${esc(s)}». Пиши число (−0,9; 2/3) или корень (√7, −√7).` : 'Впиши корни.' };
-      roots.push(v);
-    }
-    return { roots };
-  }
-  return null;
+  return inputKind(H.task).collect(get);
 }
 function homeCheckClick(x = homeCollect()) { const r = homeCheck(x); if (r && r.empty) homeRender(r); }
 
+
+// ---------- ядро: core/boot.js ----------
 // ================= Управление =================
 let lastInput = null;
 document.addEventListener('click', e => {
@@ -1672,13 +1732,7 @@ document.addEventListener('keydown', e => {
   B.notes = store.get('notes') === '1';
   const back = siteHref();
   if (back) { $('toSite').href = back; $('toSite').hidden = false; }
-  const ra = RT('<i>a</i>');
-  ['helpRa', 'helpRa2', 'helpRa3', 'helpRa4'].forEach(id => { $(id).innerHTML = ra; });
-  $('helpSq').innerHTML = `(${ra})² = <i>a</i>`;
-  $('helpEx1').innerHTML = `Например, ${RT(49)} = 7, потому что 7 ≥ 0 и 7² = 49. Число ${MINUS}7 тоже даёт 49 в квадрате, но ${RT(49)} ≠ ${MINUS}7.`;
-  $('helpEx2').innerHTML = `${RT('0,09')} = 0,3`;
-  $('helpEx3').innerHTML = `${RT(M({ w: 2, n: 7, d: 9 }), true)} = ${RT(F({ n: 25, d: 9 }), true)} = ${F({ n: 5, d: 3 })} = ${M({ w: 1, n: 2, d: 3 })}`;
-  $('helpEx4').innerHTML = RT(73);
+  if (typeof helpInit === 'function') helpInit();   // тема дорисовывает формулы в справке
   const lvl = +P.get('level');
   if (STUDENT) document.body.classList.add('student');
   if (PREVIEW) { show('board'); boardStartPreview(); }
@@ -1690,8 +1744,9 @@ document.addEventListener('keydown', e => {
 
 // Для автотестов и снимка превью
 window.APP = {
-  CONFIG, GEN_VERSION, TYPES, SECTIONS, KINDS_V1, WORDS_V1, OGE_V1,
-  Q, qeq, decStr, keyQ, parseQ, parseVal, eqRoots, generate, makeVariant, makeVariantOGE, taskRnd, mulberry32, parseNums,
+  SLUG, META, CONFIG, GEN_VERSION, TYPES, SECTIONS, KINDS_V1, WORDS_V1,
+  OGE_V1: HAS_OGE ? OGE_V1 : undefined, makeVariantOGE: HAS_OGE ? makeVariantOGE : undefined,
+  Q, qeq, decStr, keyQ, parseQ, parseVal, eqRoots, generate, makeVariant, taskRnd, mulberry32, parseNums,
   STUDENT, show, get screen() { return screen; },
   board: { get steps() { return B.steps; }, get i() { return B.i; }, get phase() { return B.phase; }, get e() { return B.e; },
     next: boardNext, prev: boardPrev, go: boardGo, numbers: random => { boardNumbers(random); renderBoard(); }, poster: boardPoster },
@@ -1699,6 +1754,7 @@ window.APP = {
   home: { state: H, start: homeStart, check: homeCheck, hint: homeHint, next: homeContinue, collect: homeCollect,
     setCount: n => { H.eqCount = n; homeRender(); } },
 };
+
 </script>
 </body>
 </html>

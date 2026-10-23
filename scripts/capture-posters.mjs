@@ -16,12 +16,11 @@ const PORT = 9334;
 const W = 1280, H = 800;
 // сколько дать материалу поработать перед снимком (мс), если показу нужно больше времени
 const WAIT = {};
-// что сделать в материале перед снимком, чтобы на картинке был виден ход урока, а не пустое поле
-const AFTER = {
-  'slozhenie-drobei': 'APP.board.poster()',   // шаг «сколько долей вместе»: обе полоски и сумма
-  'ugly-pri-parallelnyh-pryamyh': 'APP.board.poster()',   // секущая под 60°, все углы и пары подписаны
-  'arifmeticheskii-kvadratnyi-koren': 'APP.board.poster()',   // квадрат площадью 2 между квадратами 1 × 1 и 2 × 2
-};
+// что сделать в материале перед снимком, чтобы на картинке был виден ход урока, а не пустое поле.
+// По умолчанию — APP.board.poster(): кадр, который материал выбрал сам (в конструкторе — BOARD.poster).
+// Сюда вписывай только материалы, которым нужно что-то другое.
+const AFTER = {};
+const DEFAULT_AFTER = 'window.APP && APP.board && APP.board.poster && APP.board.poster()';
 
 const browsers = [
   process.env.CHROME,
@@ -84,7 +83,7 @@ try {
       await sleep(400);
       await run(`new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r))`);
       await run(`document.fonts.ready.then(() => new Promise(r => setTimeout(r, ${WAIT[slug] ?? 2200})))`);
-      if (AFTER[slug]) { await run(AFTER[slug]); await sleep(900); }
+      await run(AFTER[slug] ?? DEFAULT_AFTER); await sleep(900);
       const { data } = await cdp('Page.captureScreenshot', { format: 'png' });
       const file = join(OUT, `${slug}${scheme === 'dark' ? '-dark' : ''}.jpg`);
       await sharp(Buffer.from(data, 'base64')).resize(960, 600).jpeg({ quality: 78, mozjpeg: true }).toFile(file);
