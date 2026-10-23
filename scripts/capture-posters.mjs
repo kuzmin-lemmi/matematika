@@ -20,6 +20,7 @@ const WAIT = {};
 const AFTER = {
   'slozhenie-drobei': 'APP.board.poster()',   // шаг «сколько долей вместе»: обе полоски и сумма
   'ugly-pri-parallelnyh-pryamyh': 'APP.board.poster()',   // секущая под 60°, все углы и пары подписаны
+  'arifmeticheskii-kvadratnyi-koren': 'APP.board.poster()',   // квадрат площадью 2 между квадратами 1 × 1 и 2 × 2
 };
 
 const browsers = [
