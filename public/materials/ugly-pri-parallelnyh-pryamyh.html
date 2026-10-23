@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Углы при параллельных прямых — Матшаг</title>
+<meta name="description" content="Живой чертёж для доски: две прямые и секущая, накрест лежащие, соответственные и односторонние углы, свойства и признак параллельности. Геометрия, 7 класс.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%E2%88%A0%E2%96%B3%E2%88%A5%E2%8A%A5%CF%80%E2%89%A0%E2%88%9E%E2%96%A1%E2%87%92&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F3EB; --surface:#FFFDF8; --ink:#203B31; --soft:#5C7065; --line:#D8DFD2; --grid:rgba(37,100,73,.09);
+  --accent:#256449; --accent-ink:#FFFFFF;
+  /* пары углов: цвет и заливка разные — смысл не только в цвете (проектор искажает цвета) */
+  --k1:#256449; --k1-soft:#A8D5BA;        /* накрест лежащие — сплошная заливка */
+  --k2:#B94C2D; --k2-soft:#F6DDD3; --k2-mid:#E0937A;   /* соответственные — штриховка */
+  --k3:#2F6F8F; --k3-soft:#D3E6EE;        /* односторонние — точки */
+  --q:#7D847C; --q-soft:#E3E6DF;          /* пара без подсказки, какая она */
+  --hand:#B94C2D;
+  --font:'Golos Text','Noto Sans Math','Cambria Math','Segoe UI Symbol','Segoe UI',system-ui,-apple-system,sans-serif;
+  --r:14px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
+    --accent:#99D7B4; --accent-ink:#153725;
+    --k1:#99D7B4; --k1-soft:#3F7A5C; --k2:#FFAE8C; --k2-soft:#5B3326; --k2-mid:#C8735A; --k3:#8FCBE3; --k3-soft:#2D5A6B;
+    --q:#C9D2C8; --q-soft:#3E5047; --hand:#FFAE8C; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
+  --accent:#99D7B4; --accent-ink:#153725;
+  --k1:#99D7B4; --k1-soft:#3F7A5C; --k2:#FFAE8C; --k2-soft:#5B3326; --k2-mid:#C8735A; --k3:#8FCBE3; --k3-soft:#2D5A6B;
+  --q:#C9D2C8; --q-soft:#3E5047; --hand:#FFAE8C; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:400 18px/1.45 var(--font);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button{font:inherit;color:inherit;cursor:pointer;border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:.5em 1em;font-weight:600}
+button:hover{border-color:var(--accent)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+[hidden]{display:none !important}
+.screen{min-height:100vh;min-height:100dvh}
+.wrap{max-width:880px;margin:0 auto;padding:48px 16px}
+
+/* стартовый экран */
+.kicker{color:var(--soft);font-weight:600;margin:0 0 6px}
+h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px}
+.lead{font-size:20px;color:var(--soft);margin:0 0 32px}
+.modes{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.mode{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;padding:22px;border-radius:var(--r);min-height:150px}
+.mode b{font-size:26px}
+.mode span{font-weight:400;color:var(--soft)}
+.topright{position:fixed;top:calc(12px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));z-index:5}
+.tosite{position:fixed;top:calc(12px + env(safe-area-inset-top));left:calc(12px + env(safe-area-inset-left));z-index:5;
+  display:inline-flex;align-items:center;min-height:44px;padding:.35em .9em;border:2px solid var(--line);border-radius:12px;
+  background:var(--surface);color:var(--ink);font-weight:600;text-decoration:none}
+.tosite:hover{border-color:var(--accent)}
+.icon{padding:.35em .6em;min-width:44px;min-height:44px}
+
+/* доска: на экране — вопрос, короткий ответ, чертёж и запись в тетради; объяснение — в подсказке учителю */
+#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
+.bbar{display:flex;align-items:center;gap:8px;font-size:20px}
+.bbar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap;margin-right:6px}
+.bbar button{font-size:18px;min-height:44px;padding:.2em .7em;white-space:nowrap}
+@media (max-width:1150px){ .bbar .ttl{visibility:hidden} .bbar button .t{display:none} }
+.btext{padding:4px 0}
+.btext .q{font-size:clamp(30px,3vw,44px);font-weight:700;line-height:1.25}
+.btext .a{font-size:clamp(28px,2.7vw,40px);line-height:1.3;margin-top:.15em;color:var(--accent);font-weight:600}
+.btext .a ol{margin:.1em 0;padding-left:1.3em;color:var(--ink)}
+.btext .a.hide{visibility:hidden}
+.bstage{min-height:0;display:flex;align-items:center;justify-content:center}
+.bstage svg{width:100%;height:100%;max-height:100%;touch-action:none;user-select:none}
+.brec{border-top:2px dashed var(--line);padding:6px 0 2px;min-height:calc(2 * 1.6em + 26px);font-size:clamp(24px,2.3vw,34px);line-height:1.6}
+.brec .rt{display:block;font-size:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);line-height:1.2}
+.brec .ln{line-height:1.3;margin:2px 0}
+.bctl{display:flex;gap:12px;justify-content:center;padding-top:8px}
+.bctl button{font-size:26px;min-height:60px;padding:.25em 1em}
+.bctl .main{min-width:10em}
+.bnote{position:fixed;right:clamp(12px,3vw,40px);bottom:96px;max-width:min(520px,90vw);background:var(--surface);border:2px solid var(--accent);
+  border-radius:var(--r);padding:12px 16px;font-size:20px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:4}
+.bnote b{display:block;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+#board.preview .bctl,#board.preview .bbar button{visibility:hidden}
+#board.preview .bnote{display:none}
+.v{font-style:italic}
+
+/* чертёж */
+svg .ln-ab{stroke:var(--ink);stroke-width:5;stroke-linecap:round}
+svg .ln-c{stroke:var(--ink);stroke-width:4;stroke-linecap:round}
+svg .ln-b.tilted{stroke-dasharray:none}
+svg .lbl{font:italic 700 52px var(--font);fill:var(--ink)}
+svg .num{font:700 38px var(--font);fill:var(--soft);text-anchor:middle;dominant-baseline:central}
+svg .val{font:800 40px var(--font);fill:var(--ink);text-anchor:middle;dominant-baseline:central;paint-order:stroke;stroke:var(--bg);stroke-width:7px}
+svg .val.k1{fill:var(--k1)} svg .val.k2{fill:var(--k2)} svg .val.k3{fill:var(--k3)}
+svg .sec{stroke-width:4}
+svg .sec.k1{fill:var(--k1-soft);stroke:var(--k1)}
+svg .sec.k2{fill:url(#pk2);stroke:var(--k2)}
+svg .sec.k3{fill:url(#pk3);stroke:var(--k3)}
+svg .sec.q{fill:var(--q-soft);stroke:var(--q)}
+svg .mark{fill:none;stroke:var(--ink);stroke-width:3}
+svg .dot{fill:var(--ink)}
+svg .handle{fill:var(--hand);stroke:var(--surface);stroke-width:4;cursor:grab}
+svg .hint{font:600 28px var(--font);fill:var(--hand)}
+svg .par{font:700 40px var(--font);fill:var(--k1)}
+svg .gh-line{stroke:var(--hand);stroke-width:4;stroke-dasharray:14 9;stroke-linecap:round}
+svg .gh-sec{opacity:.9}
+svg .num.pop{animation:pop .45s ease-out both;transform-box:fill-box;transform-origin:center}
+@keyframes pop{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){ .mode:hover{transform:none} svg .num.pop{animation:none} }
+@media (max-width:600px){ .bbar{font-size:18px} .bctl button{font-size:18px;min-height:48px} }
+</style>
+</head>
+<body>
+
+<!-- стартовый экран -->
+<section id="start" class="screen" hidden>
+  <a class="tosite" id="toSite" target="_top" hidden>← Назад на сайт</a>
+  <div class="topright"><button class="icon" type="button" data-act="theme" aria-label="Сменить тему">◐</button></div>
+  <div class="wrap">
+    <p class="kicker">7 класс · Мерзляк и др. · Геометрия</p>
+    <h1>Углы при параллельных прямых</h1>
+    <p class="lead">Живой чертёж для доски: секущую поворачивают мышью или пальцем, углы пересчитываются.</p>
+    <div class="modes">
+      <button class="mode" type="button" data-go="board"><b>🖥 На доске</b><span>Накрест лежащие, соответственные и односторонние углы, свойства параллельных прямых и признак. Учитель ведёт по шагам.</span></button>
+      <button class="mode" type="button" disabled><b>🖨 Раздатка</b><span>Скоро: задачи на готовых чертежах, у каждого свой вариант.</span></button>
+      <button class="mode" type="button" disabled><b>🏠 Тренировка</b><span>Скоро: найти угол и выбрать обоснование, с разбором ошибок.</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- доска -->
+<section id="board" class="screen" hidden>
+  <div class="bbar">
+    <button class="icon" type="button" data-act="menu" title="Меню (Esc)" aria-label="Меню">☰</button>
+    <span class="ttl">Углы при параллельных прямых</span>
+    <span class="cnt" id="bCnt"></span>
+    <button type="button" data-act="restart" title="С первого шага" aria-label="Заново">↺<span class="t"> Заново</span></button>
+    <button type="button" data-act="numbers" title="Другой угол (на шаге «Назовите пару» — другая пара)" aria-label="Другой угол">🎲<span class="t"> Другой угол</span></button>
+    <button type="button" data-act="notes" id="bNotesBtn" aria-pressed="false" title="Что сказать на этом шаге. Подсказку видно и на проекторе — включайте, когда нужно" aria-label="Подсказка учителю">💬<span class="t"> Учителю</span></button>
+    <button class="icon" type="button" data-act="theme" title="Светлая или тёмная тема" aria-label="Сменить тему">◐</button>
+    <button class="icon" type="button" data-act="full" title="Во весь экран (F)" aria-label="Во весь экран">⛶</button>
+  </div>
+  <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
+  <div class="bstage" id="bStage"></div>
+  <div class="brec"><span class="rt">Запись в тетради</span><div id="bRec"></div></div>
+  <div class="bctl">
+    <button type="button" data-act="prev" title="Назад (←, PageUp)">← Назад</button>
+    <button type="button" class="main" data-act="next" id="bNext" title="Далее (→, Пробел, PageDown)">Показать ответ</button>
+  </div>
+  <div class="bnote" id="bNote" hidden></div>
+</section>
+
+<script>
+'use strict';
+// ================= Параметры: учитель может поменять их за минуту =================
+const CONFIG = {
+  theta: 65,              // ∠1 в начале показа, градусы
+  snap: 5,                // секущая и прямая b «прилипают» к углам, кратным 5°
+  thetaMin: 30,           // насколько можно наклонить секущую
+  thetaMax: 150,
+  tilt: -15,              // наклон прямой b в шаге «а если прямые не параллельны» (минус — правый конец ниже)
+  tiltMax: 30,
+  previewDelay: 70,       // превью на сайте: пауза между поворотами секущей на 1°, мс
+};
+
+const P = new URLSearchParams(location.search);
+const MODE = P.get('mode') === 'board' ? 'board' : null;
+const PREVIEW = P.get('preview') === '1';
+const $ = id => document.getElementById(id);
+const store = {
+  get(k) { try { return localStorage.getItem('matshag:ugly:' + k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem('matshag:ugly:' + k, String(v)); } catch {} },
+};
+
+// ================= Модель чертежа =================
+// Прямая a — горизонталь через A, секущая c — через A под углом θ, прямая b — через точку B на секущей
+// (B всегда на высоте yb) под углом φ к горизонтали (φ = 0 — a ∥ b). b наклоняется вокруг B — чертёж не «уезжает». Углы 1–4 — при A, 5–8 — при B, против часовой стрелки от правого верхнего:
+// 1 и 5 — справа сверху, 2 и 6 — слева сверху, 3 и 7 — слева снизу, 4 и 8 — справа снизу.
+// Тогда накрест лежащие — 3 и 5, 4 и 6; односторонние — 4 и 5, 3 и 6; соответственные — 1 и 5, 2 и 6, 3 и 7, 4 и 8.
+const M = { theta: CONFIG.theta, phi: 0 };
+const G = { W: 1000, H: 490, ya: 130, yb: 365, ax: 520 };
+const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
+const snap = v => Math.round(v / CONFIG.snap) * CONFIG.snap;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+function geom() {
+  const A = { x: G.ax, y: G.ya };
+  const ds = { x: Math.cos(rad(M.theta)), y: -Math.sin(rad(M.theta)) };   // секущая «вверх» в экранных координатах
+  const db = { x: Math.cos(rad(M.phi)), y: -Math.sin(rad(M.phi)) };
+  const t = (G.yb - A.y) / ds.y;                                           // секущая доходит до высоты yb
+  return { A, ds, db, B: { x: A.x + t * ds.x, y: G.yb } };
+}
+// величины углов 1–8 (индекс 0 — ∠1)
+function angles() {
+  const t = M.theta, d = M.theta - M.phi;
+  return [t, 180 - t, t, 180 - t, d, 180 - d, d, 180 - d];
+}
+// сектор угла k (1–8) в математических градусах: от s до e против часовой стрелки
+function sector(k) {
+  const base = k <= 4 ? 0 : M.phi, t = M.theta;
+  return [[base, t], [t, base + 180], [base + 180, t + 180], [t + 180, base + 360]][(k - 1) % 4];
+}
+const PAIRS = [
+  [3, 5, 'k1'], [4, 6, 'k1'],                              // накрест лежащие
+  [4, 5, 'k3'], [3, 6, 'k3'],                              // односторонние
+  [1, 5, 'k2'], [2, 6, 'k2'], [3, 7, 'k2'], [4, 8, 'k2'],  // соответственные
+];
+const KIND = { k1: 'накрест лежащие', k2: 'соответственные', k3: 'односторонние' };
+
+// ================= Рисунок =================
+const pt = (V, a, r) => ({ x: V.x + r * Math.cos(rad(a)), y: V.y - r * Math.sin(rad(a)) });
+const f1 = n => Math.round(n * 10) / 10;
+function arcPath(V, s, e, r, fill) {
+  const p1 = pt(V, s, r), p2 = pt(V, e, r);
+  const arc = `A${r} ${r} 0 ${e - s > 180 ? 1 : 0} 0 ${f1(p2.x)} ${f1(p2.y)}`;
+  return fill ? `M${f1(V.x)} ${f1(V.y)} L${f1(p1.x)} ${f1(p1.y)} ${arc} Z` : `M${f1(p1.x)} ${f1(p1.y)} ${arc}`;
+}
+// прямая через точку V с направлением d, обрезанная рамкой чертежа
+function clipLine(V, d, pad = 24) {
+  const ts = [];
+  if (Math.abs(d.x) > 1e-9) ts.push((pad - V.x) / d.x, (G.W - pad - V.x) / d.x);
+  if (Math.abs(d.y) > 1e-9) ts.push((pad - V.y) / d.y, (G.H - pad - V.y) / d.y);
+  const pos = ts.filter(t => t > 0), neg = ts.filter(t => t < 0);
+  const t1 = Math.min(...pos), t0 = Math.max(...neg);
+  return [{ x: V.x + t0 * d.x, y: V.y + t0 * d.y }, { x: V.x + t1 * d.x, y: V.y + t1 * d.y }];
+}
+const line = (p, q, cls) => `<line class="${cls}" x1="${f1(p.x)}" y1="${f1(p.y)}" x2="${f1(q.x)}" y2="${f1(q.y)}"/>`;
+
+// sc — что показать: nums, vals ('all' | [номера]), pairs [[i, j, kind]], marks (дужки равенства),
+// rotate (ручка секущей), tilt (ручка наклона b), par (подпись a ∥ b или «не параллельны»)
+function boardSVG(sc) {
+  const g = geom(), ang = angles();
+  const V = k => k <= 4 ? g.A : g.B;
+  let s = `<svg viewBox="0 0 ${G.W} ${G.H}" role="img" aria-label="Прямые a и b и секущая c" id="draw">` +
+    `<defs><pattern id="pk2" patternUnits="userSpaceOnUse" width="14" height="14" patternTransform="rotate(45)">` +
+    `<rect width="14" height="14" style="fill:var(--k2-soft)"/><line x1="3" y1="0" x2="3" y2="14" style="stroke:var(--k2-mid);stroke-width:6"/></pattern>` +
+    `<pattern id="pk3" patternUnits="userSpaceOnUse" width="12" height="12">` +
+    `<rect width="12" height="12" style="fill:var(--k3-soft)"/><circle cx="6" cy="6" r="2.4" style="fill:var(--k3)"/></pattern></defs>`;
+  // подсветка пар — под линиями
+  const lit = new Map();
+  (sc.pairs || []).forEach(([i, j, k]) => { lit.set(i, k); lit.set(j, k); });
+  lit.forEach((k, n) => { const [a, b] = sector(n); s += `<path class="sec ${k}" d="${arcPath(V(n), a, b, 80, true)}"/>`; });
+  // прямые
+  const [a0, a1] = clipLine(g.A, { x: 1, y: 0 }), [b0, b1] = clipLine(g.B, g.db);
+  let [c0, c1] = clipLine(g.A, g.ds);
+  // нижний конец секущей короче — под ним место для буквы c
+  const cut = q => q.y > G.H - 70 ? { x: g.A.x + (G.H - 70 - g.A.y) / g.ds.y * g.ds.x, y: G.H - 70 } : q;
+  c0 = cut(c0); c1 = cut(c1);
+  s += line(a0, a1, 'ln-ab') + line(b0, b1, 'ln-ab ln-b') + line(c0, c1, 'ln-c');
+  s += `<text class="lbl" x="${f1(a1.x - 30)}" y="${f1(a1.y - 16)}">a</text>`;
+  s += `<text class="lbl" x="${f1(b1.x - 30)}" y="${f1(b1.y - 16)}">b</text>`;
+  const botEnd = c0.y > c1.y ? c0 : c1;   // подпись секущей — под нижним концом: у верхнего стоит ручка
+  s += `<text class="lbl" x="${f1(botEnd.x - 14)}" y="${f1(botEnd.y + 46)}">c</text>`;
+  // дужки равенства: равные углы — одинаковое число дужек (только при a ∥ b)
+  if (sc.marks && M.phi === 0) for (let n = 1; n <= 8; n++) {
+    const [a, b] = sector(n), two = n % 2 === 0;
+    s += `<path class="mark" d="${arcPath(V(n), a, b, 24)}"/>` + (two ? `<path class="mark" d="${arcPath(V(n), a, b, 32)}"/>` : '');
+  }
+  s += `<circle class="dot" cx="${f1(g.A.x)}" cy="${f1(g.A.y)}" r="6"/><circle class="dot" cx="${f1(g.B.x)}" cy="${f1(g.B.y)}" r="6"/>`;
+  // номера и величины: по биссектрисе, дальше от вершины, если угол острый
+  for (let n = 1; n <= 8; n++) {
+    const [a, b] = sector(n), mid = (a + b) / 2, span = b - a;
+    const rn = clamp(32 / Math.sin(rad(span / 2)), 56, 120);
+    const showVal = sc.vals === 'all' || (Array.isArray(sc.vals) && sc.vals.includes(n));
+    if (sc.nums) {
+      const p = pt(V(n), mid, rn), pop = B.popUntil > performance.now();
+      s += `<text class="num${pop ? ' pop' : ''}" x="${f1(p.x)}" y="${f1(p.y)}"${pop ? ` style="animation-delay:${(n - 1) * 0.15}s"` : ''}>${n}</text>`;
+    }
+    if (showVal) {
+      const p = pt(V(n), mid, rn + 52), k = lit.get(n) || '';
+      s += `<text class="val ${k}" x="${f1(p.x)}" y="${f1(p.y)}">${fmtDeg(ang[n - 1])}</text>`;
+    }
+  }
+  // «a ∥ b» — в верхнем углу с той стороны, куда не уходит секущая; наклон b и так виден на чертеже
+  const pp = M.theta < 90 ? 'x="30" y="44"' : `x="${G.W - 30}" y="44" text-anchor="end"`;
+  if (sc.par === 'par' || (sc.par === 'auto' && M.phi === 0)) s += `<text class="par" ${pp}>a ∥ b</text>`;
+  if (B.ghost) s += ghostSVG(g, B.ghost);
+  // ручки: секущая — поворот вокруг A, прямая b — наклон вокруг B
+  if (sc.rotate) {
+    const h = pt(g.A, M.theta, Math.min(150, (g.A.y - 30) / Math.sin(rad(M.theta))));   // ручка не уходит за край
+    s += `<circle class="handle" data-drag="theta" cx="${f1(h.x)}" cy="${f1(h.y)}" r="22"><title>Поверните секущую</title></circle>`;
+  }
+  if (sc.tilt) {
+    const h = { x: g.B.x + 330 * g.db.x, y: g.B.y + 330 * g.db.y };
+    s += `<circle class="handle" data-drag="phi" cx="${f1(h.x)}" cy="${f1(h.y)}" r="22"><title>Наклоните прямую b</title></circle>`;
+    s += `<text class="hint" x="${f1(h.x - 50)}" y="${f1(h.y - 34)}">↕ наклон</text>`;
+  }
+  return s + '</svg>';
+}
+const fmtDeg = v => String(Math.round(v)) + '°';
+
+// ================= Движение на чертеже =================
+// Движение запускает кнопка учителя («Показать ответ», «Другой угол»); шаги сами не листаются.
+// prefers-reduced-motion или нет matchMedia (автотесты в jsdom) — сразу конечное состояние.
+const motionMQ = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+const calm = () => !motionMQ || motionMQ.matches;
+const ease = u => u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2;
+let anim = null;
+function tween(ms, frame, done, linear = false) {
+  stopAnim();
+  const end = () => { frame(1); done?.(); };
+  if (calm()) { end(); renderBoard(); return; }
+  const t0 = performance.now(), a = { finish: end };
+  const tick = now => {
+    const u = Math.min(1, (now - t0) / ms);
+    if (u < 1) { frame(linear ? u : ease(u)); renderBoard(); a.raf = requestAnimationFrame(tick); }
+    else { anim = null; end(); renderBoard(); }
+  };
+  anim = a; a.raf = requestAnimationFrame(tick);
+}
+// остановить движение: учитель листает дальше — конечное состояние применяется сразу
+function stopAnim() {
+  if (!anim) return;
+  const a = anim; anim = null;
+  cancelAnimationFrame(a.raf); a.finish();
+}
+// плавно провести секущую и прямую b через точки [{theta, phi}, …]
+function moveThrough(list, ms = 900) {
+  const pts = [{ theta: M.theta, phi: M.phi }];
+  list.forEach(q => pts.push({ ...pts[pts.length - 1], ...q }));
+  const n = pts.length - 1;
+  tween(ms * n, u => {
+    const k = Math.min(n - 1, Math.floor(u * n)), w = ease(u * n - k);
+    M.theta = pts[k].theta + (pts[k + 1].theta - pts[k].theta) * w;
+    M.phi = pts[k].phi + (pts[k + 1].phi - pts[k].phi) * w;
+  }, null, true);
+}
+const moveTo = (q, ms) => moveThrough([q], ms);
+// «призрак»: копия части чертежа, которая едет или поворачивается и ложится на другую часть
+function ghost(type, ms) {
+  B.ghost = { type, u: 0 };
+  tween(ms, u => { if (B.ghost) B.ghost.u = u; }, () => { B.ghost = null; });
+}
+function ghostSVG(g, gh) {
+  let s = '<g style="pointer-events:none">';
+  if (gh.type === 'slide') {
+    // прямая a с углами 1 и 3 едет вдоль секущей к прямой b: соответственные углы совпадают
+    const V = { x: g.A.x + (g.B.x - g.A.x) * gh.u, y: g.A.y + (g.B.y - g.A.y) * gh.u };
+    const [p, q] = clipLine(V, { x: 1, y: 0 });
+    for (const n of [1, 3]) { const [a, b] = sector(n); s += `<path class="sec k2 gh-sec" d="${arcPath(V, a, b, 80, true)}"/>`; }
+    s += line(p, q, 'gh-line');
+  } else {
+    // ∠3 поворачивается на 180° вокруг середины AB и ложится на ∠5: накрест лежащие равны
+    const r = 180 * gh.u, C = { x: (g.A.x + g.B.x) / 2, y: (g.A.y + g.B.y) / 2 };
+    const dx = g.A.x - C.x, dy = g.A.y - C.y, cr = Math.cos(rad(r)), sr = Math.sin(rad(r));
+    const V = { x: C.x + dx * cr + dy * sr, y: C.y - dx * sr + dy * cr };
+    const [a, b] = sector(3), [p, q] = clipLine(V, { x: Math.cos(rad(r)), y: -Math.sin(rad(r)) });
+    s += `<path class="sec k1 gh-sec" d="${arcPath(V, a + r, b + r, 80, true)}"/>` + line(p, q, 'gh-line');
+  }
+  return s + '</g>';
+}
+
+// ================= Шаги показа =================
+// q — вопрос классу, a — короткий ответ, note — что сказать (подсказка учителю), sc(ph) — что на чертеже,
+// rec(ph) — строки записи в тетради, enter — как поставить чертёж при входе в шаг
+const D = n => `∠${n}`;
+const B = { steps: [], i: 0, phase: 0, timer: 0, notes: false, quiz: 0 };
+const REC_PAIRS = [
+  '∠3 и ∠5, ∠4 и ∠6 — накрест лежащие',
+  '∠4 и ∠5, ∠3 и ∠6 — односторонние',
+  '∠1 и ∠5, ∠2 и ∠6, ∠3 и ∠7, ∠4 и ∠8 — соответственные',
+];
+const PROP = '<i>a</i> ∥ <i>b</i> ⇒ накрест лежащие равны, соответственные равны, сумма односторонних 180°';
+function buildSteps() {
+  const par = () => { if (M.phi !== 0) moveTo({ phi: 0 }, 700); };
+  const tiltIn = () => { if (M.phi === 0) moveTo({ phi: CONFIG.tilt }, 1000); };
+  return [
+    {
+      enter: par,
+      q: () => 'Прямые <i>a</i> и <i>b</i> пересекает прямая <i>c</i> — секущая. Сколько углов получилось?',
+      a: () => '8 углов. Пронумеруем их.',
+      note: () => 'Параллельность пока не обсуждаем: названия пар углов от неё не зависят. Секущую можно поворачивать за кружок.',
+      reveal: () => { B.popUntil = performance.now() + 1800; },
+      sc: ph => ({ nums: ph === 1, rotate: true }), rec: () => [],
+    },
+    {
+      enter: par,
+      q: () => `${D(3)} и ${D(5)} — <b>накрест лежащие</b>: между прямыми <i>a</i> и <i>b</i>, по разные стороны от секущей. Найдите ещё такую пару.`,
+      a: () => `${D(4)} и ${D(6)}`,
+      note: () => 'Подскажите: «между прямыми» — внутри полосы между a и b; «по разные стороны» — один угол слева от секущей, другой справа.',
+      sc: ph => ({ nums: true, rotate: true, pairs: ph ? [[3, 5, 'k1'], [4, 6, 'k1']] : [[3, 5, 'k1']] }),
+      rec: ph => ph ? [REC_PAIRS[0]] : [],
+    },
+    {
+      enter: par,
+      q: () => `${D(4)} и ${D(5)} — <b>односторонние</b>: между прямыми, по одну сторону от секущей. Найдите ещё пару.`,
+      a: () => `${D(3)} и ${D(6)}`,
+      note: () => 'Сравните с накрест лежащими: тоже между прямыми, но по одну сторону от секущей.',
+      sc: ph => ({ nums: true, rotate: true, pairs: ph ? [[4, 5, 'k3'], [3, 6, 'k3']] : [[4, 5, 'k3']] }),
+      rec: ph => ph ? [REC_PAIRS[0], REC_PAIRS[1]] : [REC_PAIRS[0]],
+    },
+    {
+      enter: par,
+      q: () => `${D(1)} и ${D(5)} — <b>соответственные</b>: занимают одинаковое место у прямой <i>a</i> и у прямой <i>b</i>. Найдите ещё три пары.`,
+      a: () => `${D(2)} и ${D(6)}, ${D(3)} и ${D(7)}, ${D(4)} и ${D(8)}`,
+      note: () => 'Подсказка для класса: если сдвинуть прямую a вдоль секущей до прямой b, соответственные углы совпадут.',
+      reveal: () => ghost('slide', 1800),
+      // две пары из четырёх: если подсветить все, круги сольются; остальные — в ответе и в записи
+      sc: ph => ({ nums: true, rotate: true, pairs: ph ? [[1, 5, 'k2'], [3, 7, 'k2']] : [[1, 5, 'k2']] }),
+      rec: ph => ph ? REC_PAIRS.slice(1) : [REC_PAIRS[1]],
+    },
+    {
+      enter: par,
+      q: () => { const [i, j] = PAIRS[B.quiz]; return `Как называются углы ${D(i)} и ${D(j)}?`; },
+      a: () => { const [i, j, k] = PAIRS[B.quiz]; return `${D(i)} и ${D(j)} — ${KIND[k]}`; },
+      note: () => 'Кнопка 🎲 — другая пара. Можно спрашивать с сигнальными карточками: Н — накрест лежащие, С — соответственные, О — односторонние.',
+      sc: ph => { const [i, j, k] = PAIRS[B.quiz]; return { nums: true, rotate: true, pairs: [[i, j, ph ? k : 'q']] }; },
+      rec: () => REC_PAIRS.slice(1),
+    },
+    {
+      enter: par,
+      q: () => `Прямые <i>a</i> и <i>b</i> параллельны, ${D(1)} = ${fmtDeg(M.theta)}. Какие углы равны ${D(1)}? Чему равны остальные?`,
+      a: () => `${D(1)} = ${D(3)} = ${D(5)} = ${D(7)} = ${fmtDeg(M.theta)}, остальные — 180° − ${fmtDeg(M.theta)} = ${fmtDeg(180 - M.theta)}`,
+      note: () => `${D(2)} смежный с ${D(1)}, поэтому ${D(2)} = 180° − ${D(1)}; ${D(3)} вертикальный с ${D(1)}. Равные углы отмечены одинаковым числом дужек.`,
+      sc: ph => ({ nums: true, rotate: true, par: 'par', vals: ph ? 'all' : [1], marks: ph === 1 }),
+      rec: ph => ph ? [`<i>a</i> ∥ <i>b</i>: ${D(1)} = ${D(3)} = ${D(5)} = ${D(7)} = ${fmtDeg(M.theta)}, ${D(2)} = ${D(4)} = ${D(6)} = ${D(8)} = ${fmtDeg(180 - M.theta)}`] : [],
+    },
+    {
+      enter: par,
+      q: () => 'Поверните секущую. Что меняется, а что остаётся?',
+      a: () => 'Углы меняются, но накрест лежащие и соответственные остаются равными, а сумма односторонних — 180°.',
+      note: () => 'Позовите ученика к доске повернуть секущую за кружок. С клавиатуры: + и − поворачивают на 5°.',
+      // секущая сама покачивается: числа бегут, а равенства и сумма 180° остаются
+      reveal: () => {
+        const t = M.theta;
+        moveThrough([{ theta: Math.max(CONFIG.thetaMin, t - 25) }, { theta: Math.min(CONFIG.thetaMax, t + 40) }, { theta: t }], 1300);
+      },
+      // пары без общего угла, иначе подсветка одной перекроет другую
+      sc: ph => ({ nums: true, rotate: true, par: 'par', vals: 'all', marks: true, pairs: ph ? [[3, 5, 'k1'], [2, 6, 'k2']] : [] }),
+      rec: ph => ph ? [`${D(3)} = ${D(5)}, ${D(2)} = ${D(6)}, ${D(4)} + ${D(5)} = ${fmtDeg(180 - M.theta)} + ${fmtDeg(M.theta)} = 180°`] : [],
+    },
+    {
+      enter: par,
+      q: () => 'Сформулируйте свойство углов при параллельных прямых и секущей.',
+      a: () => '<ol><li>Накрест лежащие углы равны.</li><li>Соответственные углы равны.</li><li>Сумма односторонних углов равна 180°.</li></ol>',
+      note: () => 'Это свойства параллельных прямых: дано, что a ∥ b, — делаем вывод об углах.',
+      reveal: () => ghost('turn', 2000),
+      sc: ph => ({ nums: true, rotate: true, par: 'par', vals: 'all', marks: true, pairs: ph ? [[3, 5, 'k1']] : [] }),
+      rec: ph => ph ? [PROP] : [],
+    },
+    {
+      enter: tiltIn,
+      q: () => 'А если прямые не параллельны? Останутся ли равными накрест лежащие углы?',
+      a: () => { const g = angles(); return `Нет: ${D(3)} = ${fmtDeg(g[2])}, а ${D(5)} = ${fmtDeg(g[4])}.`; },
+      note: () => 'Свойство работает только для параллельных прямых. Типичная ошибка — применять его, не проверив, что a ∥ b.',
+      sc: ph => ({ nums: true, rotate: true, tilt: true, par: 'auto', vals: ph ? 'all' : [], pairs: [[3, 5, 'k1']] }),
+      rec: ph => ph ? [PROP, `Если <i>a</i> и <i>b</i> не параллельны — равенств нет: ${D(3)} ≠ ${D(5)}`] : [PROP],
+    },
+    {
+      enter: tiltIn,
+      reveal: () => moveTo({ phi: 0 }, 1400),
+      q: () => `Наклоняйте прямую <i>b</i>, пока ${D(3)} не станет равен ${D(5)}. Что получится?`,
+      a: () => 'Прямые станут параллельными. Если накрест лежащие углы равны, то прямые параллельны.',
+      note: () => 'Это признак параллельности — обратное утверждение: дано равенство углов, вывод a ∥ b. Так же: соответственные равны или сумма односторонних 180° ⇒ a ∥ b. Не путайте признак и свойство.',
+      sc: ph => ({ nums: true, rotate: true, tilt: true, par: 'auto', vals: [3, 5], pairs: [[3, 5, 'k1']], marks: ph === 1 }),
+      rec: ph => ph ? [`Признак: ${D(3)} = ${D(5)} ⇒ <i>a</i> ∥ <i>b</i> (так же для соответственных; для односторонних — если сумма 180°)`] : [],
+    },
+    {
+      enter: par,
+      q: () => `Верно ли, что ${D(4)} = ${D(5)}?`,
+      a: () => `Нет: ${D(4)} и ${D(5)} — односторонние, ${D(4)} + ${D(5)} = 180°. Равны они только по 90°.`,
+      note: () => 'Типичная ошибка: считать односторонние углы равными. Можно повернуть секущую до 90° — тогда все восемь углов прямые.',
+      sc: ph => ({ nums: true, rotate: true, par: 'par', vals: ph ? [4, 5] : [], pairs: [[4, 5, 'k3']] }),
+      rec: ph => ph ? [`${D(4)} + ${D(5)} = ${fmtDeg(180 - M.theta)} + ${fmtDeg(M.theta)} = 180°`] : [],
+    },
+    {
+      enter: par,
+      q: () => `<i>a</i> ∥ <i>b</i>, ${D(1)} = ${fmtDeg(M.theta)}. Найдите ${D(6)}. Обоснуйте.`,
+      a: () => `${D(6)} = ${fmtDeg(180 - M.theta)}`,
+      note: () => 'Решений несколько: через соответственные ∠1 и ∠5 и смежный ∠6; или через вертикальный ∠3 и односторонние ∠3 и ∠6. Кнопка 🎲 — другой угол ∠1.',
+      sc: ph => ({ nums: true, rotate: true, par: 'par', vals: ph ? [1, 5, 6] : [1], pairs: ph ? [[1, 5, 'k2']] : [] }),
+      rec: ph => ph ? [`${D(5)} = ${D(1)} = ${fmtDeg(M.theta)} (соответственные), ${D(6)} = 180° − ${fmtDeg(M.theta)} = ${fmtDeg(180 - M.theta)} (смежный с ${D(5)})`] : [],
+    },
+  ];
+}
+
+function renderBoard() {
+  if (!B.steps.length) B.steps = buildSteps();
+  const st = B.steps[B.i];
+  $('bCnt').textContent = `Шаг ${B.i + 1} из ${B.steps.length}`;
+  $('bQ').innerHTML = st.q();
+  $('bA').innerHTML = st.a();
+  $('bA').classList.toggle('hide', B.phase === 0);
+  $('bStage').innerHTML = boardSVG(st.sc(B.phase));
+  $('bRec').innerHTML = st.rec(B.phase).map(l => `<div class="ln">${l}</div>`).join('');
+  $('bNote').innerHTML = `<b>Учителю</b>${st.note()}`;
+  $('bNote').hidden = !B.notes;
+  $('bNotesBtn').setAttribute('aria-pressed', String(B.notes));
+  $('bNext').textContent = B.phase === 0 ? 'Показать ответ' : 'Далее →';
+  $('bNext').disabled = B.i === B.steps.length - 1 && B.phase === 1;
+}
+function boardGo(i, phase = 0) {
+  stopAnim();
+  if (!B.steps.length) B.steps = buildSteps();
+  const was = B.i;
+  B.i = clamp(i, 0, B.steps.length - 1); B.phase = phase ? 1 : 0;
+  if (B.i !== was || !B.entered) { B.steps[B.i].enter?.(); B.entered = true; }
+  renderBoard();
+}
+function boardNext() {
+  if (B.phase === 0) { stopAnim(); B.phase = 1; renderBoard(); B.steps[B.i].reveal?.(); }
+  else if (B.i < B.steps.length - 1) boardGo(B.i + 1, 0);
+}
+function boardPrev() {
+  if (B.phase === 1) { stopAnim(); B.phase = 0; renderBoard(); }
+  else if (B.i > 0) boardGo(B.i - 1, 1);
+}
+// угол секущей: кратный 5°, в пределах и так, чтобы угол при B не вырождался (θ − φ от 20° до 160°)
+const fitTheta = v => clamp(clamp(snap(v), CONFIG.thetaMin, CONFIG.thetaMax), M.phi + 20, M.phi + 160);
+function setTheta(v) { M.theta = fitTheta(v); }
+function setPhi(v) { M.phi = clamp(snap(v), -CONFIG.tiltMax, CONFIG.tiltMax); if (M.theta - M.phi < 20 || M.theta - M.phi > 160) M.phi = M.theta - clamp(M.theta - M.phi, 20, 160); }
+// «Другой угол»: удобное значение ∠1 (не 90° — тогда все углы прямые), на шаге с вопросом — другая пара
+function boardShuffle() {
+  if (B.steps[B.i].q().startsWith('Как называются')) { B.quiz = (B.quiz + 1 + Math.floor(Math.random() * (PAIRS.length - 1))) % PAIRS.length; }
+  else {
+    let v;
+    do v = fitTheta(35 + Math.random() * 110); while (v === 90 || v === M.theta);
+    return moveTo({ theta: v }, 800);
+  }
+  renderBoard();
+}
+function boardNotes() { B.notes = !B.notes; store.set('notes', B.notes ? 1 : 0); renderBoard(); }
+
+// перетаскивание ручек: мышь, палец и перо интерактивной доски (Pointer Events)
+let drag = null;
+function svgPoint(e) {
+  const svg = $('draw');
+  const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse());
+  return { x: p.x, y: p.y };
+}
+$('bStage').addEventListener('pointerdown', e => {
+  const h = e.target.closest?.('[data-drag]');
+  if (!h) return;
+  stopAnim();
+  drag = h.dataset.drag;
+  $('bStage').setPointerCapture?.(e.pointerId);
+  e.preventDefault();
+});
+$('bStage').addEventListener('pointermove', e => {
+  if (!drag || !$('draw')) return;
+  const p = svgPoint(e), g = geom();
+  if (drag === 'theta') {
+    let a = deg(Math.atan2(g.A.y - p.y, p.x - g.A.x));
+    if (a < 0) a += 180;          // тянут ниже прямой a — берём противоположный луч секущей
+    setTheta(a);
+  } else {
+    setPhi(deg(Math.atan2(g.B.y - p.y, p.x - g.B.x)));
+  }
+  renderBoard();
+});
+const endDrag = () => { drag = null; };
+$('bStage').addEventListener('pointerup', endDrag);
+$('bStage').addEventListener('pointercancel', endDrag);
+
+// превью на сайте: секущая медленно поворачивается, углы пересчитываются
+function boardStartPreview() {
+  $('board').classList.add('preview');
+  boardGo(6, 0);
+  let dir = 1;
+  B.timer = setInterval(() => {
+    let t = M.theta + dir;
+    if (t > 130 || t < 45) { dir = -dir; t = M.theta + dir; }
+    M.theta = t;   // в превью без «прилипания» — движение плавное
+    renderBoard();
+  }, CONFIG.previewDelay);
+}
+function boardStopPreview() { clearInterval(B.timer); B.timer = 0; }
+function boardPoster() { boardStopPreview(); M.theta = 60; boardGo(6, 1); }
+
+// ================= Экраны и управление =================
+let screen = null;
+function show(name) {
+  boardStopPreview();
+  screen = name;
+  ['start', 'board'].forEach(s => { $(s).hidden = s !== name; });
+  if (name === 'board') boardGo(B.i, B.phase);
+}
+function toggleTheme() {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+  store.set('theme', root.dataset.theme);
+}
+async function toggleFull() {
+  try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen(); } catch {}
+}
+// «← Назад на сайт»: материал открыт с сайта (/zapusk/<slug>/ или /materials/<slug>.html)
+function siteHref() {
+  if (location.protocol === 'file:') return '';
+  let top = location;
+  try { if (window.top !== window && window.top.location.origin === location.origin) top = window.top.location; } catch {}
+  const z = top.pathname.match(/^(.*\/)zapusk\/([a-z0-9-]+)\/?$/);
+  if (z) return `${top.origin}${z[1]}item/${z[2]}/`;
+  const m = location.pathname.match(/^(.*\/)materials\/([a-z0-9-]+)\.html$/);
+  return m ? `${location.origin}${m[1]}item/${m[2]}/` : '';
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest?.('[data-go],[data-act]');
+  if (!el) return;
+  if (el.dataset.go) return show(el.dataset.go);
+  const act = el.dataset.act;
+  if (act === 'menu') { if (document.fullscreenElement) toggleFull(); show('start'); }
+  if (act === 'next') boardNext();
+  if (act === 'prev') boardPrev();
+  if (act === 'restart') { stopAnim(); M.theta = CONFIG.theta; boardGo(0, 0); }
+  if (act === 'numbers') boardShuffle();
+  if (act === 'notes') boardNotes();
+  if (act === 'theme') toggleTheme();
+  if (act === 'full') toggleFull();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { if (screen !== 'start') show('start'); return; }
+  if (screen !== 'board') return;
+  if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); boardNext(); }
+  else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); boardPrev(); }
+  else if ('fFаА'.includes(e.key)) toggleFull();
+  else if (e.key === '+' || e.key === '=') { stopAnim(); setTheta(M.theta + CONFIG.snap); renderBoard(); }
+  else if (e.key === '-' || e.key === '_') { stopAnim(); setTheta(M.theta - CONFIG.snap); renderBoard(); }
+});
+
+(() => {
+  const th = store.get('theme');
+  if (th === 'dark' || th === 'light') document.documentElement.dataset.theme = th;
+  B.notes = store.get('notes') === '1';
+  const back = siteHref();
+  if (back) { $('toSite').href = back; $('toSite').hidden = false; }
+  if (PREVIEW) { show('board'); boardStartPreview(); }
+  else show(MODE || 'start');
+})();
+
+// Для автотестов и снимка превью
+window.APP = {
+  CONFIG, M, PAIRS, KIND, geom, angles, sector, setTheta, setPhi,
+  show, get screen() { return screen; },
+  board: { get steps() { return B.steps; }, get i() { return B.i; }, get phase() { return B.phase; },
+    next: boardNext, prev: boardPrev, go: boardGo, shuffle: boardShuffle, poster: boardPoster,
+    get quiz() { return B.quiz; }, get ghost() { return B.ghost; }, get moving() { return !!anim; },
+    // кадр движения без анимации: для автотестов и снимков (u от 0 до 1)
+    ghostAt(type, u) { stopAnim(); B.ghost = u >= 1 ? null : { type, u }; renderBoard(); } },
+};
+</script>
+</body>
+</html>
