@@ -151,6 +151,64 @@ test('раздатка: листы и ключ собираются, номер�
   assert.deepEqual(errors, []);
 });
 
+// ответ задания бланка ОГЭ — независимо от кода материала
+function expectedOGE(x) {
+  if (['dec', 'expr', 'square'].includes(x.kind)) return expected(x.t).key;
+  if (x.kind === 'fraction') return dec(R(x.t.p, x.t.q));
+  if (x.kind === 'eq' || x.kind === 'eqShift') { const s = sqrtR(x.t.a); return dec(x.big ? s : R(-s.n, s.d)); }
+  if (x.kind === 'est') return String(expected(x.t).value.lo);
+  if (x.kind === 'max') return String(x.t.sqs.indexOf(Math.max(...x.t.sqs)) + 1);
+  throw new Error('Нет решения для ' + x.kind);
+}
+
+test('бланк ОГЭ: 30 вариантов различны, ответы — числа для клеточек, ключ верный', t => {
+  const { APP } = open(t, '?mode=print').window;
+  const seen = new Set(), bigs = new Set();
+  for (let i = 0; i < 30; i++) {
+    const n = 1000 + i * 293, v = APP.makeVariantOGE(n);
+    assert.equal(JSON.stringify(v), JSON.stringify(APP.makeVariantOGE(n)), 'один номер — один вариант');
+    const sig = JSON.stringify(v.answers) + JSON.stringify(v.tasks.map(x => x.t));
+    assert.ok(!seen.has(sig), 'варианты различны'); seen.add(sig);
+    assert.equal(v.label, `1-${n}`);
+    assert.deepEqual([...v.tasks.map(x => x.kind)], ['dec', 'fraction', 'expr', 'square', 'eq', 'eqShift', 'est', 'max']);
+    const word = APP.makeVariant(n).tasks;
+    assert.ok([0, 1, 2, 3].some(k => JSON.stringify(v.tasks[k].t) !== JSON.stringify(word[k])), 'бланк и кодовое слово — разные задания');
+    assert.deepEqual([...v.answers], [...v.tasks].map(expectedOGE), 'ключ совпадает с независимым решением');
+    for (const a of v.answers) {
+      assert.match(a, /^−?\d+(,\d+)?$/, `ответ «${a}» — целое число или десятичная дробь`);
+      assert.ok(a.length <= 10, `ответ «${a}» помещается в 10 клеточек`);
+    }
+    assert.ok(v.tasks[1].t.mixed, 'задание 2 — корень из смешанного числа');
+    const mx = v.tasks[7].t.sqs;
+    assert.equal(new Set(mx).size, 4, 'в задании 8 четыре разных числа');
+    assert.equal(sqrtInt(Math.max(...mx)), null, 'наибольшее — корень, а не целое число');
+    for (const x of v.tasks) { assert.doesNotMatch(x.ask, /undefined|NaN/); if ('big' in x) bigs.add(x.big); }
+  }
+  assert.deepEqual([...bigs].sort(), [false, true], 'встречается и «больший», и «меньший» корень');
+});
+
+test('бланк ОГЭ: листы с клеточками и ключ собираются, вид листа запоминается', t => {
+  const { window: w, errors } = open(t, '?mode=print');
+  const doc = w.document;
+  doc.getElementById('pKind').value = 'oge';
+  w.APP.print.nums = [4817, 1234];
+  const vs = w.APP.print.draw();
+  assert.ok(vs.every(v => v.oge));
+  const sheet = doc.querySelector('.page:not(.key) .sheet.oge');
+  assert.ok(sheet, 'лист бланка');
+  assert.equal(sheet.querySelectorAll('.blank .brow').length, 8, 'в бланке 8 строк');
+  assert.equal(sheet.querySelectorAll('.blank .brow')[0].querySelectorAll('i').length, 10, 'по 10 клеточек');
+  assert.equal(doc.querySelectorAll('table.key tr').length, 3, 'ключ — строка на вариант');
+  assert.match(doc.querySelector('.page.key').textContent, /бланк ответов/);
+  assert.doesNotMatch(doc.getElementById('pSheets').innerHTML, /undefined|NaN/);
+  assert.equal(w.localStorage.getItem(`matshag:${SLUG}:printKind`), 'oge');
+  // два бланка на листе
+  doc.getElementById('pSpace').checked = false; doc.getElementById('pTwo').checked = true;
+  w.APP.print.draw();
+  assert.equal(doc.querySelectorAll('.page.half .sheet.oge').length, 2);
+  assert.deepEqual(errors, []);
+});
+
 test('доска: все шаги вперёд и назад без ошибок, на разных числах', t => {
   const { window: w, errors } = open(t, '?mode=board');
   const B = w.APP.board;
