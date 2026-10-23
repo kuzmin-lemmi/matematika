@@ -19,6 +19,7 @@ const WAIT = {};
 // что сделать в материале перед снимком, чтобы на картинке был виден ход урока, а не пустое поле
 const AFTER = {
   'slozhenie-drobei': 'APP.board.poster()',   // шаг «сколько долей вместе»: обе полоски и сумма
+  'ugly-pri-parallelnyh-pryamyh': 'APP.board.poster()',   // секущая под 60°, все углы и пары подписаны
 };
 
 const browsers = [
