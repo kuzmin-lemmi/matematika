@@ -166,6 +166,23 @@ svg .new{animation:fade .6s ease-out both}
 .half table.ans td,.half table.ans th{padding:.4mm 1mm}
 .half table.ans .tall td{height:7mm}
 .half .word{font-size:10pt}
+/* бланк ответов в стиле ОГЭ */
+.panel select{padding:.3em .5em;border:2px solid var(--line);border-radius:10px;background:var(--bg);font:inherit}
+.oge .task{font-size:12pt;line-height:1.35}
+.oge .cells{height:15mm}
+.oge .otv{font-size:11pt;margin-top:1mm}
+.oge .bhead{display:flex;align-items:center;justify-content:space-between;gap:4mm;margin-top:1mm}
+.oge .sample{display:flex;align-items:center;gap:2mm;font-size:10pt}
+.oge .sample .brow b{display:none}
+.blank{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm 8mm}
+.brow{display:flex;align-items:center}
+.brow b{width:7mm;font-size:12pt}
+.brow i{width:6.5mm;height:8mm;border:1px solid #000;margin-left:-1px;display:inline-flex;align-items:center;justify-content:center;
+  font-style:normal;font-size:12pt}
+.half .oge .task{font-size:11pt;line-height:1.25}
+.half .oge .otv{display:none}
+.half .blank{gap:1.2mm 8mm}
+.half .brow i{height:6.5mm}
 .sheet{display:flex;flex-direction:column;gap:3mm}
 .shead{display:grid;grid-template-columns:1fr 22mm 28mm auto;gap:4mm;font-size:11pt;align-items:end}
 .shead span{border-bottom:1px solid #000;padding-bottom:1mm;white-space:nowrap}
@@ -319,6 +336,14 @@ body.student [data-act="menu"],body.student #hLinks{display:none !important}
         <label><input type="checkbox" id="pSpace"> место для решения (сетка)</label>
         <label><input type="checkbox" id="pTwo"> два варианта на листе</label>
       </div>
+      <div class="row">
+        <label>Вид листа
+          <select id="pKind">
+            <option value="word">Кодовое слово (самопроверка)</option>
+            <option value="oge">Бланк ответов, как в ОГЭ</option>
+          </select>
+        </label>
+      </div>
       <label style="display:grid;gap:4px">Номера вариантов (можно вписать свои — ключ восстановится по номеру)
         <input type="text" id="pNums" autocomplete="off" spellcheck="false">
       </label>
@@ -327,7 +352,7 @@ body.student [data-act="menu"],body.student #hLinks{display:none !important}
         <button type="button" class="main" id="pPrint">🖨 Печать листов</button>
         <button type="button" id="pPrintKey">🔑 Печать ключа</button>
       </div>
-      <p class="note">В каждом варианте 8 заданий: корень из десятичной дроби, из смешанного числа, значение выражения, квадрат корня, два уравнения x² = a, оценка корня целыми числами и сравнение. Печать — A4, поля браузера — «по умолчанию» или «нет».</p>
+      <p class="note"><span id="pAbout"></span> Печать — A4, поля браузера — «по умолчанию» или «нет».</p>
     </div>
     <div class="sheets" id="pSheets"></div>
   </div>
@@ -914,6 +939,45 @@ function makeVariant(num, version = GEN_VERSION) {
   return { num, version, label: version + '-' + num, tasks, answers, word, bank: shuffle(rnd, [...bank.values()]) };
 }
 
+// Бланк ответов в стиле ОГЭ, версия 1: ответ — целое число, конечная десятичная дробь или номер.
+// Задания свои (зерна 200+), поэтому один номер даёт разные листы для слова и для бланка.
+const OGE_V1 = ['dec', 'fraction', 'expr', 'square', 'eq', 'eqShift', 'est', 'max'];
+function ogeTask(kind, rnd) {
+  const value = s => `Найдите значение выражения <span class="nw">${s}.</span>`;
+  if (kind === 'dec' || kind === 'expr' || kind === 'square') {
+    const t = generate(kind, rnd);
+    return { kind, t, ask: value(TYPES[kind].text(t)), ans: TYPES[kind].key(t) };
+  }
+  if (kind === 'fraction') {   // корень — конечная десятичная дробь: знаменатель 2, 4 или 5
+    let t; do t = generate('fraction', rnd, 'mixed'); while (![2, 4, 5].includes(t.q));
+    return { kind, t, ask: value(TYPES.fraction.text(t)), ans: decStr(Q(t.p, t.q)) };
+  }
+  if (kind === 'eq' || kind === 'eqShift') {
+    let t; do t = generate('eq', rnd, kind === 'eq' ? pick(rnd, ['sq', 'dec']) : 'shift'); while (t.a.n <= 0);
+    const big = rnd() < 0.5, r = qsqrt(t.a);
+    return { kind, t, big, ans: keyQ(big ? r : qneg(r)),
+      ask: `Решите уравнение ${TYPES.eq.text(t)}. Если уравнение имеет более одного корня, в ответ запишите ${big ? 'больший' : 'меньший'} из корней.` };
+  }
+  if (kind === 'est') {
+    const t = generate('est', rnd);
+    return { kind, t, ans: String(floorSqrt(t.a)), ask: `Между какими двумя соседними целыми числами заключено число ${RT(t.a)}? В ответ запишите меньшее из этих чисел.` };
+  }
+  // какое из чисел наибольшее: среди чисел есть целое k, но больше него — корень из k² + d
+  for (;;) {
+    const k = int(rnd, 4, 12);
+    const sqs = shuffle(rnd, [k * k, k * k + int(rnd, 1, 2 * k), k * k - int(rnd, 1, 2 * k - 2), (k - 1) ** 2 + int(rnd, 1, 2 * k - 2)]);
+    if (new Set(sqs).size < 4) continue;
+    const show = s => isqrt(s) != null ? String(isqrt(s)) : RT(s);
+    return { kind, t: { sqs }, ans: String(sqs.indexOf(Math.max(...sqs)) + 1),
+      ask: `Какое из чисел наибольшее? ${sqs.map((s, i) => `<span class="nw">${i + 1}) ${show(s)}</span>`).join('; ')}. В ответ запишите номер этого числа.` };
+  }
+}
+function makeVariantOGE(num, version = GEN_VERSION) {
+  if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
+  const tasks = OGE_V1.map((kind, i) => ogeTask(kind, taskRnd(num, 200 + i)));
+  return { num, version, label: version + '-' + num, oge: true, tasks, answers: tasks.map(x => x.ans) };
+}
+
 // Ссылка «← Назад на сайт» на стартовом экране: материал открыт с сайта (/zapusk/<slug>/ или /materials/<slug>.html)
 // ведёт на страницу материала /item/<slug>/. Скачанный файл и ссылка для учеников её не показывают.
 function siteHref() {
@@ -1245,6 +1309,28 @@ function sheetHTML(v) {
     <div class="word">Слово: ______________________</div>
   </div>`;
 }
+// бланк: строка «номер задания — клеточки», по символу в клеточку, как в бланке ответов ОГЭ
+const OGE_CELLS = 10;
+const cellsRow = (no, text = '') => `<div class="brow"><b>${no}</b>${[...text.padEnd(OGE_CELLS)].map(ch => `<i>${ch.trim()}</i>`).join('')}</div>`;
+function ogeSheetHTML(v) {
+  return `<div class="sheet oge">
+    <div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">Вариант ${v.label}</span></div>
+    <h2>Арифметический квадратный корень · бланк ответов</h2>
+    <p class="instr">Ответом к каждому заданию является число. Запиши его в бланк ответов справа от номера задания,
+    начиная с первой клеточки. Каждый символ — в отдельной клеточке, минус и запятая тоже.</p>
+    <ol class="tasks">${v.tasks.map((x, i) => `<li class="task"><span class="no">${i + 1}.</span>${x.ask}<div class="cells"></div><div class="otv">Ответ: ______________</div></li>`).join('')}</ol>
+    <div class="bhead"><p class="sub-h">Бланк ответов</p><div class="sample">Образец: ${cellsRow('', '−0,5')}</div></div>
+    <div class="blank">${v.tasks.map((_, i) => cellsRow(i + 1)).join('')}</div>
+  </div>`;
+}
+function ogeKeyHTML(vs) {
+  const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  return `<div class="page key"><h2>Ключ учителя · бланк ответов · арифметический квадратный корень</h2>
+    <table class="key"><tr><th>Вариант</th>${head}</tr>
+    ${vs.map(v => `<tr><td>${v.label}</td>${v.answers.map(a => `<td>${a}</td>`).join('')}</tr>`).join('')}
+    </table><p style="font-size:10pt">Ответ верен, если совпадает с ключом (запятая или точка — одинаково). Ключ всегда можно восстановить
+    по номеру варианта: режим «Раздатка», вид листа «Бланк ответов».</p></div>`;
+}
 function keyHTML(vs) {
   const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
   return `<div class="page key"><h2>Ключ учителя · арифметический квадратный корень</h2>
@@ -1261,23 +1347,30 @@ function renderPrint() {
     $('pCount').value = printNums.length;
     $('pSpace').checked = store.get('printSpace') ? store.get('printSpace') === '1' : CONFIG.print.space;
     $('pTwo').checked = store.get('printTwo') === '1';
+    $('pKind').value = store.get('printKind') === 'oge' ? 'oge' : 'word';
     if (saved.length) $('pMsg').textContent = 'Открыты номера, с которыми вы работали в прошлый раз. Для другого класса нажмите «Новые номера».';
   }
   $('pNums').value = printNums.map(n => GEN_VERSION + '-' + n).join(', ');
   drawSheets();
 }
 function drawSheets() {
-  const vs = printNums.map(n => makeVariant(n));
+  const oge = $('pKind').value === 'oge';
+  const vs = printNums.map(n => oge ? makeVariantOGE(n) : makeVariant(n));
+  const sheet = oge ? ogeSheetHTML : sheetHTML, key = oge ? ogeKeyHTML : keyHTML;
   const space = $('pSpace').checked, two = $('pTwo').checked && !space;
   store.set('printNums', printNums.join(','));
   store.set('printSpace', space ? 1 : 0);
   store.set('printTwo', $('pTwo').checked ? 1 : 0);
+  store.set('printKind', oge ? 'oge' : 'word');
   $('pTwo').disabled = space;
+  $('pAbout').textContent = oge
+    ? 'В бланке 8 заданий с кратким ответом, как в ОГЭ: корень из десятичной дроби и из смешанного числа, значение выражения, квадрат корня, два уравнения (в ответ — больший или меньший корень), оценка корня и выбор наибольшего числа. Ответ — число, оно вписывается в клеточки бланка.'
+    : 'В каждом варианте 8 заданий: корень из десятичной дроби, из смешанного числа, значение выражения, квадрат корня, два уравнения x² = a, оценка корня целыми числами и сравнение. Верные ответы складываются в слово.';
   let html = '';
   if (two) for (let i = 0; i < vs.length; i += 2)
-    html += `<div class="page half compact">${sheetHTML(vs[i])}${vs[i + 1] ? sheetHTML(vs[i + 1]) : ''}</div>`;
-  else html = vs.map(v => `<div class="page${space ? '' : ' compact'}">${sheetHTML(v)}</div>`).join('');
-  $('pSheets').innerHTML = (vs.length ? keyHTML(vs) : '') + html;
+    html += `<div class="page half compact">${sheet(vs[i])}${vs[i + 1] ? sheet(vs[i + 1]) : ''}</div>`;
+  else html = vs.map(v => `<div class="page${space ? '' : ' compact'}">${sheet(v)}</div>`).join('');
+  $('pSheets').innerHTML = (vs.length ? key(vs) : '') + html;
   return vs;
 }
 function printNow(what) {
@@ -1533,6 +1626,7 @@ $('pNew').addEventListener('click', () => { $('pMsg').textContent = ''; printNum
 $('pCount').addEventListener('change', () => $('pNew').click());
 $('pSpace').addEventListener('change', drawSheets);
 $('pTwo').addEventListener('change', drawSheets);
+$('pKind').addEventListener('change', drawSheets);
 $('pNums').addEventListener('change', () => {
   const { nums, bad } = parseNums($('pNums').value);
   $('pMsg').innerHTML = bad.length ? `<span class="err">Не понял номера: ${esc(bad.join(', '))}. Номер — как на листе, например ${GEN_VERSION}-4817.</span>` : '';
@@ -1581,8 +1675,8 @@ document.addEventListener('keydown', e => {
 
 // Для автотестов и снимка превью
 window.APP = {
-  CONFIG, GEN_VERSION, TYPES, SECTIONS, KINDS_V1, WORDS_V1,
-  Q, qeq, decStr, keyQ, parseQ, parseVal, eqRoots, generate, makeVariant, taskRnd, mulberry32, parseNums,
+  CONFIG, GEN_VERSION, TYPES, SECTIONS, KINDS_V1, WORDS_V1, OGE_V1,
+  Q, qeq, decStr, keyQ, parseQ, parseVal, eqRoots, generate, makeVariant, makeVariantOGE, taskRnd, mulberry32, parseNums,
   STUDENT, show, get screen() { return screen; },
   board: { get steps() { return B.steps; }, get i() { return B.i; }, get phase() { return B.phase; }, get e() { return B.e; },
     next: boardNext, prev: boardPrev, go: boardGo, numbers: random => { boardNumbers(random); renderBoard(); }, poster: boardPoster },
