@@ -209,6 +209,23 @@ test('бланк ОГЭ: листы с клеточками и ключ соби
   assert.deepEqual(errors, []);
 });
 
+test('бланк ОГЭ виден: кнопка на стартовом экране, переключатель в панели, ссылка ?kind=oge', t => {
+  const { window: w, errors } = open(t, '');
+  const doc = w.document;
+  doc.querySelector('#start [data-kind="oge"]').click();
+  assert.equal(w.APP.screen, 'print');
+  assert.ok(doc.querySelector('.sheet.oge'), 'со стартового экрана открылся бланк');
+  assert.equal(doc.querySelector('[data-kind-set="oge"]').getAttribute('aria-pressed'), 'true');
+  doc.querySelector('[data-kind-set="word"]').click();
+  assert.ok(!doc.querySelector('.sheet.oge') && doc.querySelector('.sheet .bank'), 'переключатель возвращает кодовое слово');
+  w.APP.show('start');
+  doc.querySelector('#start [data-kind="oge"]').click();
+  assert.ok(doc.querySelector('.sheet.oge'), 'повторный выбор бланка на стартовом экране работает');
+  assert.deepEqual(errors, []);
+  const m = open(t, '?mode=print&kind=oge');
+  assert.ok(m.window.document.querySelector('.sheet.oge'), 'ссылка сразу на бланк');
+});
+
 test('доска: все шаги вперёд и назад без ошибок, на разных числах', t => {
   const { window: w, errors } = open(t, '?mode=board');
   const B = w.APP.board;

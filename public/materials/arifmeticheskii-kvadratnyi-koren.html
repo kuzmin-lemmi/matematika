@@ -167,7 +167,13 @@ svg .new{animation:fade .6s ease-out both}
 .half table.ans .tall td{height:7mm}
 .half .word{font-size:10pt}
 /* бланк ответов в стиле ОГЭ */
-.panel select{padding:.3em .5em;border:2px solid var(--line);border-radius:10px;background:var(--bg);font:inherit}
+.seg{display:inline-flex;flex-wrap:wrap;gap:6px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.mode.split{border:2px solid var(--line);background:var(--surface)}
+.mode.split:hover{transform:none}
+.kinds{display:grid;gap:8px;width:100%;margin-top:auto}
+.kinds button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;font-size:17px;padding:.5em .8em}
+.kinds small{font-weight:400;font-size:14px;color:var(--soft)}
 .oge .task{font-size:12pt;line-height:1.35}
 .oge .cells{height:15mm}
 .oge .otv{font-size:11pt;margin-top:1mm}
@@ -291,10 +297,15 @@ body.student [data-act="menu"],body.student #hLinks{display:none !important}
   <div class="wrap">
     <p class="kicker">8 класс · Макарычев и др. · Алгебра</p>
     <h1>Арифметический квадратный корень</h1>
-    <p class="lead">Одна тема в трёх режимах: показ на доске, раздатка с кодовым словом и тренажёр, который объясняет каждую ошибку.</p>
+    <p class="lead">Одна тема в трёх режимах: показ на доске, раздатка (кодовое слово или бланк как в ОГЭ) и тренажёр, который объясняет каждую ошибку.</p>
     <div class="modes">
       <button class="mode" type="button" data-go="board"><b>🖥 На доске</b><span>Корень — сторона квадрата с данной площадью. Ловушки «√16 = ±4» и «√0,09 = 0,03», оценка √2, уравнение x² = a.</span></button>
-      <button class="mode" type="button" data-go="print"><b>🖨 Раздатка</b><span>У каждого свой вариант, верные ответы складываются в слово. Ключ — по номеру варианта.</span></button>
+      <div class="mode split"><b>🖨 Раздатка</b><span>У каждого свой вариант, ключ — по номеру варианта.</span>
+        <div class="kinds">
+          <button type="button" data-go="print" data-kind="word">🔤 Кодовое слово<small>верные ответы складываются в слово</small></button>
+          <button type="button" data-go="print" data-kind="oge">🧾 Бланк как в ОГЭ<small>ответ-число в клеточки бланка</small></button>
+        </div>
+      </div>
       <button class="mode" type="button" data-go="home"><b>🏠 Тренировка</b><span>Вычисление корней, уравнение x² = a, оценка и сравнение. Разбор каждой ошибки.</span></button>
     </div>
   </div>
@@ -331,18 +342,18 @@ body.student [data-act="menu"],body.student #hLinks{display:none !important}
     </div>
     <div class="panel no-print">
       <div class="row">
+        <b>Вид листа:</b>
+        <div class="seg" role="group" aria-label="Вид листа">
+          <button type="button" data-kind-set="word" aria-pressed="true">🔤 Кодовое слово</button>
+          <button type="button" data-kind-set="oge" aria-pressed="false">🧾 Бланк ответов, как в ОГЭ</button>
+        </div>
+        <input type="hidden" id="pKind" value="word">
+      </div>
+      <div class="row">
         <label>Вариантов <input type="number" id="pCount" min="1" max="40"></label>
         <button type="button" id="pNew">Новые номера</button>
         <label><input type="checkbox" id="pSpace"> место для решения (сетка)</label>
         <label><input type="checkbox" id="pTwo"> два варианта на листе</label>
-      </div>
-      <div class="row">
-        <label>Вид листа
-          <select id="pKind">
-            <option value="word">Кодовое слово (самопроверка)</option>
-            <option value="oge">Бланк ответов, как в ОГЭ</option>
-          </select>
-        </label>
       </div>
       <label style="display:grid;gap:4px">Номера вариантов (можно вписать свои — ключ восстановится по номеру)
         <input type="text" id="pNums" autocomplete="off" spellcheck="false">
@@ -1272,6 +1283,8 @@ function boardPoster() { boardStopPreview(); boardGo(7, 1); }
 
 // ================= 🖨 Раздатка =================
 let printNums = [];
+// вид листа из адреса (?mode=print&kind=oge) или с кнопки стартового экрана — важнее сохранённого
+let pendingKind = ['word', 'oge'].includes(P.get('kind')) ? P.get('kind') : null;
 function newNumbers(count) {
   const set = new Set();
   while (set.size < count) set.add(1000 + Math.floor(Math.random() * 9000));
@@ -1350,11 +1363,13 @@ function renderPrint() {
     $('pKind').value = store.get('printKind') === 'oge' ? 'oge' : 'word';
     if (saved.length) $('pMsg').textContent = 'Открыты номера, с которыми вы работали в прошлый раз. Для другого класса нажмите «Новые номера».';
   }
+  if (pendingKind) { $('pKind').value = pendingKind; pendingKind = null; }
   $('pNums').value = printNums.map(n => GEN_VERSION + '-' + n).join(', ');
   drawSheets();
 }
 function drawSheets() {
   const oge = $('pKind').value === 'oge';
+  document.querySelectorAll('[data-kind-set]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.kindSet === $('pKind').value)));
   const vs = printNums.map(n => oge ? makeVariantOGE(n) : makeVariant(n));
   const sheet = oge ? ogeSheetHTML : sheetHTML, key = oge ? ogeKeyHTML : keyHTML;
   const space = $('pSpace').checked, two = $('pTwo').checked && !space;
@@ -1585,9 +1600,10 @@ function homeCheckClick(x = homeCollect()) { const r = homeCheck(x); if (r && r.
 // ================= Управление =================
 let lastInput = null;
 document.addEventListener('click', e => {
-  const el = e.target.closest('[data-go],[data-act],[data-level],[data-copy],[data-choice],[data-count]');
+  const el = e.target.closest('[data-go],[data-act],[data-level],[data-copy],[data-choice],[data-count],[data-kind-set]');
   if (!el) return;
-  if (el.dataset.go) return show(el.dataset.go);
+  if (el.dataset.go) { if (el.dataset.kind) pendingKind = el.dataset.kind; return show(el.dataset.go); }
+  if (el.dataset.kindSet) { $('pKind').value = el.dataset.kindSet; return drawSheets(); }
   if (el.dataset.level) { H.level = +el.dataset.level; return homeStart(); }
   if (el.dataset.copy) return copyLevelLink(+el.dataset.copy);
   if (el.dataset.choice) return homeCheckClick(el.dataset.choice);
@@ -1626,7 +1642,6 @@ $('pNew').addEventListener('click', () => { $('pMsg').textContent = ''; printNum
 $('pCount').addEventListener('change', () => $('pNew').click());
 $('pSpace').addEventListener('change', drawSheets);
 $('pTwo').addEventListener('change', drawSheets);
-$('pKind').addEventListener('change', drawSheets);
 $('pNums').addEventListener('change', () => {
   const { nums, bad } = parseNums($('pNums').value);
   $('pMsg').innerHTML = bad.length ? `<span class="err">Не понял номера: ${esc(bad.join(', '))}. Номер — как на листе, например ${GEN_VERSION}-4817.</span>` : '';
