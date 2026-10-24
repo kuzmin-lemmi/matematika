@@ -5,7 +5,7 @@ import { getCollection } from 'astro:content';
 import { klassName, gradeSubjects, isReady } from '../../lib';
 import { SITE, SUBJECTS } from '../../config';
 import plans from '../../data/lesson-plans.json';
-import { quarterTopics, lessonRanges, PLAN_SOURCES } from '../../lesson-plan';
+import { quarterTopics, topicMaterials, lessonRanges, PLAN_SOURCES } from '../../lesson-plan';
 
 export async function getStaticPaths() {
   return SITE.grades.map(g => ({ params: { grade: String(g) } }));
@@ -21,14 +21,8 @@ const groups = subjects.map(subject => {
   const materials = items.filter(i => i.data.subject === subject);
   return {
     subject,
-    quarters: [1, 2, 3, 4].map(quarter => ({
-      quarter,
-      lessons: quarterTopics(plan, quarter).map(lesson => ({
-        ...lesson,
-        materials: materials.filter(item => item.data.planLessons.some(ref => ref.grade === grade && ref.lessons.some(n => lesson.annualNumbers.includes(n)))),
-      })),
-    })),
-    unplaced: materials.filter(item => !item.data.planLessons.some(ref => ref.grade === grade)),
+    quarters: [1, 2, 3, 4].map(quarter => ({ quarter, lessons: topicMaterials(quarterTopics(plan, quarter), materials, grade) })),
+    unplaced: materials.filter(item => ![...item.data.planLessons, ...item.data.planRelated].some(ref => ref.grade === grade)),
   };
 });
 ---
@@ -56,9 +50,9 @@ const groups = subjects.map(subject => {
           <section class="quarter-pane" data-plan-pane data-subject={group.subject} data-quarter={quarter} aria-label={`${SUBJECTS[group.subject].label}, ${quarter} четверть`}>
             <div class="section-heading"><h2>{quarter} четверть <span>· {SUBJECTS[group.subject].label}</span></h2><span class="hint">Тема · материалы</span></div>
             <ol class="lesson-list">
-              {lessons.map(lesson => <li class="lesson-row" value={lesson.number} data-lesson data-annual-numbers={lesson.annualNumbers.join(',')} data-ready={lesson.materials.length > 0 ? 'true' : 'false'}>
+              {lessons.map(lesson => <li class="lesson-row" value={lesson.number} data-lesson data-annual-numbers={lesson.annualNumbers.join(',')} data-ready={lesson.materials.length + lesson.related.length > 0 ? 'true' : 'false'}>
                 <div class="lesson-topic"><span class="lesson-number" aria-label={`Тема ${lesson.number}`}>{lesson.number}</span><div><h3>{lesson.title}</h3><p class="lesson-meta">{lesson.annualNumbers.length > 1 ? 'уроки' : 'урок'} {lessonRanges(lesson.annualNumbers)} · {lesson.annualNumbers.length} ч</p></div></div>
-                <PlanMaterials items={lesson.materials} title={lesson.title} />
+                <PlanMaterials items={lesson.materials} related={lesson.related} title={lesson.title} />
               </li>)}
             </ol>
             <p class="empty-quarter" data-empty hidden>К этой четверти материалы пока не добавлены. Снимите фильтр, чтобы увидеть все темы.</p>

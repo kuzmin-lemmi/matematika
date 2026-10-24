@@ -33,6 +33,24 @@ export function lessonRanges(numbers: number[]) {
   return parts.join(', ');
 }
 
+interface PlanRef { grade: number; lessons: number[] }
+interface Bound { id: string; data: { planLessons: PlanRef[]; planRelated: PlanRef[] } }
+
+// Материалы тем одной четверти: основные — полные кнопки, «подходит» — короткая ссылка на материал.
+// Основной материал показывается кнопками только у первой своей темы в четверти, у следующих — ссылкой,
+// чтобы один материал не выглядел несколькими разными.
+export function topicMaterials<T extends Bound, L extends { annualNumbers: number[] }>(topics: L[], items: T[], grade: number) {
+  const shown = new Set<string>();
+  const hits = (refs: PlanRef[], numbers: number[]) => refs.some(r => r.grade === grade && r.lessons.some(n => numbers.includes(n)));
+  return topics.map(topic => {
+    const materials = items.filter(i => hits(i.data.planLessons, topic.annualNumbers) && !shown.has(i.id));
+    const related = items.filter(i => !materials.includes(i)
+      && (hits(i.data.planRelated, topic.annualNumbers) || hits(i.data.planLessons, topic.annualNumbers)));
+    materials.forEach(i => shown.add(i.id));
+    return { ...topic, materials, related };
+  });
+}
+
 export const PLAN_SOURCES: Record<string, string> = {
   math: 'https://gim87-sar.gosuslugi.ru/netcat_files/30/69/4._matematika_5_6_pod.pdf',
   algebra: 'https://gim87-sar.gosuslugi.ru/netcat_files/30/69/5._algebra_7_9_podp.pdf',

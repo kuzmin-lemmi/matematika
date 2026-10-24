@@ -10,7 +10,9 @@ url: materials/ugly-pri-parallelnyh-pryamyh.html
 access: free
 grades: [7]
 planLessons:
-  - { grade: 7, lessons: [37, 39, 40, 41, 42, 43] }
+  - { grade: 7, lessons: [39, 40, 41, 42, 43] }
+planRelated:                  # «Параллельные прямые, их свойства»
+  - { grade: 7, lessons: [37] }
 topic: "Параллельные прямые и секущая: накрест лежащие, соответственные и односторонние углы"
 textbook: "Мерзляк, Полонский, Якир. Геометрия, 7 класс — параллельные прямые"
 duration: "10–15 минут на доске"

@@ -2,18 +2,19 @@
 // Кнопки материалов темы в плане уроков. Режимы называются так же, как везде на сайте (PARTS),
 // рядом — «Ссылка для дома». Несколько материалов — группы «название + кнопки».
 // На компьютере ряд листается, на телефоне кнопки переносятся на следующую строку.
+// related — материалы, которые к теме подходят, но сделаны не для неё: короткая ссылка на страницу материала.
 import type { CollectionEntry } from 'astro:content';
 import { PARTS } from '../config';
 import { isLocalFile, openPageHref, sheetHref, pageHref } from '../lib';
 import StudentLink from './StudentLink.astro';
-interface Props { items: CollectionEntry<'items'>[]; title: string }
-const { items, title } = Astro.props;
+interface Props { items: CollectionEntry<'items'>[]; related?: CollectionEntry<'items'>[]; title: string }
+const { items, related = [], title } = Astro.props;
 const modes = ['board', 'print', 'home'] as const;
 const many = items.length > 1;
 ---
 <div class="materials" data-materials>
   <div class="rail" data-rail role="group" aria-label={`Материалы: ${title}`}>
-    {items.length === 0 && <span class="empty">Материалов пока нет</span>}
+    {items.length === 0 && related.length === 0 && <span class="empty">Материалов пока нет</span>}
     {items.map(item => (
       <div class:list={['group', { many }]}>
         {many && <a class="group-title" href={pageHref(item.id)}>{item.data.title}</a>}
@@ -29,6 +30,11 @@ const many = items.length > 1;
         </div>
       </div>
     ))}
+    {related.length > 0 && (
+      <div class="related">
+        {related.map(item => <a href={pageHref(item.id)} title="Материал сделан к другой теме, но подходит и к этой">↗ Подходит: «{item.data.title}»</a>)}
+      </div>
+    )}
   </div>
   <div class="rail-controls" data-rail-controls hidden>
     <button type="button" data-scroll="-1" aria-label={`Предыдущие материалы: ${title}`}>←</button>
@@ -46,6 +52,9 @@ const many = items.length > 1;
   .material,.buttons :global(.student-link){flex:0 0 auto;min-height:44px;padding:9px 12px;display:inline-flex;align-items:center;gap:6px;
     border:1px solid var(--line);border-radius:4px;background:var(--surface);font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;white-space:nowrap}
   .material:hover,.buttons :global(.student-link:hover){background:var(--tint);border-color:var(--accent)}
+  .related{flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;gap:2px}
+  .related a{display:inline-flex;align-items:center;min-height:32px;font-size:13px;color:var(--soft);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+  .related a:hover{color:var(--accent);text-decoration-color:var(--accent)}
   .empty{font-size:13px;color:var(--soft);align-self:center;padding:8px 0}
   .rail-controls{display:flex;gap:4px;flex:none}
   .rail-controls[hidden]{display:none}
@@ -54,7 +63,7 @@ const many = items.length > 1;
   /* телефон: без прокрутки вбок — кнопки переносятся, каждый материал с новой строки */
   @media(max-width:680px){
     .rail{flex-wrap:wrap;overflow:visible;gap:12px}
-    .group{flex:1 1 100%}
+    .group,.related{flex:1 1 100%}
     .buttons{flex-wrap:wrap}
   }
   @media(pointer:coarse){button{min-width:44px;min-height:44px}}
