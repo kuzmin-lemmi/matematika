@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import { isLocalFile, openPageHref, sheetHref, pageHref } from '../lib';
 interface Props { items: CollectionEntry<'items'>[]; title: string }
 const { items, title } = Astro.props;
-const labels = { board: 'Практика', home: 'Тренажёр', print: 'Печать' };
+const labels = { board: 'Урок на доске', home: 'Тренажёр / ДЗ', print: 'Карточки для печати' };
 const modes = ['board', 'home', 'print'] as const;
 ---
 <div class="materials" data-materials>
