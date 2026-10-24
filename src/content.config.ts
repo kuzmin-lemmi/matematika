@@ -22,6 +22,11 @@ const items = defineCollection({
     url: z.string(),                          // 'materials/xxx.html' — файл на сайте, или полный адрес https://…
     access: z.enum(['free', 'paid', 'external', 'soon']).default('free'),
     grades: z.array(z.number()).default([]),  // классы: [7], [7, 8]
+    // Номера уроков за год из src/data/lesson-plans.json. На странице нумерация внутри четверти.
+    planLessons: z.array(z.object({
+      grade: z.number().int().min(5).max(9),
+      lessons: z.array(z.number().int().positive()).min(1),
+    })).default([]),
     topic: z.string().optional(),             // тема школьного курса
     textbook: z.string().optional(),          // учебник и глава — без номеров параграфов, если автор их не дал
     duration: z.string().optional(),          // «5–10 минут на доске»

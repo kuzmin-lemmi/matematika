@@ -9,6 +9,8 @@ color: "#B94C2D"
 url: materials/slozhenie-drobei.html
 access: free
 grades: [6]
+planLessons:
+  - { grade: 6, lessons: [44, 45, 46, 47, 48, 49, 50] }
 topic: "Сложение и вычитание дробей с разными знаменателями"
 textbook: "Виленкин и др. Математика, 6 класс — сложение и вычитание дробей с разными знаменателями"
 duration: "5–10 минут на доске"

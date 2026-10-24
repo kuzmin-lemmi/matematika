@@ -11,6 +11,8 @@ color: "#3E6C8F"
 url: materials/arifmeticheskii-kvadratnyi-koren.html
 access: free
 grades: [8]
+planLessons:
+  - { grade: 8, lessons: [20, 22, 23, 25, 26, 27] }
 topic: "Арифметический квадратный корень, уравнение x² = a, оценка корня"
 textbook: "Макарычев и др. Алгебра, 8 класс — квадратные корни"
 duration: "10–15 минут на доске"

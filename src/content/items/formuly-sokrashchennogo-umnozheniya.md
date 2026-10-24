@@ -11,6 +11,8 @@ color: "#8A6B3F"
 url: materials/formuly-sokrashchennogo-umnozheniya.html
 access: free
 grades: [7]
+planLessons:
+  - { grade: 7, lessons: [35, 36, 37, 38, 39, 40, 41] }
 topic: "Квадрат суммы и квадрат разности, разность квадратов, куб суммы и разности"
 textbook: "Макарычев и др. Алгебра, 7 класс — формулы сокращённого умножения"
 duration: "10–15 минут на доске"
