@@ -19,7 +19,9 @@ const WAIT = {};
 // что сделать в материале перед снимком, чтобы на картинке был виден ход урока, а не пустое поле.
 // По умолчанию — APP.board.poster(): кадр, который материал выбрал сам (в конструкторе — BOARD.poster).
 // Сюда вписывай только материалы, которым нужно что-то другое.
-const AFTER = {};
+const AFTER = {
+  'instrumenty-doski': 'APP.poster()',   // у инструментов нет доски с шагами: координатная плоскость с рисунком по точкам
+};
 const DEFAULT_AFTER = 'window.APP && APP.board && APP.board.poster && APP.board.poster()';
 
 const browsers = [
