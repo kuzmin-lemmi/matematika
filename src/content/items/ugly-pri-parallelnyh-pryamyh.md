@@ -9,6 +9,8 @@ color: "#3D7563"
 url: materials/ugly-pri-parallelnyh-pryamyh.html
 access: free
 grades: [7]
+planLessons:
+  - { grade: 7, lessons: [37, 39, 40, 41, 42, 43] }
 topic: "Параллельные прямые и секущая: накрест лежащие, соответственные и односторонние углы"
 textbook: "Мерзляк, Полонский, Якир. Геометрия, 7 класс — параллельные прямые"
 duration: "10–15 минут на доске"
