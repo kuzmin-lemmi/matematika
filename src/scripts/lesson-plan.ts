@@ -26,7 +26,7 @@ export function initLessonPlan(root: HTMLElement) {
       const pane = panes.find(p => p.dataset.subject === subject && p.dataset.quarter === button.dataset.quarterButton)!;
       const count = pane.querySelectorAll('[data-lesson][data-ready="true"]').length;
       button.querySelector<HTMLElement>('[data-count]')!.textContent = count ? ` · ${count}` : '';
-      button.setAttribute('aria-label', `${button.dataset.quarterButton} четверть, уроков с материалами: ${count}`);
+      button.setAttribute('aria-label', `${button.dataset.quarterButton} четверть, тем с материалами: ${count}`);
     });
     let count = 0;
     panes.forEach(pane => {
@@ -40,7 +40,7 @@ export function initLessonPlan(root: HTMLElement) {
       if (!pane.hidden) count = visible;
     });
     root.querySelectorAll<HTMLElement>('[data-unplaced]').forEach(section => section.hidden = section.dataset.unplaced !== subject);
-    live.textContent = `${quarter} четверть. Показано уроков: ${count}.`;
+    live.textContent = `${quarter} четверть. Показано тем: ${count}.`;
     if (writeURL) {
       const url = new URL(win.location.href);
       url.searchParams.set('subject', subject);

@@ -11,7 +11,7 @@ async function loadTS(file) {
   const { outputText } = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } });
   return import(`data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`);
 }
-const { quarterLessons } = await loadTS('../src/lesson-plan.ts');
+const { quarterLessons, quarterTopics } = await loadTS('../src/lesson-plan.ts');
 const { initLessonPlan } = await loadTS('../src/scripts/lesson-plan.ts');
 
 test('850 уроков: все классы, четыре четверти, нумерация без потерь и повторов', () => {
@@ -30,6 +30,21 @@ test('850 уроков: все классы, четыре четверти, ну
       assert.ok(title.length > 5 && title.length < 250, title);
       assert.doesNotMatch(title, /https?:|Библиотека|СТРАНИЦА|٧/);
     }
+  }
+});
+
+test('Темы объединяются внутри четверти, включая несоседние повторы и продолжение в следующей четверти', () => {
+  const plan = {grade:5, subject:'math', quarterEnds:[4,6,7,8], lessons:['Дроби','Числа','Дроби',' Числа  ','Дроби','Дроби','Углы','Повторение']};
+  assert.deepEqual(quarterTopics(plan,1),[
+    {title:'Дроби',number:1,annualNumbers:[1,3]},
+    {title:'Числа',number:2,annualNumbers:[2,4]},
+  ]);
+  assert.deepEqual(quarterTopics(plan,2),[{title:'Дроби',number:1,annualNumbers:[5,6]}]);
+  for (const p of plans) for (const q of [1,2,3,4]) {
+    const topics = quarterTopics(p,q);
+    assert.equal(new Set(topics.map(t=>t.title.trim().replace(/\s+/g,' ').toLowerCase())).size,topics.length);
+    assert.deepEqual(topics.flatMap(t=>t.annualNumbers).sort((a,b)=>a-b),quarterLessons(p,q).map(l=>l.annualNumber));
+    assert.deepEqual(topics.map(t=>t.number),Array.from({length:topics.length},(_,i)=>i+1));
   }
 });
 
