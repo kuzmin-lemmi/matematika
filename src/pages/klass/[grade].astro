@@ -5,7 +5,7 @@ import { getCollection } from 'astro:content';
 import { klassName, gradeSubjects, isReady } from '../../lib';
 import { SITE, SUBJECTS } from '../../config';
 import plans from '../../data/lesson-plans.json';
-import { quarterLessons, PLAN_SOURCES } from '../../lesson-plan';
+import { quarterTopics, PLAN_SOURCES } from '../../lesson-plan';
 
 export async function getStaticPaths() {
   return SITE.grades.map(g => ({ params: { grade: String(g) } }));
@@ -23,21 +23,21 @@ const groups = subjects.map(subject => {
     subject,
     quarters: [1, 2, 3, 4].map(quarter => ({
       quarter,
-      lessons: quarterLessons(plan, quarter).map(lesson => ({
+      lessons: quarterTopics(plan, quarter).map(lesson => ({
         ...lesson,
-        materials: materials.filter(item => item.data.planLessons.some(ref => ref.grade === grade && ref.lessons.includes(lesson.annualNumber))),
+        materials: materials.filter(item => item.data.planLessons.some(ref => ref.grade === grade && ref.lessons.some(n => lesson.annualNumbers.includes(n)))),
       })),
     })),
     unplaced: materials.filter(item => !item.data.planLessons.some(ref => ref.grade === grade)),
   };
 });
 ---
-<Base title={`План уроков и материалы · ${klassName(grade)}`} description={`План уроков ${grade} класса по четвертям. Практика на доске, тренажёры и печатные задания рядом с темой урока.`} noindex={items.length === 0}>
+<Base title={`Темы и материалы · ${klassName(grade)}`} description={`Темы ${grade} класса по четвертям. Практика на доске, тренажёры и печатные задания рядом с каждой темой.`} noindex={items.length === 0}>
   <section class="plan-page" data-lesson-plan>
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Путь к странице"><a href={base}>Главная</a><span aria-hidden="true">/</span><span>{klassName(grade)}</span></nav>
       <div class="plan-hero">
-        <div><p class="eyebrow">От темы — к готовому уроку</p><h1>План уроков и материалы</h1><p class="lead">{klassName(grade)} · Подбирайте задания по ходу программы</p></div>
+        <div><p class="eyebrow">От темы — к готовому уроку</p><h1>Темы и материалы</h1><p class="lead">{klassName(grade)} · Подбирайте задания по ходу программы</p></div>
         <span class="grade-number" aria-hidden="true">{grade}</span>
       </div>
       <div class="subjects" data-plan-controls hidden role="group" aria-label="Предмет">
@@ -49,19 +49,19 @@ const groups = subjects.map(subject => {
         </div>
         <label class="ready-filter"><input type="checkbox" data-ready-only /> Только с материалами</label>
       </div>
-      <p class="plan-note">Распределение по четвертям ориентировочное. Номера уроков в каждой четверти начинаются с 1.</p>
+      <p class="plan-note">Распределение по четвертям ориентировочное. Каждая тема показана один раз в четверти.</p>
       <p class="sr-only" data-plan-status role="status" aria-live="polite"></p>
       {groups.map(group => <>
         {group.quarters.map(({quarter, lessons}) => (
           <section class="quarter-pane" data-plan-pane data-subject={group.subject} data-quarter={quarter} aria-label={`${SUBJECTS[group.subject].label}, ${quarter} четверть`}>
-            <div class="section-heading"><h2>{quarter} четверть <span>· {SUBJECTS[group.subject].label}</span></h2><span class="hint">Урок · тема · материалы</span></div>
+            <div class="section-heading"><h2>{quarter} четверть <span>· {SUBJECTS[group.subject].label}</span></h2><span class="hint">Тема · материалы</span></div>
             <ol class="lesson-list">
-              {lessons.map(lesson => <li class="lesson-row" value={lesson.number} data-lesson data-annual-number={lesson.annualNumber} data-ready={lesson.materials.length > 0 ? 'true' : 'false'}>
-                <div class="lesson-topic"><span class="lesson-number" aria-label={`Урок ${lesson.number}`}>{lesson.number}</span><h3>{lesson.title}</h3></div>
+              {lessons.map(lesson => <li class="lesson-row" value={lesson.number} data-lesson data-annual-numbers={lesson.annualNumbers.join(',')} data-ready={lesson.materials.length > 0 ? 'true' : 'false'}>
+                <div class="lesson-topic"><span class="lesson-number" aria-label={`Тема ${lesson.number}`}>{lesson.number}</span><h3>{lesson.title}</h3></div>
                 <PlanMaterials items={lesson.materials} title={lesson.title} />
               </li>)}
             </ol>
-            <p class="empty-quarter" data-empty hidden>К этой четверти материалы пока не добавлены. Снимите фильтр, чтобы увидеть все уроки.</p>
+            <p class="empty-quarter" data-empty hidden>К этой четверти материалы пока не добавлены. Снимите фильтр, чтобы увидеть все темы.</p>
           </section>
         ))}
         {group.unplaced.length > 0 && <section class="unplaced" data-unplaced={group.subject}>
