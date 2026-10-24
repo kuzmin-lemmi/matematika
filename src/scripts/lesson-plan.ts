@@ -1,4 +1,11 @@
-export function initLessonPlan(root: HTMLElement) {
+// Четверть по дате, если её нет в адресе: ориентировочно, как и границы четвертей в плане.
+// Сентябрь–октябрь — 1, ноябрь–декабрь — 2, январь–март — 3, апрель–май — 4, лето — снова 1.
+export function currentQuarter(date: Date) {
+  const m = date.getMonth();
+  return m >= 8 && m <= 9 ? 1 : m >= 10 ? 2 : m <= 2 ? 3 : m <= 4 ? 4 : 1;
+}
+
+export function initLessonPlan(root: HTMLElement, today = new Date()) {
   const doc = root.ownerDocument;
   const win = doc.defaultView!;
   const subjects = [...root.querySelectorAll<HTMLButtonElement>('[data-subject-button]')];
@@ -53,7 +60,7 @@ export function initLessonPlan(root: HTMLElement) {
   function readURL() {
     const params = new URL(win.location.href).searchParams;
     subject = subjects.some(b => b.dataset.subjectButton === params.get('subject')) ? params.get('subject')! : subjects[0].dataset.subjectButton!;
-    quarter = ['1','2','3','4'].includes(params.get('quarter') ?? '') ? params.get('quarter')! : '1';
+    quarter = ['1','2','3','4'].includes(params.get('quarter') ?? '') ? params.get('quarter')! : String(currentQuarter(today));
     ready.checked = params.get('ready') === '1';
     render();
   }

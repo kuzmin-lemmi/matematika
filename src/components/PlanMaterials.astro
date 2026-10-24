@@ -1,25 +1,34 @@
 ---
+// Кнопки материалов темы в плане уроков. Режимы называются так же, как везде на сайте (PARTS),
+// рядом — «Ссылка для дома». Несколько материалов — группы «название + кнопки».
+// На компьютере ряд листается, на телефоне кнопки переносятся на следующую строку.
 import type { CollectionEntry } from 'astro:content';
+import { PARTS } from '../config';
 import { isLocalFile, openPageHref, sheetHref, pageHref } from '../lib';
+import StudentLink from './StudentLink.astro';
 interface Props { items: CollectionEntry<'items'>[]; title: string }
 const { items, title } = Astro.props;
-const labels = { board: 'Урок на доске', home: 'Тренажёр / ДЗ', print: 'Карточки для печати' };
-const modes = ['board', 'home', 'print'] as const;
+const modes = ['board', 'print', 'home'] as const;
+const many = items.length > 1;
 ---
 <div class="materials" data-materials>
   <div class="rail" data-rail role="group" aria-label={`Материалы: ${title}`}>
     {items.length === 0 && <span class="empty">Материалов пока нет</span>}
-    {items.map(item => <>
-      {isLocalFile(item.data.url) ? <>
-        {modes.filter(mode => item.data.parts.includes(mode)).map(mode => (
-          <a class="material" href={openPageHref(item, mode)} title={`${labels[mode]} — ${item.data.title}`} aria-label={`${labels[mode]} — ${item.data.title}`}>
-            {labels[mode]}{items.length > 1 && <small>{item.data.title}</small>}
-          </a>
-        ))}
-        {item.data.sheets.map(sheet => <a class="material" href={sheetHref(item, sheet.kind)} aria-label={`${sheet.label} — ${item.data.title}`}>{sheet.label}{items.length > 1 && <small>{item.data.title}</small>}</a>)}
-        {item.data.parts.length === 0 && <a class="material" href={pageHref(item.id)}>{item.data.title}</a>}
-      </> : <a class="material" href={openPageHref(item)}>{item.data.title}</a>}
-    </>)}
+    {items.map(item => (
+      <div class:list={['group', { many }]}>
+        {many && <a class="group-title" href={pageHref(item.id)}>{item.data.title}</a>}
+        <div class="buttons">
+          {isLocalFile(item.data.url) ? <>
+            {modes.filter(mode => item.data.parts.includes(mode)).map(mode => (
+              <a class="material" href={openPageHref(item, mode)} aria-label={`${PARTS[mode].label} — ${item.data.title}`}>{PARTS[mode].icon} {PARTS[mode].label}</a>
+            ))}
+            {item.data.sheets.map(sheet => <a class="material" href={sheetHref(item, sheet.kind)} aria-label={`${sheet.label} — ${item.data.title}`}>{sheet.label}</a>)}
+            <StudentLink item={item} />
+            {item.data.parts.length === 0 && <a class="material" href={pageHref(item.id)}>{item.data.title}</a>}
+          </> : <a class="material" href={openPageHref(item)}>{item.data.title} ↗</a>}
+        </div>
+      </div>
+    ))}
   </div>
   <div class="rail-controls" data-rail-controls hidden>
     <button type="button" data-scroll="-1" aria-label={`Предыдущие материалы: ${title}`}>←</button>
@@ -28,15 +37,25 @@ const modes = ['board', 'home', 'print'] as const;
 </div>
 <style>
   .materials{min-width:0;display:flex;align-items:center;gap:8px}
-  .rail{display:flex;gap:8px;min-width:0;flex:1;overflow-x:auto;padding:4px;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
-  .material{flex:0 0 auto;min-width:108px;max-width:210px;min-height:44px;padding:9px 12px;display:flex;flex-direction:column;justify-content:center;border:1px solid var(--line);border-radius:4px;background:var(--surface);font-size:13px;color:var(--accent);text-decoration:none;scroll-snap-align:start;overflow-wrap:anywhere}
-  .material:hover{background:var(--tint);border-color:var(--accent)}
-  .material small{font-size:11px;color:var(--soft);margin-top:3px}
+  .rail{display:flex;gap:16px;min-width:0;flex:1;overflow-x:auto;padding:4px;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+  .group{flex:0 0 auto;display:flex;flex-direction:column;gap:4px;scroll-snap-align:start}
+  .group.many{padding-left:10px;border-left:2px solid var(--line)}
+  .group-title{font-size:12px;font-weight:600;color:var(--soft);text-decoration:none}
+  .group-title:hover{color:var(--accent)}
+  .buttons{display:flex;gap:8px}
+  .material,.buttons :global(.student-link){flex:0 0 auto;min-height:44px;padding:9px 12px;display:inline-flex;align-items:center;gap:6px;
+    border:1px solid var(--line);border-radius:4px;background:var(--surface);font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;white-space:nowrap}
+  .material:hover,.buttons :global(.student-link:hover){background:var(--tint);border-color:var(--accent)}
   .empty{font-size:13px;color:var(--soft);align-self:center;padding:8px 0}
   .rail-controls{display:flex;gap:4px;flex:none}
   .rail-controls[hidden]{display:none}
   button{width:36px;min-height:44px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--accent);font:inherit;cursor:pointer}
   button:disabled{opacity:.35;cursor:default}
-  @media(max-width:560px){.rail-controls{flex-direction:column}button{min-height:32px}.material{min-width:100px}}
+  /* телефон: без прокрутки вбок — кнопки переносятся, каждый материал с новой строки */
+  @media(max-width:680px){
+    .rail{flex-wrap:wrap;overflow:visible;gap:12px}
+    .group{flex:1 1 100%}
+    .buttons{flex-wrap:wrap}
+  }
   @media(pointer:coarse){button{min-width:44px;min-height:44px}}
 </style>

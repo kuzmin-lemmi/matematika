@@ -11,8 +11,8 @@ async function loadTS(file) {
   const { outputText } = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } });
   return import(`data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`);
 }
-const { quarterLessons, quarterTopics } = await loadTS('../src/lesson-plan.ts');
-const { initLessonPlan } = await loadTS('../src/scripts/lesson-plan.ts');
+const { quarterLessons, quarterTopics, lessonRanges } = await loadTS('../src/lesson-plan.ts');
+const { initLessonPlan, currentQuarter } = await loadTS('../src/scripts/lesson-plan.ts');
 
 test('850 уроков: все классы, четыре четверти, нумерация без потерь и повторов', () => {
   assert.equal(plans.length, 8);
@@ -69,7 +69,7 @@ test('Фильтр сохраняет номера уроков, четверт�
   const panes = ['algebra','geometry'].flatMap(s => [1,2,3,4].map(q => `<section data-plan-pane data-subject="${s}" data-quarter="${q}"><li data-lesson data-ready="false">1</li><li data-lesson data-ready="true">2</li><p data-empty hidden></p></section>`)).join('');
   const dom = new JSDOM(`<div data-root><div data-plan-controls hidden>${['algebra','geometry'].map(s=>`<button data-subject-button="${s}"></button>`).join('')}${[1,2,3,4].map(q=>`<button data-quarter-button="${q}"><span data-count></span></button>`).join('')}<input type="checkbox" data-ready-only></div><p data-plan-status></p>${panes}</div>`, {url:'https://matshag.ru/klass/7/?subject=geometry&quarter=3&ready=1'});
   const root = dom.window.document.querySelector('[data-root]');
-  initLessonPlan(root);
+  initLessonPlan(root, new Date(2026, 9, 24));
   const visible = () => [...root.querySelectorAll('[data-plan-pane]')].filter(p=>!p.hidden);
   assert.equal(visible().length,1);
   assert.equal(visible()[0].dataset.subject,'geometry');
@@ -84,6 +84,29 @@ test('Фильтр сохраняет номера уроков, четверт�
   dom.window.history.pushState(null,'','?subject=bad&quarter=99');
   dom.window.dispatchEvent(new dom.window.PopStateEvent('popstate'));
   assert.equal(visible()[0].dataset.subject,'algebra');
-  assert.equal(visible()[0].dataset.quarter,'1');
+  assert.equal(visible()[0].dataset.quarter,'1', 'без четверти в адресе — текущая по дате (24 октября — 1-я)');
   dom.window.close();
+});
+
+test('Текущая четверть по дате', () => {
+  const q = (m, d) => currentQuarter(new Date(2026, m - 1, d));
+  assert.equal(q(9, 1), 1); assert.equal(q(10, 24), 1);
+  assert.equal(q(11, 5), 2); assert.equal(q(12, 28), 2);
+  assert.equal(q(1, 12), 3); assert.equal(q(3, 20), 3);
+  assert.equal(q(4, 1), 4); assert.equal(q(5, 25), 4);
+  assert.equal(q(7, 15), 1);
+});
+
+test('Номера уроков темы за год: диапазоны и повторы', () => {
+  assert.equal(lessonRanges([44,45,46,47,48,49,50]), '44–50');
+  assert.equal(lessonRanges([52]), '52');
+  assert.equal(lessonRanges([150,92,93,94,145]), '92–94, 145, 150');
+});
+
+test('«Сложение дробей» привязано к 5 классу: там по плану сложение и вычитание обыкновенных дробей', () => {
+  const card = parse(readFileSync(new URL('../src/content/items/slozhenie-drobei.md', import.meta.url), 'utf8').split('---')[1]);
+  assert.ok(card.grades.includes(5));
+  const p5 = plans.find(p => p.grade === 5 && p.subject === 'math');
+  const ref = card.planLessons.find(r => r.grade === 5);
+  for (const n of ref.lessons) assert.equal(p5.lessons[n - 1], 'Сложение и вычитание обыкновенных дробей');
 });
