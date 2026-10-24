@@ -11,7 +11,7 @@ async function loadTS(file) {
   const { outputText } = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } });
   return import(`data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`);
 }
-const { quarterLessons, quarterTopics, lessonRanges } = await loadTS('../src/lesson-plan.ts');
+const { quarterLessons, quarterTopics, lessonRanges, topicMaterials } = await loadTS('../src/lesson-plan.ts');
 const { initLessonPlan, currentQuarter } = await loadTS('../src/scripts/lesson-plan.ts');
 
 test('850 уроков: все классы, четыре четверти, нумерация без потерь и повторов', () => {
@@ -54,12 +54,17 @@ test('Привязки материалов ведут на существующ
   for (const file of readdirSync(dir)) {
     if (!file.endsWith('.md')) continue;
     const data = parse(readFileSync(new URL(file, dir), 'utf8').split('---')[1]);
-    for (const ref of data.planLessons ?? []) {
+    for (const ref of [...(data.planLessons ?? []), ...(data.planRelated ?? [])]) {
       const plan = plans.find(p => p.grade === ref.grade && p.subject === data.subject);
       assert.ok(plan && data.grades.includes(ref.grade), file);
       assert.equal(new Set(ref.lessons).size, ref.lessons.length);
       for (const n of ref.lessons) assert.ok(Number.isInteger(n) && plan.lessons[n-1], `${file}: ${n}`);
       bound++;
+    }
+    // урок не может быть одновременно основным и «подходит» для одного материала
+    for (const rel of data.planRelated ?? []) {
+      const main = (data.planLessons ?? []).filter(r => r.grade === rel.grade).flatMap(r => r.lessons);
+      for (const n of rel.lessons) assert.ok(!main.includes(n), `${file}: урок ${n} и основной, и «подходит»`);
     }
   }
   assert.ok(bound >= 4);
@@ -109,4 +114,23 @@ test('«Сложение дробей» привязано к 5 классу: т
   const p5 = plans.find(p => p.grade === 5 && p.subject === 'math');
   const ref = card.planLessons.find(r => r.grade === 5);
   for (const n of ref.lessons) assert.equal(p5.lessons[n - 1], 'Сложение и вычитание обыкновенных дробей');
+});
+
+test('Материалы темы: основные — кнопками один раз в четверти, остальное — ссылкой «подходит»', () => {
+  const item = (id, main, rel = []) => ({ id, data: { planLessons: [{ grade: 8, lessons: main }], planRelated: rel.length ? [{ grade: 8, lessons: rel }] : [] } });
+  const koren = item('koren', [20, 26, 27], [22, 23, 25]);
+  const own = item('own', [22]);   // материал, сделанный именно для урока 22
+  const topics = [{ annualNumbers: [20] }, { annualNumbers: [21] }, { annualNumbers: [22, 23] }];
+  const r = topicMaterials(topics, [koren, own], 8).map(t => ({ main: t.materials.map(i => i.id), rel: t.related.map(i => i.id) }));
+  assert.deepEqual(r, [
+    { main: ['koren'], rel: [] },
+    { main: [], rel: [] },
+    { main: ['own'], rel: ['koren'] },   // свой материал — кнопками, общий — ссылкой
+  ]);
+  // основной у двух тем одной четверти — у второй уже ссылка
+  const q2 = topicMaterials([{ annualNumbers: [25] }, { annualNumbers: [26] }, { annualNumbers: [27] }], [koren], 8)
+    .map(t => [t.materials.length, t.related.length]);
+  assert.deepEqual(q2, [[0, 1], [1, 0], [0, 1]]);
+  // другой класс — привязки не действуют
+  assert.equal(topicMaterials(topics, [koren], 7).every(t => !t.materials.length && !t.related.length), true);
 });

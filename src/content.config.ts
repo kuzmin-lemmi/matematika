@@ -27,6 +27,11 @@ const items = defineCollection({
       grade: z.number().int().min(5).max(9),
       lessons: z.array(z.number().int().positive()).min(1),
     })).default([]),
+    // Уроки, к которым материал подходит, но сделан не для них: в плане — короткая ссылка на материал, без кнопок
+    planRelated: z.array(z.object({
+      grade: z.number().int().min(5).max(9),
+      lessons: z.array(z.number().int().positive()).min(1),
+    })).default([]),
     topic: z.string().optional(),             // тема школьного курса
     textbook: z.string().optional(),          // учебник и глава — без номеров параграфов, если автор их не дал
     duration: z.string().optional(),          // «5–10 минут на доске»
