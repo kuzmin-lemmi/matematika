@@ -5,7 +5,7 @@ import { getCollection } from 'astro:content';
 import { klassName, gradeSubjects, isReady } from '../../lib';
 import { SITE, SUBJECTS } from '../../config';
 import plans from '../../data/lesson-plans.json';
-import { quarterTopics, PLAN_SOURCES } from '../../lesson-plan';
+import { quarterTopics, lessonRanges, PLAN_SOURCES } from '../../lesson-plan';
 
 export async function getStaticPaths() {
   return SITE.grades.map(g => ({ params: { grade: String(g) } }));
@@ -49,7 +49,7 @@ const groups = subjects.map(subject => {
         </div>
         <label class="ready-filter"><input type="checkbox" data-ready-only /> Только с материалами</label>
       </div>
-      <p class="plan-note">Распределение по четвертям ориентировочное. Каждая тема показана один раз в четверти.</p>
+      <p class="plan-note">Распределение по четвертям ориентировочное. Каждая тема показана один раз в четверти; рядом — номера её уроков за год и число часов.</p>
       <p class="sr-only" data-plan-status role="status" aria-live="polite"></p>
       {groups.map(group => <>
         {group.quarters.map(({quarter, lessons}) => (
@@ -57,7 +57,7 @@ const groups = subjects.map(subject => {
             <div class="section-heading"><h2>{quarter} четверть <span>· {SUBJECTS[group.subject].label}</span></h2><span class="hint">Тема · материалы</span></div>
             <ol class="lesson-list">
               {lessons.map(lesson => <li class="lesson-row" value={lesson.number} data-lesson data-annual-numbers={lesson.annualNumbers.join(',')} data-ready={lesson.materials.length > 0 ? 'true' : 'false'}>
-                <div class="lesson-topic"><span class="lesson-number" aria-label={`Тема ${lesson.number}`}>{lesson.number}</span><h3>{lesson.title}</h3></div>
+                <div class="lesson-topic"><span class="lesson-number" aria-label={`Тема ${lesson.number}`}>{lesson.number}</span><div><h3>{lesson.title}</h3><p class="lesson-meta">{lesson.annualNumbers.length > 1 ? 'уроки' : 'урок'} {lessonRanges(lesson.annualNumbers)} · {lesson.annualNumbers.length} ч</p></div></div>
                 <PlanMaterials items={lesson.materials} title={lesson.title} />
               </li>)}
             </ol>
@@ -113,6 +113,7 @@ const groups = subjects.map(subject => {
   .lesson-row{display:grid;grid-template-columns:minmax(220px,29%) minmax(0,1fr);gap:24px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);min-height:72px}
   .lesson-topic{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:center}
   .lesson-number{color:var(--accent);font-size:15px;font-variant-numeric:tabular-nums}
+  .lesson-meta{margin:2px 0 0;font-size:12px;color:var(--soft);font-variant-numeric:tabular-nums}
   h3{font-size:14px;line-height:1.45;letter-spacing:0;margin:0;font-weight:600;overflow-wrap:anywhere}
   .empty-quarter{font-size:14px;color:var(--soft);padding:20px 0}
   .plan-footer{display:flex;justify-content:space-between;gap:24px;align-items:start;padding-top:24px;color:var(--soft);font-size:12px}

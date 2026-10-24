@@ -23,6 +23,16 @@ export function quarterTopics(plan: Plan, quarter: number) {
   return [...topics.values()];
 }
 
+// Номера уроков за год одной строкой: «44–50» или «92–98, 145–150» (тема могла повторяться в четверти)
+export function lessonRanges(numbers: number[]) {
+  const parts: string[] = [];
+  [...numbers].sort((x, y) => x - y).forEach((n, i, all) => {
+    if (i > 0 && n === all[i - 1] + 1) parts[parts.length - 1] = parts[parts.length - 1].replace(/–\d+$/, '') + `–${n}`;
+    else parts.push(String(n));
+  });
+  return parts.join(', ');
+}
+
 export const PLAN_SOURCES: Record<string, string> = {
   math: 'https://gim87-sar.gosuslugi.ru/netcat_files/30/69/4._matematika_5_6_pod.pdf',
   algebra: 'https://gim87-sar.gosuslugi.ru/netcat_files/30/69/5._algebra_7_9_podp.pdf',
