@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Инструменты для доски — Матшаг</title>
+<meta name="description" content="Инструменты для урока математики на проекторе: таймер, кто отвечает, деление на группы, доска в клетку, числовая прямая, координатная плоскость, транспортир.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%E2%88%A0%E2%96%B3%E2%88%A5%E2%8A%A5%CF%80%E2%89%A0%E2%88%9E%E2%96%A1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F3EB; --surface:#FFFDF8; --ink:#203B31; --soft:#5C7065; --line:#D8DFD2; --grid:rgba(37,100,73,.13); --grid2:rgba(37,100,73,.28);
+  --accent:#256449; --accent-ink:#FFFFFF; --warm:#B94C2D; --warm-soft:#F6DDD3; --blue:#2F6F8F; --tint:#E8EEDF;
+  --pen1:#203B31; --pen2:#B94C2D; --pen3:#2F6F8F; --pen4:#2E8B57;
+  --font:'Golos Text','Noto Sans Math','Cambria Math','Segoe UI Symbol','Segoe UI',system-ui,-apple-system,sans-serif;
+  --r:14px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.12); --grid2:rgba(153,215,180,.28);
+    --accent:#99D7B4; --accent-ink:#153725; --warm:#FFAE8C; --warm-soft:#5B3326; --blue:#8FCBE3; --tint:#2A4033;
+    --pen1:#EDF5EB; --pen2:#FFAE8C; --pen3:#8FCBE3; --pen4:#99D7B4; color-scheme:dark; }
+}
+:root[data-theme="dark"]{ --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.12); --grid2:rgba(153,215,180,.28);
+  --accent:#99D7B4; --accent-ink:#153725; --warm:#FFAE8C; --warm-soft:#5B3326; --blue:#8FCBE3; --tint:#2A4033;
+  --pen1:#EDF5EB; --pen2:#FFAE8C; --pen3:#8FCBE3; --pen4:#99D7B4; color-scheme:dark; }
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:400 18px/1.4 var(--font);display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);height:100vh;height:100dvh;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:.45em .9em;font-weight:600;min-height:48px}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
+input[type=number],input[type=text],select{min-height:48px;padding:.3em .5em;border:2px solid var(--line);border-radius:10px;background:var(--surface)}
+input[type=number]{width:4.2em;text-align:center}
+[hidden]{display:none !important}
+label{display:inline-flex;align-items:center;gap:8px}
+input[type=checkbox]{width:22px;height:22px;accent-color:var(--accent)}
+
+/* верхняя строка: вкладки инструментов */
+.bar{display:flex;align-items:center;gap:8px;padding:8px clamp(8px,2vw,24px);border-bottom:1px solid var(--line);background:var(--surface)}
+.tabs{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{white-space:nowrap;font-size:15px;padding:.3em .55em}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.bar .side{display:flex;gap:6px;flex:none}
+.tosite{display:inline-flex;align-items:center;min-height:48px;padding:0 .8em;border:2px solid var(--line);border-radius:12px;color:var(--ink);font-weight:600;text-decoration:none;white-space:nowrap}
+.icon{min-width:46px;padding:.35em .5em}
+@media (max-width:1240px){ .tosite .t{display:none} }
+@media (max-width:860px){ .tabs button .t{display:none} }
+
+main{min-height:0;position:relative}
+.tool{position:absolute;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr);padding:10px clamp(10px,2.5vw,32px) 12px}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding-bottom:8px}
+.ctl .sep{width:1px;align-self:stretch;background:var(--line)}
+.stage{min-height:0;display:flex;align-items:center;justify-content:center;position:relative}
+.stage svg{width:100%;height:100%;touch-action:none;user-select:none}
+.big-msg{font-size:clamp(20px,2.4vw,30px);color:var(--soft);text-align:center}
+
+/* таймер */
+.digits{font:800 clamp(90px,24vmin,360px)/1 var(--font);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.timer-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%}
+.progress{width:min(900px,90%);height:16px;border-radius:8px;background:var(--line);overflow:hidden}
+.progress div{height:100%;background:var(--accent);width:100%}
+.timer-wrap.done .digits{color:var(--warm);animation:flash 1s steps(2) 6}
+.timer-wrap.done .progress div{background:var(--warm)}
+@keyframes flash{50%{opacity:.25}}
+.tbtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.tbtns button{font-size:24px;min-width:5em;min-height:60px}
+
+/* кто отвечает, группы */
+.pick-wrap{display:flex;flex-direction:column;align-items:center;gap:16px}
+.pick-num{font:800 clamp(120px,34vmin,420px)/1 var(--font);font-variant-numeric:tabular-nums;color:var(--accent)}
+.pick-num.rolling{color:var(--soft)}
+.called{font-size:20px;color:var(--soft);max-width:900px;text-align:center}
+.groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;width:100%;align-content:start;align-self:start;overflow:auto;max-height:100%}
+.group{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:12px 16px}
+.group b{display:block;font-size:20px;color:var(--soft)}
+.group span{font:800 clamp(28px,3.4vw,44px)/1.3 var(--font);font-variant-numeric:tabular-nums}
+
+/* рисунки */
+.paper{background:var(--surface)}
+svg .cell{stroke:var(--grid);stroke-width:1}
+svg .cell2{stroke:var(--grid2);stroke-width:1.2}
+svg .stroke{fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .axis{stroke:var(--ink);stroke-width:3}
+svg .tick{stroke:var(--ink);stroke-width:2}
+svg .tick.minor{stroke:var(--soft);stroke-width:1.5}
+svg .lab{font:600 22px var(--font);fill:var(--ink);text-anchor:middle}
+svg .lab.small{font-size:18px;fill:var(--soft)}
+svg .axname{font:italic 700 28px var(--font);fill:var(--ink)}
+svg .pt{fill:var(--warm);stroke:var(--surface);stroke-width:3}
+svg .ptname{font:700 26px var(--font);fill:var(--warm);text-anchor:middle;paint-order:stroke;stroke:var(--bg);stroke-width:6px}
+svg .ptval{font:600 22px var(--font);fill:var(--ink);text-anchor:middle;paint-order:stroke;stroke:var(--bg);stroke-width:6px}
+svg .link{fill:none;stroke:var(--warm);stroke-width:4;stroke-linejoin:round}
+svg .ray{stroke:var(--ink);stroke-width:5;stroke-linecap:round}
+svg .arc{fill:var(--warm-soft);stroke:var(--warm);stroke-width:3}
+svg .prot{fill:color-mix(in srgb,var(--blue) 12%,transparent);stroke:var(--blue);stroke-width:2}
+svg .prot-t{stroke:var(--blue);stroke-width:1.5}
+svg .prot-t.mid{stroke-width:2}
+svg .prot-t.long{stroke-width:2.5}
+svg .prot-l{font:600 20px var(--font);fill:var(--blue);text-anchor:middle;dominant-baseline:central}
+svg .prot-l.in{font-size:15px}
+svg .handle{fill:var(--warm);stroke:var(--surface);stroke-width:4;cursor:grab}
+/* числовая прямая и плоскость ужимаются под экран — подписи крупнее, чтобы читались с последней парты */
+#nlSvg .lab{font-size:36px} #nlSvg .lab.small{font-size:26px} #nlSvg .ptname{font-size:44px} #nlSvg .ptval{font-size:36px}
+#nlSvg .axis{stroke-width:4} #nlSvg .tick{stroke-width:3}
+#cpSvg .lab{font-size:28px} #cpSvg .lab.small{font-size:24px} #cpSvg .ptname{font-size:30px} #cpSvg .axname{font-size:34px}
+svg .angle-val{font:800 64px var(--font);fill:var(--warm);text-anchor:middle;paint-order:stroke;stroke:var(--bg);stroke-width:10px}
+.pens{display:flex;gap:6px}
+.pens button{width:48px;padding:0}
+.pens .dot{display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:middle}
+@media (prefers-reduced-motion: reduce){ .timer-wrap.done .digits{animation:none} }
+@media (max-width:640px){ body{font-size:16px} .tbtns button{font-size:19px;min-width:4em} }
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="tabs" role="tablist" aria-label="Инструменты">
+    <button type="button" role="tab" data-tool="timer">⏱<span class="t"> Таймер</span></button>
+    <button type="button" role="tab" data-tool="pick">🎯<span class="t"> Кто отвечает</span></button>
+    <button type="button" role="tab" data-tool="groups">👥<span class="t"> Группы</span></button>
+    <button type="button" role="tab" data-tool="grid">✏️<span class="t"> Клетка</span></button>
+    <button type="button" role="tab" data-tool="line" title="Числовая прямая">↔<span class="t"> Прямая</span></button>
+    <button type="button" role="tab" data-tool="coord">⌖<span class="t"> Координаты</span></button>
+    <button type="button" role="tab" data-tool="prot">◠<span class="t"> Транспортир</span></button>
+  </div>
+  <div class="side">
+    <a class="tosite" id="toSite" target="_top" hidden>←<span class="t"> На сайт</span></a>
+    <button class="icon" type="button" data-act="theme" title="Светлая или тёмная тема" aria-label="Сменить тему">◐</button>
+    <button class="icon" type="button" data-act="full" title="Во весь экран (F)" aria-label="Во весь экран">⛶</button>
+  </div>
+</header>
+
+<main>
+  <!-- таймер и секундомер -->
+  <section class="tool" id="t-timer" role="tabpanel" hidden>
+    <div class="ctl">
+      <button type="button" data-tm-mode="down" aria-pressed="true">Таймер</button>
+      <button type="button" data-tm-mode="up" aria-pressed="false">Секундомер</button>
+      <span class="sep"></span>
+      <span id="tmPresets" class="ctl" style="padding:0"></span>
+      <button type="button" data-tm-add="-30" aria-label="Меньше на 30 секунд">−30 с</button>
+      <button type="button" data-tm-add="30" aria-label="Больше на 30 секунд">+30 с</button>
+      <span class="sep"></span>
+      <label><input type="checkbox" id="tmSound" checked> звук в конце</label>
+    </div>
+    <div class="stage"><div class="timer-wrap" id="tmWrap">
+      <div class="digits" id="tmDigits" aria-live="polite">05:00</div>
+      <div class="progress" id="tmBar"><div></div></div>
+      <div class="tbtns">
+        <button type="button" class="main" id="tmGo">▶ Старт</button>
+        <button type="button" id="tmReset">↺ Сначала</button>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- кто отвечает -->
+  <section class="tool" id="t-pick" role="tabpanel" hidden>
+    <div class="ctl">
+      <label>Учеников в классе <input type="number" id="clN" min="2" max="45" value="25"></label>
+      <label>Отсутствуют <input type="text" id="clAbsent" placeholder="например: 3, 17" size="12" inputmode="numeric" autocomplete="off"></label>
+      <label><input type="checkbox" id="pkNoRepeat" checked> без повторов</label>
+      <button type="button" id="pkReset">↺ Сначала</button>
+    </div>
+    <div class="stage"><div class="pick-wrap">
+      <div class="pick-num" id="pkNum" aria-live="polite">?</div>
+      <button type="button" class="main" id="pkGo" style="font-size:28px;min-height:72px;padding:.3em 1.4em">🎯 Кто отвечает?</button>
+      <div class="called" id="pkCalled">Номер по списку в журнале. Пробел или Enter — следующий.</div>
+    </div></div>
+  </section>
+
+  <!-- группы -->
+  <section class="tool" id="t-groups" role="tabpanel" hidden>
+    <div class="ctl">
+      <span>Учеников: <b id="grN">25</b> <small id="grAbs" style="color:var(--soft)"></small></span>
+      <span class="sep"></span>
+      <label><input type="radio" name="grBy" value="count" checked> групп</label>
+      <label><input type="radio" name="grBy" value="size"> по</label>
+      <input type="number" id="grK" min="2" max="15" value="4" aria-label="Число групп или размер группы">
+      <span id="grUnit">групп</span>
+      <button type="button" class="main" id="grGo">👥 Разделить</button>
+    </div>
+    <div class="stage" style="align-items:flex-start"><div class="groups" id="grOut"><p class="big-msg">Число учеников и отсутствующих — на вкладке «Кто отвечает».</p></div></div>
+  </section>
+
+  <!-- доска в клетку -->
+  <section class="tool" id="t-grid" role="tabpanel" hidden>
+    <div class="ctl">
+      <span class="pens" id="pens">
+        <button type="button" data-pen="pen1" aria-label="Ручка: основной цвет"><span class="dot" style="background:var(--pen1)"></span></button>
+        <button type="button" data-pen="pen2" aria-label="Ручка: красная"><span class="dot" style="background:var(--pen2)"></span></button>
+        <button type="button" data-pen="pen3" aria-label="Ручка: синяя"><span class="dot" style="background:var(--pen3)"></span></button>
+        <button type="button" data-pen="pen4" aria-label="Ручка: зелёная"><span class="dot" style="background:var(--pen4)"></span></button>
+      </span>
+      <button type="button" data-width="4" aria-pressed="true">тонко</button>
+      <button type="button" data-width="10" aria-pressed="false">толсто</button>
+      <button type="button" data-erase aria-pressed="false">🧽 ластик</button>
+      <span class="sep"></span>
+      <button type="button" id="gdUndo">↶ отменить</button>
+      <button type="button" id="gdClear">🗑 очистить</button>
+      <span class="sep"></span>
+      <label>клетка <select id="gdCell"><option value="24">мелкая</option><option value="36" selected>средняя</option><option value="52">крупная</option><option value="0">без клетки</option></select></label>
+    </div>
+    <div class="stage paper" id="gdStage"></div>
+  </section>
+
+  <!-- числовая прямая -->
+  <section class="tool" id="t-line" role="tabpanel" hidden>
+    <div class="ctl">
+      <label>от <input type="number" id="nlFrom" value="-5" step="1"></label>
+      <label>до <input type="number" id="nlTo" value="5" step="1"></label>
+      <label>деления <select id="nlSub"><option value="1">единицы</option><option value="2">половины</option><option value="4">четверти</option><option value="5">пятые</option><option value="10">десятые</option></select></label>
+      <button type="button" data-nl="zoomin" aria-label="Приблизить">＋</button>
+      <button type="button" data-nl="zoomout" aria-label="Отдалить">－</button>
+      <button type="button" data-nl="left" aria-label="Сдвинуть влево">←</button>
+      <button type="button" data-nl="right" aria-label="Сдвинуть вправо">→</button>
+      <span class="sep"></span>
+      <label><input type="checkbox" id="nlShow" checked> координаты точек</label>
+      <button type="button" id="nlClear">🗑 убрать точки</button>
+    </div>
+    <div class="stage" id="nlStage"></div>
+  </section>
+
+  <!-- координатная плоскость -->
+  <section class="tool" id="t-coord" role="tabpanel" hidden>
+    <div class="ctl">
+      <label>размер <select id="cpR"><option value="5">−5…5</option><option value="10" selected>−10…10</option><option value="15">−15…15</option></select></label>
+      <label><input type="checkbox" id="cpShow" checked> координаты точек</label>
+      <label><input type="checkbox" id="cpLink"> соединять точки</label>
+      <label><input type="checkbox" id="cpHalf"> через 0,5</label>
+      <span class="sep"></span>
+      <button type="button" id="cpUndo">↶ последняя точка</button>
+      <button type="button" id="cpClear">🗑 очистить</button>
+    </div>
+    <div class="stage" id="cpStage"></div>
+  </section>
+
+  <!-- транспортир -->
+  <section class="tool" id="t-prot" role="tabpanel" hidden>
+    <div class="ctl">
+      <label><input type="checkbox" id="prTool" checked> транспортир</label>
+      <label><input type="checkbox" id="prVal" checked> величина угла</label>
+      <label>шаг <select id="prSnap"><option value="1">1°</option><option value="5" selected>5°</option></select></label>
+      <button type="button" id="prRand">🎲 случайный угол</button>
+    </div>
+    <div class="stage" id="prStage"></div>
+  </section>
+</main>
+
+<script>
+'use strict';
+// ================= Параметры =================
+const CONFIG = {
+  timerPresets: [1, 2, 3, 5, 10, 15],   // кнопки таймера, минуты
+  timerStart: 5,                        // таймер при первом открытии, минуты
+  students: 25,                         // учеников в классе по умолчанию
+  rollMs: 900,                          // сколько мелькают номера перед выбором, мс
+};
+const TOOLS = ['timer', 'pick', 'groups', 'grid', 'line', 'coord', 'prot'];
+const P = new URLSearchParams(location.search);
+const PREVIEW = P.get('preview') === '1';
+const $ = id => document.getElementById(id);
+const store = {
+  get(k) { try { return localStorage.getItem('matshag:tools:' + k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem('matshag:tools:' + k, String(v)); } catch {} },
+};
+const motionMQ = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+const calm = () => !motionMQ || motionMQ.matches;
+const fmtNum = v => String(Math.round(v * 100) / 100).replace('.', ',').replace('-', '−');
+const svgPoint = (svg, e) => new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse());
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+// ================= Вкладки =================
+let tool = null;
+function show(name) {
+  if (!TOOLS.includes(name)) name = 'timer';
+  tool = name;
+  TOOLS.forEach(t => { $('t-' + t).hidden = t !== name; });
+  document.querySelectorAll('[data-tool]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tool === name)));
+  store.set('tool', name);
+  ({ timer: tmRender, pick: pkRender, groups: grRender, grid: gdRender, line: nlRender, coord: cpRender, prot: prRender })[name]();
+}
+
+// ================= ⏱ Таймер и секундомер =================
+// Время считается от часов (performance.now), а не числом тиков — не «плывёт» в фоновой вкладке.
+const TM = { mode: 'down', total: CONFIG.timerStart * 60e3, left: CONFIG.timerStart * 60e3, up: 0, run: false, at: 0, done: false, timer: 0 };
+const now = () => performance.now();
+function tmText() {
+  const ms = TM.mode === 'down' ? TM.left : TM.up;
+  const s = TM.mode === 'down' ? Math.ceil(ms / 1000) : Math.floor(ms / 1000);
+  return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+}
+function tmTick(t = now()) {
+  if (TM.run) {
+    if (TM.mode === 'down') {
+      TM.left = Math.max(0, TM.left - (t - TM.at));
+      if (TM.left === 0) { TM.run = false; TM.done = true; beep(); }
+    } else TM.up += t - TM.at;
+    TM.at = t;
+  }
+  tmRender();
+}
+function tmStart(t = now()) {
+  if (TM.mode === 'down' && TM.left === 0) TM.left = TM.total;
+  TM.done = false; TM.run = true; TM.at = t;
+  clearInterval(TM.timer);
+  TM.timer = setInterval(() => tmTick(), 200);
+  tmRender();
+}
+function tmPause(t = now()) { tmTick(t); TM.run = false; clearInterval(TM.timer); tmRender(); }
+function tmToggle() { TM.run ? tmPause() : tmStart(); }
+function tmReset() { TM.run = false; TM.done = false; clearInterval(TM.timer); TM.left = TM.total; TM.up = 0; tmRender(); }
+function tmSet(min) { TM.total = Math.round(min * 60e3); store.set('timer', min); tmReset(); }
+function tmAdd(sec) {
+  TM.total = clamp(TM.total + sec * 1000, 10e3, 99 * 60e3);
+  TM.left = clamp(TM.left + sec * 1000, 0, 99 * 60e3);
+  TM.done = false; tmRender();
+}
+function tmMode(m) { TM.mode = m; tmReset(); }
+function tmRender() {
+  $('tmDigits').textContent = tmText();
+  $('tmWrap').classList.toggle('done', TM.done);
+  $('tmBar').hidden = TM.mode === 'up';
+  $('tmBar').firstElementChild.style.width = (TM.total ? 100 * TM.left / TM.total : 0) + '%';
+  $('tmGo').textContent = TM.run ? '⏸ Пауза' : '▶ Старт';
+  document.querySelectorAll('[data-tm-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tmMode === TM.mode)));
+  document.querySelectorAll('[data-tm-add],#tmPresets button').forEach(b => { b.disabled = TM.mode === 'up'; });
+}
+// короткий сигнал в конце: три тона, без файлов (Web Audio)
+function beep() {
+  if (PREVIEW || !$('tmSound').checked) return;
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    [0, .35, .7].forEach(d => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.frequency.value = 880; o.connect(g); g.connect(ac.destination);
+      g.gain.setValueAtTime(.25, ac.currentTime + d); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + d + .3);
+      o.start(ac.currentTime + d); o.stop(ac.currentTime + d + .3);
+    });
+  } catch {}
+}
+
+// ================= 🎯 Кто отвечает =================
+// Только номера по журналу: имена учеников на сайте не храним.
+const CL = { n: CONFIG.students, absent: [], called: [], current: null, rolling: false };
+function parseAbsent(text, n) {
+  return [...new Set(String(text).split(/[^\d]+/).filter(Boolean).map(Number).filter(x => x >= 1 && x <= n))].sort((a, b) => a - b);
+}
+const present = () => Array.from({ length: CL.n }, (_, i) => i + 1).filter(x => !CL.absent.includes(x));
+function pool() { return present().filter(x => !$('pkNoRepeat').checked || !CL.called.includes(x)); }
+function pkChoose(rand = Math.random) {
+  const p = pool();
+  if (!p.length) return null;
+  const x = p[Math.floor(rand() * p.length)];
+  CL.current = x;
+  if (!CL.called.includes(x)) CL.called.push(x);
+  return x;
+}
+function pkGo() {
+  if (CL.rolling) return;
+  if (!pool().length) { CL.current = null; pkRender('Все уже отвечали — нажмите «Сначала»'); return; }
+  if (calm()) { pkChoose(); pkRender(); return; }
+  CL.rolling = true;
+  const t0 = now(), p = pool();
+  const roll = () => {
+    if (now() - t0 < CONFIG.rollMs) { $('pkNum').textContent = p[Math.floor(Math.random() * p.length)]; requestAnimationFrame(roll); }
+    else { CL.rolling = false; pkChoose(); pkRender(); }
+  };
+  $('pkNum').classList.add('rolling');
+  roll();
+}
+function pkReset() { CL.called = []; CL.current = null; pkRender(); }
+function readClass() {
+  CL.n = clamp(parseInt($('clN').value, 10) || CONFIG.students, 2, 45);
+  CL.absent = parseAbsent($('clAbsent').value, CL.n);
+  CL.called = CL.called.filter(x => x <= CL.n);
+  store.set('n', CL.n); store.set('absent', CL.absent.join(', '));
+}
+function pkRender(msg) {
+  $('pkNum').classList.remove('rolling');
+  $('pkNum').textContent = CL.current ?? '?';
+  const left = pool().length;
+  $('pkCalled').textContent = msg || (CL.called.length
+    ? `Уже отвечали: ${CL.called.join(', ')}. Осталось: ${left}.`
+    : 'Номер по списку в журнале. Пробел или Enter — следующий.');
+}
+
+// ================= 👥 Группы =================
+function shuffle(arr, rand = Math.random) {
+  const r = arr.slice();
+  for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
+  return r;
+}
+// по кругу — размеры групп отличаются не больше чем на одного
+function splitGroups(people, by, k, rand = Math.random) {
+  const count = by === 'size' ? Math.max(1, Math.ceil(people.length / Math.max(1, k))) : Math.max(1, Math.min(k, people.length));
+  const groups = Array.from({ length: count }, () => []);
+  shuffle(people, rand).forEach((x, i) => groups[i % count].push(x));
+  return groups.map(g => g.sort((a, b) => a - b));
+}
+let lastGroups = null;
+function grGo() {
+  const by = document.querySelector('[name=grBy]:checked').value;
+  lastGroups = splitGroups(present(), by, parseInt($('grK').value, 10) || 4);
+  grRender();
+}
+function grRender() {
+  $('grN').textContent = present().length;
+  $('grAbs').textContent = CL.absent.length ? `(отсутствуют: ${CL.absent.join(', ')})` : '';
+  $('grUnit').textContent = document.querySelector('[name=grBy]:checked').value === 'size' ? 'человек в группе' : 'групп';
+  if (lastGroups) $('grOut').innerHTML = lastGroups.map((g, i) => `<div class="group"><b>Группа ${i + 1}</b><span>${g.join(', ')}</span></div>`).join('');
+}
+
+// ================= ✏️ Доска в клетку =================
+// Рисунок — линии SVG: их можно отменять по одной, и рисунок не теряется при смене размера окна.
+const GD = { strokes: [], pen: 'pen1', width: 4, erase: false, cell: 36, drawing: null };
+const W = 1600, H = 900;
+function gdSVG() {
+  let s = `<svg id="gdSvg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-label="Доска в клетку">`;
+  if (GD.cell) {
+    for (let x = 0, i = 0; x <= W; x += GD.cell, i++) s += `<line class="${i % 5 ? 'cell' : 'cell2'}" x1="${x}" y1="0" x2="${x}" y2="${H}"/>`;
+    for (let y = 0, i = 0; y <= H; y += GD.cell, i++) s += `<line class="${i % 5 ? 'cell' : 'cell2'}" x1="0" y1="${y}" x2="${W}" y2="${y}"/>`;
+  }
+  s += GD.strokes.map((st, i) => strokePath(st, i)).join('');
+  return s + '</svg>';
+}
+const strokePath = (st, i) => `<path class="stroke" data-i="${i}" style="stroke:var(--${st.pen});stroke-width:${st.width}" d="${st.pts.map((p, k) => (k ? 'L' : 'M') + Math.round(p.x) + ' ' + Math.round(p.y)).join('')}${st.pts.length === 1 ? 'l0.1 0' : ''}"/>`;
+function gdRender() {
+  $('gdStage').innerHTML = gdSVG();
+  document.querySelectorAll('[data-pen]').forEach(b => b.setAttribute('aria-pressed', String(!GD.erase && b.dataset.pen === GD.pen)));
+  document.querySelectorAll('[data-width]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.width === GD.width)));
+  document.querySelector('[data-erase]').setAttribute('aria-pressed', String(GD.erase));
+}
+function gdBegin(p) { GD.drawing = { pen: GD.pen, width: GD.width, pts: [p] }; GD.strokes.push(GD.drawing); }
+function gdMove(p) {
+  const st = GD.drawing, last = st.pts[st.pts.length - 1];
+  if (Math.hypot(p.x - last.x, p.y - last.y) < 2) return;
+  st.pts.push(p);
+  const path = $('gdSvg')?.querySelector(`[data-i="${GD.strokes.length - 1}"]`);
+  if (path) path.outerHTML = strokePath(st, GD.strokes.length - 1);
+}
+// ластик стирает линию целиком, если пройти рядом с ней
+function gdEraseAt(p, r = 18) {
+  const before = GD.strokes.length;
+  GD.strokes = GD.strokes.filter(st => !st.pts.some(q => Math.hypot(q.x - p.x, q.y - p.y) < r + st.width));
+  if (GD.strokes.length !== before) gdRender();
+}
+function gdUndo() { GD.strokes.pop(); gdRender(); }
+function gdClear() { GD.strokes = []; gdRender(); }
+
+// ================= ↔ Числовая прямая =================
+const NL = { from: -5, to: 5, sub: 1, points: [], show: true };
+const NLW = 1600, NLM = 80, NLY = 240;
+const LETTERS = 'ABCDEFGHKLMNPRST';
+const nlX = v => NLM + (v - NL.from) * (NLW - 2 * NLM) / (NL.to - NL.from);
+const nlV = x => NL.from + (x - NLM) * (NL.to - NL.from) / (NLW - 2 * NLM);
+const snapTo = (v, sub) => Math.round(v * sub) / sub;
+function nlRender() {
+  const span = NL.to - NL.from, unit = (NLW - 2 * NLM) / span;
+  // подписи не чаще, чем помещаются: шаг 1, 2, 5, 10…
+  const every = [1, 2, 5, 10, 20, 50].find(k => unit * k >= 90) || 100;
+  let s = `<svg id="nlSvg" viewBox="0 0 ${NLW} 420" aria-label="Числовая прямая">`;
+  s += `<line class="axis" x1="${NLM - 40}" y1="${NLY}" x2="${NLW - NLM + 40}" y2="${NLY}"/><path d="M${NLW - NLM + 40} ${NLY} l-18 -10 v20 z" style="fill:var(--ink)"/>`;
+  const sub = unit / NL.sub >= 8 ? NL.sub : 1;
+  for (let i = Math.ceil(NL.from * sub); i <= NL.to * sub; i++) {
+    const v = i / sub, x = nlX(v), major = Number.isInteger(v);
+    s += `<line class="tick${major ? '' : ' minor'}" x1="${x}" y1="${NLY - (major ? 20 : 11)}" x2="${x}" y2="${NLY + (major ? 20 : 11)}"/>`;
+    if (major && v % every === 0) s += `<text class="lab" x="${x}" y="${NLY + 66}">${fmtNum(v)}</text>`;
+  }
+  NL.points.forEach((p, i) => {
+    if (p.v < NL.from || p.v > NL.to) return;
+    const x = nlX(p.v);
+    s += `<circle class="pt" cx="${x}" cy="${NLY}" r="14"/><text class="ptname" x="${x}" y="${NLY - 38}">${p.name}</text>`;
+    if (NL.show) s += `<text class="ptval" x="${x}" y="${NLY - 90}">${fmtNum(p.v)}</text>`;
+  });
+  s += `<text class="lab small" x="${NLW / 2}" y="400">Нажмите на прямую — появится точка</text>`;
+  $('nlStage').innerHTML = s + '</svg>';
+  $('nlFrom').value = NL.from; $('nlTo').value = NL.to; $('nlSub').value = NL.sub; $('nlShow').checked = NL.show;
+}
+function nlAdd(v) {
+  v = snapTo(clamp(v, NL.from, NL.to), NL.sub);
+  if (NL.points.some(p => Math.abs(p.v - v) < 1e-9)) return null;
+  const p = { v, name: LETTERS[NL.points.length % LETTERS.length] };
+  NL.points.push(p); nlRender();
+  return p;
+}
+function nlRange(from, to) {
+  from = Math.floor(from + 1e-9); to = Math.ceil(to - 1e-9);   // целые границы, приближение симметрично
+  if (to - from < 2) to = from + 2;
+  if (to - from > 200) to = from + 200;
+  NL.from = from; NL.to = to; nlRender();
+}
+function nlCmd(c) {
+  const span = NL.to - NL.from, mid = (NL.from + NL.to) / 2, step = Math.max(1, Math.round(span / 4));
+  if (c === 'zoomin') nlRange(mid - span / 4, mid + span / 4);
+  if (c === 'zoomout') nlRange(mid - span, mid + span);
+  if (c === 'left') nlRange(NL.from - step, NL.to - step);
+  if (c === 'right') nlRange(NL.from + step, NL.to + step);
+}
+
+// ================= ⌖ Координатная плоскость =================
+const CP = { r: 10, points: [], show: true, link: false, half: false };
+const CPS = 900, CPM = 50;
+const cpUnit = () => (CPS - 2 * CPM) / (2 * CP.r);
+const cpX = x => CPS / 2 + x * cpUnit(), cpY = y => CPS / 2 - y * cpUnit();
+const fmtPt = p => `(${fmtNum(p.x)}; ${fmtNum(p.y)})`;
+function cpRender() {
+  const u = cpUnit(), every = CP.r > 10 ? 5 : CP.r > 5 ? 2 : 1;
+  let s = `<svg id="cpSvg" viewBox="0 0 ${CPS} ${CPS}" aria-label="Координатная плоскость" style="max-width:min(100%,calc(100vh - 150px))">`;
+  for (let i = -CP.r; i <= CP.r; i++) {
+    const cls = i % 5 ? 'cell' : 'cell2';
+    s += `<line class="${cls}" x1="${cpX(i)}" y1="${CPM}" x2="${cpX(i)}" y2="${CPS - CPM}"/><line class="${cls}" x1="${CPM}" y1="${cpY(i)}" x2="${CPS - CPM}" y2="${cpY(i)}"/>`;
+  }
+  s += `<line class="axis" x1="${CPM - 20}" y1="${CPS / 2}" x2="${CPS - CPM + 20}" y2="${CPS / 2}"/><line class="axis" x1="${CPS / 2}" y1="${CPS - CPM + 20}" x2="${CPS / 2}" y2="${CPM - 20}"/>`;
+  s += `<path d="M${CPS - CPM + 26} ${CPS / 2} l-18 -9 v18 z M${CPS / 2} ${CPM - 26} l-9 18 h18 z" style="fill:var(--ink)"/>`;
+  s += `<text class="axname" x="${CPS - CPM + 4}" y="${CPS / 2 + 38}">x</text><text class="axname" x="${CPS / 2 + 14}" y="${CPM - 4}">y</text>`;
+  s += `<text class="lab" x="${CPS / 2 - 16}" y="${CPS / 2 + 28}">0</text>`;
+  for (let i = -CP.r; i <= CP.r; i++) {
+    if (!i || i % every) continue;
+    s += `<line class="tick" x1="${cpX(i)}" y1="${CPS / 2 - 7}" x2="${cpX(i)}" y2="${CPS / 2 + 7}"/><text class="lab small" x="${cpX(i)}" y="${CPS / 2 + 34}">${fmtNum(i)}</text>`;
+    s += `<line class="tick" x1="${CPS / 2 - 7}" y1="${cpY(i)}" x2="${CPS / 2 + 7}" y2="${cpY(i)}"/><text class="lab small" x="${CPS / 2 - 14}" y="${cpY(i) + 8}" style="text-anchor:end">${fmtNum(i)}</text>`;
+  }
+  if (CP.link && CP.points.length > 1) s += `<polyline class="link" points="${CP.points.map(p => cpX(p.x) + ',' + cpY(p.y)).join(' ')}"/>`;
+  CP.points.forEach(p => {
+    if (p.dup) return;   // повтор уже поставленной точки (замыкание рисунка) — без второй подписи
+    const x = cpX(p.x), y = cpY(p.y);
+    s += `<circle class="pt" cx="${x}" cy="${y}" r="${Math.max(6, Math.min(10, u / 4))}"/>`;
+    s += `<text class="ptname" x="${x + 6}" y="${y - 16}" style="text-anchor:start">${p.name}${CP.show ? fmtPt(p) : ''}</text>`;
+  });
+  $('cpStage').innerHTML = s + '</svg>';
+  $('cpR').value = CP.r; $('cpShow').checked = CP.show; $('cpLink').checked = CP.link; $('cpHalf').checked = CP.half;
+}
+function cpAdd(x, y) {
+  const sub = CP.half ? 2 : 1;
+  x = snapTo(clamp(x, -CP.r, CP.r), sub); y = snapTo(clamp(y, -CP.r, CP.r), sub);
+  const same = CP.points.find(p => p.x === x && p.y === y && !p.dup);
+  if (same && !CP.link) return null;
+  // в режиме «соединять» можно вернуться в уже поставленную точку: линия идёт туда, буква — прежняя
+  const n = CP.points.filter(p => !p.dup).length;
+  const p = same ? { x, y, name: same.name, dup: true }
+    : { x, y, name: LETTERS[n % LETTERS.length] + (n >= LETTERS.length ? Math.floor(n / LETTERS.length) : '') };
+  CP.points.push(p); cpRender();
+  return p;
+}
+
+// ================= ◠ Транспортир =================
+const PR = { angle: 50, snap: 5, tool: true, val: true };
+const PRV = { x: 600, y: 560 }, PRR = 380;
+const prPt = (a, r) => ({ x: PRV.x + r * Math.cos(a * Math.PI / 180), y: PRV.y - r * Math.sin(a * Math.PI / 180) });
+function prSet(a) { PR.angle = clamp(Math.round(a / PR.snap) * PR.snap, 0, 180); prRender(); }
+function prRender() {
+  const f = n => Math.round(n * 10) / 10;
+  let s = `<svg id="prSvg" viewBox="0 0 1200 660" aria-label="Транспортир и угол">`;
+  if (PR.tool) {
+    s += `<path class="prot" d="M${PRV.x - PRR} ${PRV.y} A${PRR} ${PRR} 0 0 1 ${PRV.x + PRR} ${PRV.y} Z"/>`;
+    for (let d = 0; d <= 180; d++) {
+      const long = d % 10 === 0, mid = d % 5 === 0, a = prPt(d, PRR), b = prPt(d, PRR - (long ? 30 : mid ? 20 : 11));
+      s += `<line class="prot-t${long ? ' long' : mid ? ' mid' : ''}" x1="${f(a.x)}" y1="${f(a.y)}" x2="${f(b.x)}" y2="${f(b.y)}"/>`;
+      if (long) {
+        const lift = d === 0 || d === 180 ? 18 : 0;   // у концов шкалы подпись выше луча
+        const o = prPt(d, PRR - 52), i = prPt(d, PRR - 84);
+        s += `<text class="prot-l" x="${f(o.x)}" y="${f(o.y - lift)}">${d}</text>`;
+        if (lift === 0) s += `<text class="prot-l in" x="${f(i.x)}" y="${f(i.y)}">${180 - d}</text>`;
+      }
+    }
+  }
+  const end = prPt(PR.angle, PRR + 120), h = prPt(PR.angle, PRR + 80), arcEnd = prPt(PR.angle, 90);
+  s += `<path class="arc" d="M${PRV.x} ${PRV.y} L${PRV.x + 90} ${PRV.y} A90 90 0 0 0 ${f(arcEnd.x)} ${f(arcEnd.y)} Z"/>`;
+  s += `<line class="ray" x1="${PRV.x}" y1="${PRV.y}" x2="${PRV.x + PRR + 120}" y2="${PRV.y}"/>`;
+  s += `<line class="ray" x1="${PRV.x}" y1="${PRV.y}" x2="${f(end.x)}" y2="${f(end.y)}"/>`;
+  s += `<circle cx="${PRV.x}" cy="${PRV.y}" r="7" style="fill:var(--ink)"/>`;
+  s += `<circle class="handle" data-drag="angle" cx="${f(h.x)}" cy="${f(h.y)}" r="24"><title>Потяните, чтобы изменить угол</title></circle>`;
+  if (PR.val) s += `<text class="angle-val" x="${PRV.x}" y="${PRV.y + 80}">${PR.angle}°</text>`;
+  $('prStage').innerHTML = s + '</svg>';
+  $('prTool').checked = PR.tool; $('prVal').checked = PR.val; $('prSnap').value = PR.snap;
+}
+
+// ================= Указатель: рисование, точки, угол =================
+let drag = null;
+document.querySelector('main').addEventListener('pointerdown', e => {
+  const svg = e.target.closest?.('svg');
+  if (!svg) return;
+  const p = svgPoint(svg, e);
+  if (svg.id === 'gdSvg') {
+    e.preventDefault(); svg.setPointerCapture?.(e.pointerId);
+    if (GD.erase) { drag = 'erase'; gdEraseAt(p); } else { drag = 'draw'; gdBegin(p); gdRender(); }
+  } else if (svg.id === 'nlSvg') nlAdd(nlV(p.x));
+  else if (svg.id === 'cpSvg') cpAdd((p.x - CPS / 2) / cpUnit(), (CPS / 2 - p.y) / cpUnit());
+  else if (svg.id === 'prSvg') { drag = 'angle'; e.preventDefault(); prDrag(p); }
+});
+function prDrag(p) {
+  let a = Math.atan2(PRV.y - p.y, p.x - PRV.x) * 180 / Math.PI;
+  if (a < 0) a = p.x < PRV.x ? 180 : 0;
+  prSet(a);
+}
+document.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const svg = $(drag === 'angle' ? 'prSvg' : 'gdSvg');
+  if (!svg) return;
+  const p = svgPoint(svg, e);
+  if (drag === 'draw') gdMove(p);
+  else if (drag === 'erase') gdEraseAt(p);
+  else prDrag(p);
+});
+const stopDrag = () => { drag = null; GD.drawing = null; };
+document.addEventListener('pointerup', stopDrag);
+document.addEventListener('pointercancel', stopDrag);
+
+// ================= Кнопки и клавиатура =================
+document.addEventListener('click', e => {
+  const b = e.target.closest?.('button');
+  if (!b) return;
+  if (b.dataset.tool) return show(b.dataset.tool);
+  if (b.dataset.act === 'theme') toggleTheme();
+  if (b.dataset.act === 'full') toggleFull();
+  if (b.dataset.tmMode) tmMode(b.dataset.tmMode);
+  if (b.dataset.tmPreset) tmSet(+b.dataset.tmPreset);
+  if (b.dataset.tmAdd) tmAdd(+b.dataset.tmAdd);
+  if (b.dataset.pen) { GD.pen = b.dataset.pen; GD.erase = false; gdRender(); }
+  if (b.dataset.width) { GD.width = +b.dataset.width; gdRender(); }
+  if (b.hasAttribute('data-erase')) { GD.erase = !GD.erase; gdRender(); }
+  if (b.dataset.nl) nlCmd(b.dataset.nl);
+});
+$('tmGo').addEventListener('click', tmToggle);
+$('tmReset').addEventListener('click', tmReset);
+$('pkGo').addEventListener('click', pkGo);
+$('pkReset').addEventListener('click', pkReset);
+['clN', 'clAbsent'].forEach(id => $(id).addEventListener('change', () => { readClass(); pkRender(); }));
+$('pkNoRepeat').addEventListener('change', () => pkRender());
+$('grGo').addEventListener('click', grGo);
+document.querySelectorAll('[name=grBy]').forEach(r => r.addEventListener('change', grRender));
+$('gdUndo').addEventListener('click', gdUndo);
+$('gdClear').addEventListener('click', gdClear);
+$('gdCell').addEventListener('change', () => { GD.cell = +$('gdCell').value; store.set('cell', GD.cell); gdRender(); });
+$('nlFrom').addEventListener('change', () => nlRange(+$('nlFrom').value, NL.to));
+$('nlTo').addEventListener('change', () => nlRange(NL.from, +$('nlTo').value));
+$('nlSub').addEventListener('change', () => { NL.sub = +$('nlSub').value; nlRender(); });
+$('nlShow').addEventListener('change', () => { NL.show = $('nlShow').checked; nlRender(); });
+$('nlClear').addEventListener('click', () => { NL.points = []; nlRender(); });
+$('cpR').addEventListener('change', () => { CP.r = +$('cpR').value; CP.points = CP.points.filter(p => Math.abs(p.x) <= CP.r && Math.abs(p.y) <= CP.r); cpRender(); });
+$('cpShow').addEventListener('change', () => { CP.show = $('cpShow').checked; cpRender(); });
+$('cpLink').addEventListener('change', () => { CP.link = $('cpLink').checked; cpRender(); });
+$('cpHalf').addEventListener('change', () => { CP.half = $('cpHalf').checked; cpRender(); });
+$('cpUndo').addEventListener('click', () => { CP.points.pop(); cpRender(); });
+$('cpClear').addEventListener('click', () => { CP.points = []; cpRender(); });
+$('prTool').addEventListener('change', () => { PR.tool = $('prTool').checked; prRender(); });
+$('prVal').addEventListener('change', () => { PR.val = $('prVal').checked; prRender(); });
+$('prSnap').addEventListener('change', () => { PR.snap = +$('prSnap').value; prSet(PR.angle); });
+$('prRand').addEventListener('click', () => { let a; do a = 10 + Math.floor(Math.random() * 161); while (Math.abs(a - PR.angle) < 15 || a === 90); prSet(a); });
+
+document.addEventListener('keydown', e => {
+  if (e.target.matches?.('input, select')) return;
+  if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') return toggleFull();
+  if (tool === 'timer' && e.key === ' ') { e.preventDefault(); tmToggle(); }
+  if (tool === 'timer' && (e.key === 'r' || e.key === 'R' || e.key === 'к' || e.key === 'К')) tmReset();
+  if (tool === 'pick' && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); pkGo(); }
+  if (tool === 'grid' && (e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'я')) { e.preventDefault(); gdUndo(); }
+  const n = parseInt(e.key, 10);
+  if (n >= 1 && n <= TOOLS.length && !e.ctrlKey && !e.metaKey) show(TOOLS[n - 1]);
+});
+
+function toggleTheme() {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : !!window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+  store.set('theme', root.dataset.theme);
+}
+async function toggleFull() {
+  try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen(); } catch {}
+}
+// «← На сайт»: открыто с сайта (/zapusk/<slug>/ или /materials/<slug>.html) — на страницу инструментов
+function siteHref() {
+  if (location.protocol === 'file:') return '';
+  let top = location;
+  try { if (window.top !== window && window.top.location.origin === location.origin) top = window.top.location; } catch {}
+  const z = top.pathname.match(/^(.*\/)zapusk\/([a-z0-9-]+)\/?$/);
+  if (z) return `${top.origin}${z[1]}item/${z[2]}/`;
+  const m = location.pathname.match(/^(.*\/)materials\/([a-z0-9-]+)\.html$/);
+  return m ? `${location.origin}${m[1]}item/${m[2]}/` : '';
+}
+
+// ================= Запуск =================
+(() => {
+  const th = store.get('theme');
+  if (th === 'dark' || th === 'light') document.documentElement.dataset.theme = th;
+  $('tmPresets').innerHTML = CONFIG.timerPresets.map(m => `<button type="button" data-tm-preset="${m}">${m} мин</button>`).join('');
+  const savedMin = parseFloat(store.get('timer'));
+  if (savedMin > 0) { TM.total = TM.left = savedMin * 60e3; }
+  const n = parseInt(store.get('n'), 10);
+  if (n >= 2 && n <= 45) $('clN').value = n;
+  $('clAbsent').value = store.get('absent') || '';
+  readClass();
+  const cell = store.get('cell');
+  if (cell !== null && ['0', '24', '36', '52'].includes(cell)) { GD.cell = +cell; $('gdCell').value = cell; }
+  const back = siteHref();
+  if (back) { $('toSite').href = back; $('toSite').hidden = false; }
+  if (PREVIEW) {
+    // превью на сайте: идёт таймер — без звука и без захвата фокуса
+    show('timer'); tmSet(5); tmStart();
+  } else show(P.get('tool') || store.get('tool') || 'timer');
+})();
+
+// Для автотестов и снимка превью
+window.APP = {
+  CONFIG, TOOLS, show, get tool() { return tool; },
+  timer: { state: TM, start: tmStart, pause: tmPause, tick: tmTick, reset: tmReset, set: tmSet, add: tmAdd, mode: tmMode, text: tmText },
+  pick: { state: CL, choose: pkChoose, reset: pkReset, parseAbsent, pool, readClass },
+  groups: { split: splitGroups },
+  grid: { state: GD, begin: gdBegin, move: gdMove, erase: gdEraseAt, undo: gdUndo, clear: gdClear },
+  line: { state: NL, add: nlAdd, range: nlRange, cmd: nlCmd, x: nlX, v: nlV },
+  coord: { state: CP, add: cpAdd, render: cpRender },
+  prot: { state: PR, set: prSet },
+  // кадр для картинки-превью: координатная плоскость с рисунком «домик»
+  poster() {
+    show('coord'); CP.points = []; CP.link = true; CP.show = false; CP.r = 10;
+    [[-4, -3], [-4, 2], [0, 6], [4, 2], [4, -3], [-4, -3]].forEach(([x, y]) => cpAdd(x, y));
+  },
+};
+</script>
+</body>
+</html>
