@@ -76,4 +76,9 @@ export function initLessonPlan(root: HTMLElement, today = new Date()) {
   win.addEventListener('popstate', readURL);
   win.addEventListener('resize', updateRails);
   readURL();
+  // Якорь может указывать на тему скрытой до инициализации четверти.
+  const target = doc.getElementById(win.location.hash.slice(1));
+  if (target && target.closest('[data-plan-pane]:not([hidden])')) {
+    win.requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+  }
 }
