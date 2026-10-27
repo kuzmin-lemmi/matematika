@@ -13,6 +13,7 @@ export const GET: APIRoute = async ({ site }) => {
   const urls: [string, string?][] = [
     ['', undefined],
     ['catalog/', undefined],
+    ['poisk/', undefined],
     ...grades.map(g => [`klass/${g}/`] as [string]),
     ...items.map(i => [`item/${i.id}/`, day(i.data.updated ?? i.data.added)] as [string, string?]),
     ...items.filter(i => isLocalFile(i.data.url)).map(i => [`zapusk/${i.id}/`, day(i.data.updated ?? i.data.added)] as [string, string?]),

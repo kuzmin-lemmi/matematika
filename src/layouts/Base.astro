@@ -43,6 +43,9 @@ const path = Astro.url.pathname;
         </div>
       </nav>
       <div class="tools">
+        <a class="search-link" href={`${base}poisk/`} aria-label="Поиск по темам и материалам" aria-current={path.includes('/poisk/') ? 'page' : undefined}>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"/><path d="m12.5 12.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </a>
         <button class="theme" id="theme" type="button" aria-label="Тёмная тема" aria-pressed="false">
           <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.75" /><path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor" /></svg>
         </button>
@@ -83,7 +86,7 @@ const path = Astro.url.pathname;
     document.addEventListener('click', e => {
       if (header.classList.contains('open') && !header.contains(e.target as Node)) setOpen(false);
     });
-    matchMedia('(min-width: 961px)').addEventListener('change', e => { if (e.matches) setOpen(false); });
+    matchMedia('(min-width: 1201px)').addEventListener('change', e => { if (e.matches) setOpen(false); });
   }
 
   // переключатель темы: по умолчанию тема системы, выбор запоминается (localStorage только для удобства)
@@ -121,6 +124,8 @@ const path = Astro.url.pathname;
   @media (hover:hover) and (pointer:fine){ nav a:hover{color:var(--ink);background:var(--tint)} }
   nav a[aria-current]{color:var(--accent);background:var(--tint)}
   .tools{display:flex;align-items:center;gap:8px}
+  .search-link{flex:none;display:grid;place-items:center;width:40px;height:40px;border:1.5px solid var(--line);border-radius:50%;color:var(--ink);background:var(--surface)}
+  .search-link:hover,.search-link[aria-current]{color:var(--accent);border-color:var(--accent)}
   .theme{flex:none;display:grid;place-items:center;width:40px;height:40px;padding:0;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;
     transition:border-color 160ms var(--ease-out),transform 160ms var(--ease-out)}
   @media (hover:hover) and (pointer:fine){ .theme:hover{border-color:var(--accent)} }
@@ -135,8 +140,8 @@ const path = Astro.url.pathname;
   @media (hover:hover) and (pointer:fine){ .burger:hover{border-color:var(--accent)} }
   .burger:active{transform:scale(.96)}
   @media (pointer:coarse){
-    .theme,.burger{height:44px}
-    .theme{width:44px}
+    .search-link,.theme,.burger{height:44px}
+    .search-link,.theme{width:44px}
     .links a{min-height:44px;display:inline-flex;align-items:center}
   }
   /* ноутбук у проектора (около 1024px): меню плотнее, чтобы не переносилось на вторую строку */
@@ -146,7 +151,7 @@ const path = Astro.url.pathname;
     nav a{padding:.4em;font-size:13.5px}
   }
   /* узкий экран: меню прячется в выпадающую панель (без скрипта остаётся обычной строкой в две линии) */
-  @media (max-width:960px){
+  @media (max-width:1200px){
     .bar{flex-wrap:wrap;height:auto;min-height:64px;padding-top:0;padding-bottom:0}
     nav{order:3;flex:1 0 100%;flex-direction:column;align-items:stretch;gap:2px;padding:4px 0 10px}
     html.js .burger{display:inline-flex}
@@ -162,7 +167,8 @@ const path = Astro.url.pathname;
     .logo span:last-child{display:inline}
   }
   @keyframes drop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-  @media (max-width:360px){ .burger span{display:none} .burger{padding:0 12px} }
+  @media (max-width:480px){ .burger span{display:none} .burger{padding:0 12px} }
+  @media (max-width:370px){ .logo small{display:none} .bar{gap:8px} .tools{gap:5px} }
   @media (prefers-reduced-motion:reduce){ .theme:active,.burger:active{transform:none} nav a,.theme,.burger,.burger svg path{transition-duration:.01ms} html.js .top.open nav{animation:none} }
   footer{border-top:1px solid var(--line);background:var(--surface);margin-top:40px;padding:24px 0 calc(24px + env(safe-area-inset-bottom,0px))}
   .foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:var(--soft);font-size:15px}
