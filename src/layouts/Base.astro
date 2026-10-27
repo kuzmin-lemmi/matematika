@@ -139,6 +139,12 @@ const path = Astro.url.pathname;
     .theme{width:44px}
     .links a{min-height:44px;display:inline-flex;align-items:center}
   }
+  /* ноутбук у проектора (около 1024px): меню плотнее, чтобы не переносилось на вторую строку */
+  @media (max-width:1120px){
+    .bar{gap:8px}
+    nav,nav .grades,nav .rest{gap:0}
+    nav a{padding:.4em;font-size:13.5px}
+  }
   /* узкий экран: меню прячется в выпадающую панель (без скрипта остаётся обычной строкой в две линии) */
   @media (max-width:960px){
     .bar{flex-wrap:wrap;height:auto;min-height:64px;padding-top:0;padding-bottom:0}

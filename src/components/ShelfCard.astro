@@ -2,7 +2,7 @@
 // Карточка на полке витрины: превью оживает при наведении
 import type { CollectionEntry } from 'astro:content';
 import Preview from './Preview.astro';
-import { ACCESS, PARTS } from '../config';
+import { ACCESS, PARTS, TYPES } from '../config';
 import { openPageHref, pageHref, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady } from '../lib';
 interface Props { item: CollectionEntry<'items'> }
 const { item } = Astro.props;
@@ -16,7 +16,7 @@ const dl = ready ? downloadHref(d) : '';
   <a class="media" href={pageHref(item.id)} tabindex="-1" aria-hidden="true"><Preview item={item} /></a>
   <div class="body">
     <p class="meta">
-      {d.subject ? subjectLabel(d.subject) : d.type === 'course' ? 'Курс' : 'Программа'}
+      {d.subject ? subjectLabel(d.subject) : TYPES[d.type].label}
       {d.grades.length > 0 && <> · {gradeLabel(d.grades)}</>}
       {d.access !== 'free' && <> · {ACCESS[d.access]}</>}
     </p>

@@ -6,12 +6,14 @@ import Preview from '../components/Preview.astro';
 import ShelfCard from '../components/ShelfCard.astro';
 import Rail from '../components/Rail.astro';
 import { getCollection } from 'astro:content';
-import { SITE, PARTS } from '../config';
+import { SITE, PARTS, TYPES } from '../config';
 import { openPageHref, pageHref, klassHref, klassName, isReady } from '../lib';
 const base = import.meta.env.BASE_URL;
 const all = (await getCollection('items')).sort((a, b) => a.data.order - b.data.order);
 const lessons = all.filter(i => i.data.type === 'lesson');
 const more = all.filter(i => i.data.type !== 'lesson');
+// заголовок полки по тому, что на ней есть: пока только инструменты — «Для любого урока»
+const moreTitle = more.every(i => i.data.type === 'app') ? TYPES.app.plural : 'Курсы и инструменты';
 // полки-слайдеры — по классу на полку, только для классов, где уже есть материалы (как в «Инфошаге»)
 const shelves = SITE.grades.map(g => ({ g, items: lessons.filter(i => i.data.grades.includes(g)) })).filter(s => s.items.length);
 const hero = all.filter(i => isReady(i.data) && i.data.added)
@@ -73,7 +75,7 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
       </div>
     </section>
   ))}
-  {more.length > 0 && <section><div class="wrap"><h2>Курсы и программы</h2><div class="grid">{more.map(item => <ShelfCard item={item} />)}</div></div></section>}
+  {more.length > 0 && <section><div class="wrap"><h2>{moreTitle}</h2><div class="grid">{more.map(item => <ShelfCard item={item} />)}</div></div></section>}
 </Base>
 <script>
   // Пример режима «На доске»: шаг меняет чертёж (через data-step), вопрос и запись для тетради

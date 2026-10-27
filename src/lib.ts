@@ -23,7 +23,14 @@ export const studentHref = (item: { id: string; data: { url: string; access: str
     : '';
 export const klassHref = (g: number) => `${import.meta.env.BASE_URL}klass/${g}/`;
 export const klassName = (g: number) => `${g} класс`;
-export const gradeLabel = (g: number[]) => g.length ? g.map(x => `${x} класс`).join(', ') : '';
+// подряд идущие классы — диапазоном: [5, 6, 7, 8, 9] → «5–9 классы», [7] → «7 класс»
+export const gradeLabel = (g: number[]) => {
+  if (!g.length) return '';
+  const s = [...g].sort((a, b) => a - b);
+  if (s.length === 1) return `${s[0]} класс`;
+  const run = s.every((x, i) => i === 0 || x === s[i - 1] + 1);
+  return run ? `${s[0]}–${s[s.length - 1]} классы` : s.map(x => `${x} класс`).join(', ');
+};
 export const subjectLabel = (s?: keyof typeof SUBJECTS) => s ? SUBJECTS[s].label : '';
 // Предметы класса по программе: 5–6 — математика, 7–9 — алгебра и геометрия
 export const gradeSubjects = (g: number): (keyof typeof SUBJECTS)[] => g <= 6 ? ['math'] : ['algebra', 'geometry'];

@@ -1,7 +1,8 @@
 name: Публикация на GitHub Pages
 
-# Пока сайт не опубликован, сборка запускается только вручную (вкладка Actions → Run workflow).
-# Когда автор включит Pages (Settings → Pages → Source: GitHub Actions), добавить запуск по push в main:
+# Сайт опубликован на https://matshag.ru. Публикация запускается вручную (вкладка Actions → Run workflow)
+# или командой конструктора `npm run publish`. Автопубликацию по push в main включает только автор
+# (docs/ROADMAP.md, этап 4) — для этого добавить:
 #   push:
 #     branches: [main]
 on:
