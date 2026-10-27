@@ -226,6 +226,10 @@ table.key td:first-child{font-weight:700}
 .level{text-align:left;padding:16px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
 .level small{font-weight:400;color:var(--soft)}
 .level .lex{font-size:24px;font-weight:700;margin:4px 0}
+/* название раздела — главное в карточке; пример словами (exText в разделе темы) — мельче формулы */
+.level b{font-size:15px;color:var(--soft)}
+.level .lname{font-size:20px;font-weight:700;line-height:1.25}
+.level .lex.txt{font-size:16px;font-weight:400;color:var(--soft);margin:0}
 .stats{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--soft);font-weight:600}
 .stats b{color:var(--ink)}
 .card{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:clamp(16px,3vw,28px)}
@@ -1479,7 +1483,7 @@ function homeSetup() {
   $('hSetup').hidden = false; $('hPlay').hidden = true; $('hEnd').hidden = true;
   $('hLevels').innerHTML = SECTIONS.map((S, i) => {
     const best = +store.get('best' + i) || 0;
-    return `<button type="button" class="level" data-level="${i}"><b>${S.title} →</b><span>${S.text}</span><span class="lex">${S.ex()}</span><small>Рекорд: ${best}</small></button>`;
+    return `<button type="button" class="level" data-level="${i}"><b>${S.title} →</b><span class="lname">${S.text}</span><span class="lex${S.exText ? ' txt' : ''}">${S.ex()}</span><small>Рекорд: ${best}</small></button>`;
   }).join('');
   $('home').classList.remove('playing');
   // учителю: ссылка сразу на раздел, чтобы отправить её в чат класса

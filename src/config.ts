@@ -28,7 +28,7 @@ export const PARTS = {
 export const TYPES = {
   lesson: { label: 'Материал к уроку', plural: 'Материалы к урокам' },
   course: { label: 'Курс',             plural: 'Курсы' },
-  app:    { label: 'Программа',        plural: 'Программы и сервисы' },
+  app:    { label: 'Для любого урока', plural: 'Для любого урока' },
 } as const;
 
 export const ACCESS = {

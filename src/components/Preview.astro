@@ -21,7 +21,9 @@ const hasDark = posterDark && existsSync(join(process.cwd(), 'public', posterDar
     {d.poster ? (
       <picture>
         {hasDark && <source media="(prefers-color-scheme: dark)" srcset={base + posterDark} />}
-        <img src={base + d.poster} alt="" loading="lazy" decoding="async" width="960" height="600" />
+        {/* превью сразу на экране (страница материала) — картинка грузится первой, иначе до материала видна пустая рамка */}
+        <img src={base + d.poster} alt="" loading={load === 'visible' ? 'eager' : 'lazy'} fetchpriority={load === 'visible' ? 'high' : undefined}
+          decoding="async" width="960" height="600" />
       </picture>
     ) : <MaterialArt subject={d.subject} />}
   </div>
@@ -56,6 +58,7 @@ const hasDark = posterDark && existsSync(join(process.cwd(), 'public', posterDar
   const timers = new WeakMap<HTMLElement, number>();
   const leaving = new WeakMap<HTMLElement, number>();   // iframe ещё в DOM, пока плавно гаснет
   const FADE = 260;                                     // чуть дольше transition opacity (250 мс)
+  const waiting = new WeakSet<HTMLElement>();           // материал ждёт, пока загрузится картинка-превью
 
   const fit = (el: HTMLElement) => el.style.setProperty('--s', String(el.clientWidth / W));
 
@@ -75,6 +78,17 @@ const hasDark = posterDark && existsSync(join(process.cwd(), 'public', posterDar
       if (!video.src) return;
       video.play().then(() => el.classList.add('on')).catch(() => {});
     } else if (el.dataset.src && !el.querySelector('iframe')) {
+      // сначала картинка-превью, потом материал: пока он грузится, видна картинка, а не пустая рамка
+      const img = el.querySelector<HTMLImageElement>('.cover img');
+      if (img && !img.complete) {
+        if (!waiting.has(el)) {
+          waiting.add(el);
+          const go = () => { if (waiting.delete(el)) start(el); };
+          img.addEventListener('load', go, { once: true });
+          img.addEventListener('error', go, { once: true });
+        }
+        return;
+      }
       const f = document.createElement('iframe');
       f.src = el.dataset.src;
       f.tabIndex = -1;
@@ -101,6 +115,7 @@ const hasDark = posterDark && existsSync(join(process.cwd(), 'public', posterDar
   }
 
   function stop(el: HTMLElement) {
+    waiting.delete(el);
     el.classList.remove('on');
     el.querySelector('video')?.pause();
     const frame = el.querySelector('iframe');
