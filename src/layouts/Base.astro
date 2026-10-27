@@ -86,7 +86,7 @@ const path = Astro.url.pathname;
     document.addEventListener('click', e => {
       if (header.classList.contains('open') && !header.contains(e.target as Node)) setOpen(false);
     });
-    matchMedia('(min-width: 961px)').addEventListener('change', e => { if (e.matches) setOpen(false); });
+    matchMedia('(min-width: 1201px)').addEventListener('change', e => { if (e.matches) setOpen(false); });
   }
 
   // переключатель темы: по умолчанию тема системы, выбор запоминается (localStorage только для удобства)
@@ -151,7 +151,7 @@ const path = Astro.url.pathname;
     nav a{padding:.4em;font-size:13.5px}
   }
   /* узкий экран: меню прячется в выпадающую панель (без скрипта остаётся обычной строкой в две линии) */
-  @media (max-width:960px){
+  @media (max-width:1200px){
     .bar{flex-wrap:wrap;height:auto;min-height:64px;padding-top:0;padding-bottom:0}
     nav{order:3;flex:1 0 100%;flex-direction:column;align-items:stretch;gap:2px;padding:4px 0 10px}
     html.js .burger{display:inline-flex}
