@@ -630,7 +630,7 @@ function shuffle(rnd, arr) {
   for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
   return r;
 }
-const taskRnd = (n, i) => mulberry32(GEN_VERSION * 1000003 + n * 7919 + i * 104729 + 1);
+const taskRnd = (n, i, version = GEN_VERSION) => mulberry32(version * 1000003 + n * 7919 + i * 104729 + 1);
 const plural = (n, one, few, many) => {
   const m10 = n % 10, m100 = n % 100;
   return m10 === 1 && m100 !== 11 ? one : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? few : many;
@@ -1687,52 +1687,14 @@ function extraKeyHTML(vs, kind) {
     : `<p><b>1.</b> ${TYPES.which.ok(v.sign)}</p><p><b>2.</b> Ошибка: ${v.error.kind === 'aaa' ? 'равные углы не задают размер треугольника, поэтому признака по трём углам нет.' : 'для первого признака угол должен лежать между данными сторонами; без этого условия признака нет.'} Вывод: данных недостаточно. Это не доказательство неравенства.</p><p><b>3.</b> ${ticketReasonForm(v) === 'common' ? 'BD = BD — общая сторона.' : '∠AOB = ∠COD — вертикальные углы.'}</p><p>По 1 баллу за каждый обоснованный ответ. Ошибка в № 1 — повторить признаки; в № 2 — достаточность данных; в № 3 — причины равенств.</p>`}</section>`).join('')}</div>`;
 }
 
-function helpInit() {
-  // Тематические листы используют номера, печать и переключатель ядра, сохраняя его кодовое слово.
-  const baseDraw = drawSheets;
-  drawSheets = function () {
-    const base = baseDraw();
-    const kind = $('pKind').value;
-    const extra = ['proofs', 'ticket'].includes(kind);
-    $('pExtraKey').hidden = !extra;
-    if (!extra) {
-      $('print').dataset.extraKey = 'false';
-      $('pExtraKey').textContent = 'Показать ключ';
-      $('pExtraKey').setAttribute('aria-expanded', 'false');
-      return base;
-    }
-    const vs = printNums.map(n => makeLessonSheet(n, kind));
-    const grid = $('pSpace').checked;
-    const two = kind === 'ticket' && $('pTwo').checked && !grid;
-    $('pTwo').disabled = grid || kind === 'proofs';
-    $('pAbout').textContent = kind === 'proofs'
-      ? 'Три доказательства по разным признакам и задача на порядок вершин. Один вариант на A4; ключ содержит полные доказательства.'
-      : 'Билет на 3 минуты: признак, ошибка в рассуждении, обоснование равенства. Можно печатать два варианта на A4. Ключ — по номеру.';
-    const sheet = v => kind === 'proofs' ? proofPracticeHTML(v, grid) : ticketHTML(v);
-    let html = '';
-    if (two) for (let i = 0; i < vs.length; i += 2) html += `<div class="page half compact lesson-page">${sheet(vs[i])}${vs[i + 1] ? sheet(vs[i + 1]) : ''}</div>`;
-    else html = vs.map(v => `<div class="page lesson-page${grid ? '' : ' compact'}">${sheet(v)}</div>`).join('');
-    $('pSheets').innerHTML = (vs.length ? extraKeyHTML(vs, kind) : '') + html;
-    return vs;
-  };
-  const choices = Object.entries(LESSON_KINDS);
-  $('pKind').insertAdjacentHTML('beforebegin', `<div class="row"><b>Вид листа:</b><div class="seg" role="group" aria-label="Вид листа">${choices.map(([k, text]) => `<button type="button" data-kind-set="${k}" aria-pressed="${k === 'word'}">${text}</button>`).join('')}</div></div>`);
-  const startPrint = document.querySelector('#start [data-go="print"]');
-  const box = document.createElement('div'); box.className = 'mode split';
-  box.innerHTML = `<b>🖨 Раздатка</b><span>${META.modePrint}</span><div class="kinds">${choices.map(([k, text]) => `<button type="button" data-go="print" data-kind="${k}">${text}</button>`).join('')}</div>`;
-  startPrint.replaceWith(box);
-  $('pPrintKey').insertAdjacentHTML('afterend', '<button type="button" id="pExtraKey" aria-controls="lessonKey" aria-expanded="false" hidden>Показать ключ</button>');
-  $('pExtraKey').addEventListener('click', () => {
-    const visible = $('print').dataset.extraKey !== 'true';
-    $('print').dataset.extraKey = String(visible);
-    $('pExtraKey').textContent = visible ? 'Скрыть ключ' : 'Показать ключ';
-    $('pExtraKey').setAttribute('aria-expanded', String(visible));
-  });
-  if (['proofs', 'ticket'].includes(P.get('kind'))) pendingKind = P.get('kind');
-  // Эти обработчики ядро зарегистрировало до тематической настройки; дополняем их перерисовкой.
-  $('pSpace').addEventListener('change', () => drawSheets());
-  $('pTwo').addEventListener('change', () => drawSheets());
-}
+const TOPIC_SHEETS = {
+  proofs: { label: LESSON_KINDS.proofs, generate: n => makeLessonSheet(n, 'proofs'), sheet: proofPracticeHTML,
+    key: vs => extraKeyHTML(vs, 'proofs'), two: false, previewKey: true, pageClass: 'lesson-page',
+    about: 'Три доказательства и задача на порядок вершин. Один вариант на A4; ключ содержит полные доказательства.' },
+  ticket: { label: LESSON_KINDS.ticket, generate: n => makeLessonSheet(n, 'ticket'), sheet: ticketHTML,
+    key: vs => extraKeyHTML(vs, 'ticket'), previewKey: true, pageClass: 'lesson-page',
+    about: 'Билет на 3 минуты. Можно печатать два варианта на A4. Ключ — по номеру.' },
+};
 
 // ---------- ядро: core/types.js ----------
 // число — ответ: same по умолчанию, ключ и ловушки по умолчанию
@@ -1759,17 +1721,18 @@ function generate(type, rnd, form, tries = 2000) {
 const ABC = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ';
 const HAS_OGE = typeof OGE_V1 !== 'undefined';
 const lowerTitle = () => META.title[0].toLowerCase() + META.title.slice(1);
-function makeVariant(num, version = GEN_VERSION) {
+function wordVariantV1(num) {
+  const version = 1;
   if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
   const tasks = [];
   KINDS_V1.forEach(([type, forms], i) => {
-    const rnd = taskRnd(num, i);
+    const rnd = taskRnd(num, i, 1);
     let t, guard = 0;
     do t = generate(type, rnd, Array.isArray(forms) ? pick(rnd, forms) : forms);
     while (tasks.some(u => TYPES[u.type].key(u) === TYPES[type].key(t)) && ++guard < 200);
     tasks.push(t);
   });
-  const rnd = taskRnd(num, 99);
+  const rnd = taskRnd(num, 99, 1);
   const word = pick(rnd, WORDS_V1);
   const answers = tasks.map(t => TYPES[t.type].key(t));
   const bank = new Map();   // ответ → { html, letter }
@@ -1782,16 +1745,17 @@ function makeVariant(num, version = GEN_VERSION) {
 }
 
 // Бланк ОГЭ: задания свои (зерна 200+), поэтому один номер даёт разные листы для слова и для бланка
-function makeVariantOGE(num, version = GEN_VERSION) {
+function ogeVariantV1(num) {
+  const version = 1;
   if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
-  const tasks = OGE_V1.map((kind, i) => ogeTask(kind, taskRnd(num, 200 + i)));
+  const tasks = OGE_V1.map((kind, i) => ogeTask(kind, taskRnd(num, 200 + i, 1)));
   return { num, version, label: version + '-' + num, oge: true, tasks, answers: tasks.map(x => x.ans) };
 }
 
 // ================= 🖨 Раздатка =================
 let printNums = [];
 // вид листа из адреса (?mode=print&kind=oge) или с кнопки стартового экрана — важнее сохранённого
-let pendingKind = (HAS_OGE ? ['word', 'oge'] : ['word']).includes(P.get('kind')) ? P.get('kind') : null;
+let pendingKind = P.get('kind');
 function newNumbers(count) {
   const set = new Set();
   while (set.size < count) set.add(1000 + Math.floor(Math.random() * 9000));
@@ -1801,8 +1765,10 @@ function parseNums(text) {
   const nums = [], bad = [];
   for (const part of text.split(/[\s,;]+/).filter(Boolean)) {
     const m = part.match(/^(?:(\d+)[-–])?(\d{4})$/);
-    if (!m || (m[1] && +m[1] !== GEN_VERSION)) bad.push(part);
-    else if (!nums.includes(+m[2])) nums.push(+m[2]);
+    const version = m ? +(m[1] || GEN_VERSION) : 0;
+    const value = version === GEN_VERSION ? +m?.[2] : version + '-' + m?.[2];
+    if (!m || !PRINT_GENERATORS[version]) bad.push(part);
+    else if (!nums.includes(value)) nums.push(value);
   }
   return { nums, bad };
 }
@@ -1860,29 +1826,32 @@ function renderPrint() {
     $('pCount').value = printNums.length;
     $('pSpace').checked = store.get('printSpace') ? store.get('printSpace') === '1' : CONFIG.print.space;
     $('pTwo').checked = store.get('printTwo') === '1';
-    $('pKind').value = HAS_OGE && store.get('printKind') === 'oge' ? 'oge' : 'word';
+    $('pKind').value = SHEETS[store.get('printKind')] ? store.get('printKind') : 'word';
     if (saved.length) $('pMsg').textContent = 'Открыты номера, с которыми вы работали в прошлый раз. Для другого класса нажмите «Новые номера».';
   }
-  if (pendingKind) { $('pKind').value = pendingKind; pendingKind = null; }
-  $('pNums').value = printNums.map(n => GEN_VERSION + '-' + n).join(', ');
+  if (pendingKind) { $('pKind').value = SHEETS[pendingKind] ? pendingKind : 'word'; pendingKind = null; }
+  $('pNums').value = printNums.map(n => typeof n === 'string' ? n : GEN_VERSION + '-' + n).join(', ');
   drawSheets();
 }
 function drawSheets() {
-  const oge = HAS_OGE && $('pKind').value === 'oge';
+  const kind = SHEETS[$('pKind').value] ? $('pKind').value : 'word';
+  const format = SHEETS[kind];
   document.querySelectorAll('[data-kind-set]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.kindSet === $('pKind').value)));
-  const vs = printNums.map(n => oge ? makeVariantOGE(n) : makeVariant(n));
-  const sheet = oge ? ogeSheetHTML : sheetHTML, key = oge ? ogeKeyHTML : keyHTML;
-  const space = $('pSpace').checked, two = $('pTwo').checked && !space;
-  store.set('printNums', printNums.join(','));
+  const vs = printNums.map(n => printVariant(n, kind));
+  const sheet = v => format.sheet(v, $('pSpace').checked), key = format.key;
+  const space = $('pSpace').checked, two = $('pTwo').checked && !space && format.two !== false;
+  store.set('printNums', printNums.map(n => typeof n === 'string' ? n : GEN_VERSION + '-' + n).join(','));
   store.set('printSpace', space ? 1 : 0);
   store.set('printTwo', $('pTwo').checked ? 1 : 0);
-  store.set('printKind', oge ? 'oge' : 'word');
-  $('pTwo').disabled = space;
-  $('pAbout').textContent = oge ? PRINT.ogeAbout : PRINT.about;
+  store.set('printKind', kind);
+  $('pTwo').disabled = space || format.two === false;
+  $('pAbout').textContent = format.about;
+  $('pExtraKey').hidden = !format.previewKey;
+  if (!format.previewKey) { $('print').dataset.extraKey = 'false'; $('pExtraKey').textContent = 'Показать ключ'; $('pExtraKey').setAttribute('aria-expanded', 'false'); }
   let html = '';
   if (two) for (let i = 0; i < vs.length; i += 2)
-    html += `<div class="page half compact">${sheet(vs[i])}${vs[i + 1] ? sheet(vs[i + 1]) : ''}</div>`;
-  else html = vs.map(v => `<div class="page${space ? '' : ' compact'}">${sheet(v)}</div>`).join('');
+    html += `<div class="page half compact ${format.pageClass || ''}">${sheet(vs[i])}${vs[i + 1] ? sheet(vs[i + 1]) : ''}</div>`;
+  else html = vs.map(v => `<div class="page ${format.pageClass || ''}${space ? '' : ' compact'}">${sheet(v)}</div>`).join('');
   $('pSheets').innerHTML = (vs.length ? key(vs) : '') + html;
   return vs;
 }
@@ -1890,6 +1859,43 @@ function printNow(what) {
   document.body.classList.remove('print-key', 'print-sheets');
   document.body.classList.add(what === 'key' ? 'print-key' : 'print-sheets');
   try { window.print(); } catch {}
+}
+
+// Тема регистрирует форматы и старые генераторы без подмены функций ядра.
+const SHEETS = {
+  word: { label: 'Кодовое слово', about: PRINT.about, generate: wordVariantV1, sheet: sheetHTML, key: keyHTML },
+  ...(HAS_OGE ? { oge: { label: 'Бланк ОГЭ', about: PRINT.ogeAbout, generate: ogeVariantV1, sheet: ogeSheetHTML, key: ogeKeyHTML } } : {}),
+  ...(typeof TOPIC_SHEETS === 'undefined' ? {} : TOPIC_SHEETS),
+};
+const PRINT_GENERATORS = { 1: Object.fromEntries(Object.entries(SHEETS).map(([k, f]) => [k, f.generate])),
+  ...(typeof TOPIC_PRINT_VERSIONS === 'undefined' ? {} : TOPIC_PRINT_VERSIONS) };
+function printVariant(num, kind = 'word', version = GEN_VERSION) {
+  if (typeof num === 'string' && num.includes('-')) { const parts = num.split('-'); version = +parts[0]; num = +parts[1]; }
+  const gen = PRINT_GENERATORS[version]?.[kind];
+  if (!gen) throw new Error('Нет генератора формата ' + kind + ' версии ' + version);
+  return gen(num);
+}
+function makeVariant(num, version = GEN_VERSION) { return printVariant(num, 'word', version); }
+function makeVariantOGE(num, version = GEN_VERSION) { return printVariant(num, 'oge', version); }
+function initPrintFormats() {
+  const choices = Object.entries(SHEETS);
+  const input = $('pKind');
+  const old = input.closest('.row');
+  if (old) { old.before(input); old.remove(); }
+  input.insertAdjacentHTML('beforebegin', '<div class="row"><b>Вид листа:</b><div class="seg" role="group" aria-label="Вид листа">' + choices.map(([k, f]) => '<button type="button" data-kind-set="' + k + '" aria-pressed="' + (k === 'word') + '">' + esc(f.label) + '</button>').join('') + '</div></div>');
+  const start = document.querySelector('#start [data-go="print"]')?.closest('.mode');
+  if (start) {
+    const box = document.createElement('div'); box.className = 'mode split';
+    box.innerHTML = '<b>🖨 Раздатка</b><span>' + esc(META.modePrint) + '</span><div class="kinds">' + choices.map(([k, f]) => '<button type="button" data-go="print" data-kind="' + k + '">' + esc(f.label) + '</button>').join('') + '</div>';
+    start.replaceWith(box);
+  }
+  $('pPrintKey').insertAdjacentHTML('afterend', '<button type="button" id="pExtraKey" aria-expanded="false" hidden>Показать ключ</button>');
+  $('pExtraKey').addEventListener('click', () => {
+    const visible = $('print').dataset.extraKey !== 'true';
+    $('print').dataset.extraKey = String(visible);
+    $('pExtraKey').textContent = visible ? 'Скрыть ключ' : 'Показать ключ';
+    $('pExtraKey').setAttribute('aria-expanded', String(visible));
+  });
 }
 
 // ---------- ядро: core/board.js ----------
@@ -2238,6 +2244,7 @@ document.addEventListener('keydown', e => {
   B.notes = store.get('notes') === '1';
   const back = siteHref();
   if (back) { $('toSite').href = back; $('toSite').hidden = false; }
+  initPrintFormats();
   if (typeof helpInit === 'function') helpInit();   // тема дорисовывает формулы в справке
   const lvl = +P.get('level');
   if (STUDENT) document.body.classList.add('student');
@@ -2250,7 +2257,7 @@ document.addEventListener('keydown', e => {
 
 // Для автотестов и снимка превью
 window.APP = {
-  SLUG, META, CONFIG, GEN_VERSION, TYPES, SECTIONS, KINDS_V1, WORDS_V1,
+  SHEETS, PRINT_GENERATORS, printVariant, SLUG, META, CONFIG, GEN_VERSION, TYPES, SECTIONS, KINDS_V1, WORDS_V1,
   OGE_V1: HAS_OGE ? OGE_V1 : undefined, makeVariantOGE: HAS_OGE ? makeVariantOGE : undefined,
   Q, qeq, decStr, keyQ, parseQ, parseVal, eqRoots, generate, makeVariant, taskRnd, mulberry32, parseNums,
   STUDENT, show, get screen() { return screen; },
