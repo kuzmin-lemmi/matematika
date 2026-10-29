@@ -1,4 +1,4 @@
-import { SUBJECTS } from './config';
+import { SITE, SUBJECTS } from './config';
 
 // Ссылка на сам материал: файл на сайте или внешний адрес
 export const openHref = (url: string) => /^https?:\/\//.test(url) ? url : import.meta.env.BASE_URL + url;
@@ -17,7 +17,10 @@ export const openPageHref = (item: { id: string; data: { url: string } }, mode?:
 export const sheetHref = (item: { id: string; data: { url: string } }, kind: string) => `${openPageHref(item, 'print')}&kind=${kind}`;
 // Ссылка для учеников — в чат класса: тренажёр «Дома» на весь экран, закрытый (student=1):
 // без выхода на сайт и к доске и раздатке. Пусто, если у материала нет режима «Дома».
-export const studentHref = (item: { id: string; data: { url: string; access: string; parts: string[] } }, site?: URL) =>
+// форма обратной связи; со страницы материала — с его адресом в скрытом вопросе material
+export const feedbackHref = (slug?: string) =>
+  SITE.form ? SITE.form + (slug ? `?material=${encodeURIComponent(slug)}` : '') : '';
+export const studentHref =(item: { id: string; data: { url: string; access: string; parts: string[] } }, site?: URL) =>
   isReady(item.data) && isLocalFile(item.data.url) && item.data.parts.includes('home')
     ? new URL(`${openPageHref(item, 'home')}&student=1`, site).toString()
     : '';

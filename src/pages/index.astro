@@ -37,6 +37,15 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
       </div>
     </div>
   </section>
+  {(SITE.max || SITE.form) && (
+    <section class="talk" aria-label="Обратная связь"><div class="wrap"><div class="talk-in">
+      <p><b>Какую тему сделать следующей?</b> <span class="muted">Пишите пожелания, идеи и вопросы по материалам — сайт растёт под ваши уроки.</span></p>
+      <div class="talk-act">
+        {SITE.max && <a class="btn primary" href={SITE.max} rel="noopener">Обсудить в Максе <span aria-hidden="true">↗</span></a>}
+        {SITE.form && <a class="btn" href={SITE.form} rel="noopener">Предложить тему или улучшение <span aria-hidden="true">↗</span></a>}
+      </div>
+    </div></div></section>
+  )}
   <section class="walkthrough" id="kak-rabotaet" aria-labelledby="walkthrough-title">
     <div class="wrap walkthrough-in">
       <div class="walkthrough-copy">
@@ -193,6 +202,9 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   .new-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:center;padding:24px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
   .new-preview{border-radius:8px;overflow:hidden}
   .new-in h2{margin-top:12px}
+  .talk-in{display:flex;justify-content:space-between;align-items:center;gap:14px 28px;flex-wrap:wrap;padding:16px 20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+  .talk-in p{margin:0;max-width:62ch;line-height:1.5}
+  .talk-act{display:flex;gap:10px;flex-wrap:wrap}
   @media(prefers-color-scheme:dark){:global(:root:not([data-theme="light"])) .hero-art :global(img){filter:brightness(.72) saturate(.82)}}
   :global(:root[data-theme="dark"]) .hero-art :global(img){filter:brightness(.72) saturate(.82)}
   @media(max-width:800px){.intro-in{min-height:0;padding-top:38px;padding-bottom:20px}.intro-copy{width:100%;max-width:520px}h1{font-size:64px}.hero-art{display:none}.walkthrough-in{grid-template-columns:1fr;gap:20px}.walkthrough{padding-top:28px}.walkthrough-copy>p:not(.eyebrow){max-width:42ch}.walkthrough-copy h2 br{display:none}.notebook{max-width:560px;width:100%;justify-self:center;transform:none}.class-grid{grid-template-columns:1fr 1fr;gap:10px;border:0}.class-grid .class-link{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 14px}.class-link:last-child:nth-child(odd){grid-column:span 2}.new-in{grid-template-columns:1fr}.section-heading{align-items:start;flex-wrap:wrap;gap:12px}}

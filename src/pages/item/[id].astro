@@ -3,8 +3,8 @@ import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
 import Preview from '../../components/Preview.astro';
 import StudentLink from '../../components/StudentLink.astro';
-import { TYPES, ACCESS, PARTS } from '../../config';
-import { openPageHref, sheetHref, ogImage, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady, isLocalFile } from '../../lib';
+import { SITE, TYPES, ACCESS, PARTS } from '../../config';
+import { openPageHref, sheetHref, ogImage, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady, isLocalFile, feedbackHref } from '../../lib';
 
 export async function getStaticPaths() {
   const items = await getCollection('items');
@@ -56,6 +56,15 @@ const rows = [
       <aside class="side">
         <div class="media"><Preview item={item} load="visible" /></div>
         {ready && <p class="cap muted">{d.video ? 'Ролик из материала' : 'Так материал выглядит на доске'}</p>}
+        {ready && (SITE.form || SITE.max) && (
+          <div class="fb">
+            <p><b>Нашли ошибку?</b> <span class="muted">Или есть идея, как сделать материал удобнее, — напишите.</span></p>
+            <div class="fb-act">
+              {SITE.form && <a class="btn" href={feedbackHref(item.id)} rel="noopener">Сообщить <span aria-hidden="true">↗</span></a>}
+              {SITE.max && <a class="btn" href={SITE.max} rel="noopener">Обсудить в Максе <span aria-hidden="true">↗</span></a>}
+            </div>
+          </div>
+        )}
       </aside>
     </div>
   </section>
@@ -78,5 +87,9 @@ const rows = [
   .side{position:sticky;top:90px;display:flex;flex-direction:column;gap:12px}
   .media{border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
   .cap{margin:-4px 0 0;font-size:13.5px;text-align:center}
+  .fb{margin-top:8px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+  .fb p{margin:0 0 10px;font-size:15px;line-height:1.45}
+  .fb-act{display:flex;gap:8px;flex-wrap:wrap}
+  .fb-act .btn{font-size:14px;padding:.55em .9em}
   @media (max-width:860px){ .layout{grid-template-columns:1fr} .side{position:static;order:-1} }
 </style>
