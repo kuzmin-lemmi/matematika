@@ -6,6 +6,7 @@ import { klassName, gradeSubjects, isReady } from '../../lib';
 import { SITE, SUBJECTS } from '../../config';
 import plans from '../../data/lesson-plans.json';
 import { quarterTopics, topicMaterials, lessonRanges, PLAN_SOURCES } from '../../lesson-plan';
+import { currentQuarter } from '../../scripts/lesson-plan';
 
 export async function getStaticPaths() {
   return SITE.grades.map(g => ({ params: { grade: String(g) } }));
@@ -16,6 +17,9 @@ const subjects = gradeSubjects(grade);
 const items = (await getCollection('items'))
   .filter(item => item.data.type === 'lesson' && item.data.grades.includes(grade) && isReady(item.data))
   .sort((a, b) => a.data.order - b.data.order);
+// Сразу видна четверть по дате сборки и первый предмет — скрипт потом выберет по адресу и сегодняшней дате.
+// Без этого до запуска скрипта на странице мелькают все четверти обоих предметов.
+const shownQuarter = currentQuarter(new Date());
 const groups = subjects.map(subject => {
   const plan = plans.find(p => p.grade === grade && p.subject === subject)!;
   const materials = items.filter(i => i.data.subject === subject);
@@ -47,7 +51,7 @@ const groups = subjects.map(subject => {
       <p class="sr-only" data-plan-status role="status" aria-live="polite"></p>
       {groups.map(group => <>
         {group.quarters.map(({quarter, lessons}) => (
-          <section class="quarter-pane" data-plan-pane data-subject={group.subject} data-quarter={quarter} aria-label={`${SUBJECTS[group.subject].label}, ${quarter} четверть`}>
+          <section class="quarter-pane" data-plan-pane data-subject={group.subject} data-quarter={quarter} hidden={group.subject !== subjects[0] || quarter !== shownQuarter} aria-label={`${SUBJECTS[group.subject].label}, ${quarter} четверть`}>
             <div class="section-heading"><h2>{quarter} четверть <span>· {SUBJECTS[group.subject].label}</span></h2><span class="hint">Тема · материалы</span></div>
             <ol class="lesson-list">
               {lessons.map(lesson => <li class="lesson-row" id={`topic-${group.subject}-${quarter}-${lesson.annualNumbers[0]}`} value={lesson.number} data-lesson data-annual-numbers={lesson.annualNumbers.join(',')} data-ready={lesson.materials.length + lesson.related.length > 0 ? 'true' : 'false'}>
@@ -58,7 +62,7 @@ const groups = subjects.map(subject => {
             <p class="empty-quarter" data-empty hidden>К этой четверти материалы пока не добавлены. Снимите фильтр, чтобы увидеть все темы.</p>
           </section>
         ))}
-        {group.unplaced.length > 0 && <section class="unplaced" data-unplaced={group.subject}>
+        {group.unplaced.length > 0 && <section class="unplaced" data-unplaced={group.subject} hidden={group.subject !== subjects[0]}>
           <h2>Ещё материалы · {SUBJECTS[group.subject].label}</h2>
           <p class="plan-note">Готовые материалы, которые пока не привязаны к урокам плана.</p>
           {group.unplaced.map(item => <div class="lesson-row"><h3>{item.data.title}</h3><PlanMaterials items={[item]} title={item.data.title} /></div>)}
@@ -70,6 +74,8 @@ const groups = subjects.map(subject => {
       </div>
     </div>
   </section>
+  <!-- без скрипта переключателей нет — показываем все четверти и предметы -->
+  <noscript><style is:inline>.quarter-pane[hidden],.unplaced[hidden]{display:block}</style></noscript>
 </Base>
 <script>
   import { initLessonPlan } from '../../scripts/lesson-plan';
