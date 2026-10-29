@@ -4,7 +4,7 @@ import { getCollection, render } from 'astro:content';
 import Preview from '../../components/Preview.astro';
 import StudentLink from '../../components/StudentLink.astro';
 import { SITE, TYPES, ACCESS, PARTS } from '../../config';
-import { openPageHref, sheetHref, ogImage, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady, isLocalFile, feedbackHref } from '../../lib';
+import { ogImage, gradeLabel, subjectLabel, downloadName, colorVars, itemLinks, feedbackHref } from '../../lib';
 
 export async function getStaticPaths() {
   const items = await getCollection('items');
@@ -13,10 +13,7 @@ export async function getStaticPaths() {
 const { item } = Astro.props;
 const d = item.data;
 const { Content } = await render(item);
-const external = /^https?:/.test(d.url);
-const ready = isReady(d);
-const local = isLocalFile(d.url);
-const dl = ready ? downloadHref(d) : '';
+const { ready, local, external, open, modes, sheets, download } = itemLinks(item);
 const rows = [
   ['Тип', TYPES[d.type].label],
   ['Предмет', subjectLabel(d.subject)],
@@ -37,14 +34,14 @@ const rows = [
         <h1>{d.title}</h1>
         <p class="lead">{d.summary}</p>
         <div class="cta">
-          {ready && local && d.parts.map(p => <a class="btn primary" href={openPageHref(item, p)}>{PARTS[p].icon} {PARTS[p].label}</a>)}
-          {ready && local && d.sheets.map(s => <a class="btn primary" href={sheetHref(item, s.kind)}>{s.icon} {s.label}</a>)}
-          {ready && (external || !d.parts.length) && (
-            <a class="btn primary" href={openPageHref(item)} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>
+          {modes.map(m => <a class="btn primary" href={m.href}>{PARTS[m.part].icon} {PARTS[m.part].label}</a>)}
+          {sheets.map(s => <a class="btn primary" href={s.href}>{s.icon} {s.label}</a>)}
+          {open && (!local || !modes.length) && (
+            <a class="btn primary" href={open} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>
               {d.type === 'course' ? 'Перейти к курсу' : 'Открыть'} {external ? '↗' : '▶'}
             </a>
           )}
-          {dl && <a class="btn" href={dl} download={downloadName(d.url)} title="Один HTML-файл: работает без интернета и с флешки">⬇ Скачать бесплатно</a>}
+          {download && <a class="btn" href={download} download={downloadName(d.url)} title="Один HTML-файл: работает без интернета и с флешки">⬇ Скачать бесплатно</a>}
           <StudentLink item={item} label="🔗 Ссылка для учеников (домашняя работа)" />
           {d.repo && <a class="btn" href={d.repo}>Исходный код ↗</a>}
         </div>

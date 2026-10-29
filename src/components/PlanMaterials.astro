@@ -5,31 +5,34 @@
 // related — материалы, которые к теме подходят, но сделаны не для неё: короткая ссылка на страницу материала.
 import type { CollectionEntry } from 'astro:content';
 import { PARTS } from '../config';
-import { isLocalFile, openPageHref, sheetHref, pageHref } from '../lib';
+import { pageHref, itemLinks } from '../lib';
 import StudentLink from './StudentLink.astro';
 interface Props { items: CollectionEntry<'items'>[]; related?: CollectionEntry<'items'>[]; title: string }
 const { items, related = [], title } = Astro.props;
-const modes = ['board', 'print', 'home'] as const;
+const order = ['board', 'print', 'home'];
 const many = items.length > 1;
 ---
 <div class="materials" data-materials>
-  <div class="rail" data-rail role="group" aria-label={`Материалы: ${title}`}>
+  <div class="rail" data-plan-rail role="group" aria-label={`Материалы: ${title}`}>
     {items.length === 0 && related.length === 0 && <span class="empty">Материалов пока нет</span>}
-    {items.map(item => (
+    {items.map(item => {
+      const { local, open, modes, sheets } = itemLinks(item);
+      return (
       <div class:list={['group', { many }]}>
         {many && <a class="group-title" href={pageHref(item.id)}>{item.data.title}</a>}
         <div class="buttons">
-          {isLocalFile(item.data.url) ? <>
-            {modes.filter(mode => item.data.parts.includes(mode)).map(mode => (
-              <a class="material" href={openPageHref(item, mode)} aria-label={`${PARTS[mode].label} — ${item.data.title}`}>{PARTS[mode].icon} {PARTS[mode].label}</a>
+          {local ? <>
+            {modes.sort((a, b) => order.indexOf(a.part) - order.indexOf(b.part)).map(m => (
+              <a class="material" href={m.href} aria-label={`${PARTS[m.part].label} — ${item.data.title}`}>{PARTS[m.part].icon} {PARTS[m.part].label}</a>
             ))}
-            {item.data.sheets.map(sheet => <a class="material" href={sheetHref(item, sheet.kind)} aria-label={`${sheet.label} — ${item.data.title}`}>{sheet.label}</a>)}
+            {sheets.map(sheet => <a class="material" href={sheet.href} aria-label={`${sheet.label} — ${item.data.title}`}>{sheet.label}</a>)}
             <StudentLink item={item} />
-            {item.data.parts.length === 0 && <a class="material" href={pageHref(item.id)}>{item.data.title}</a>}
-          </> : <a class="material" href={openPageHref(item)}>{item.data.title} ↗</a>}
+            {modes.length === 0 && <a class="material" href={pageHref(item.id)}>{item.data.title}</a>}
+          </> : open && <a class="material" href={open}>{item.data.title} ↗</a>}
         </div>
       </div>
-    ))}
+      );
+    })}
     {related.length > 0 && (
       <div class="related">
         {related.map(item => <a href={pageHref(item.id)} title="Материал сделан к другой теме, но подходит и к этой">↗ Подходит: «{item.data.title}»</a>)}

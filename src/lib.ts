@@ -1,10 +1,12 @@
-import { SITE, SUBJECTS } from './config';
+import { SITE, SUBJECTS, PARTS } from './config';
 
+// Материал на другом сайте: открывается в новой вкладке, без /zapusk/ и скачивания
+export const isExternal = (url: string) => /^https?:\/\//.test(url);
 // Ссылка на сам материал: файл на сайте или внешний адрес
-export const openHref = (url: string) => /^https?:\/\//.test(url) ? url : import.meta.env.BASE_URL + url;
+export const openHref = (url: string) => isExternal(url) ? url : import.meta.env.BASE_URL + url;
 export const pageHref = (id: string) => `${import.meta.env.BASE_URL}item/${id}/`;
 // Материал лежит на сайте одним HTML-файлом — такой открываем через постоянный адрес /zapusk/<slug>/
-export const isLocalFile = (url: string) => !/^https?:\/\//.test(url) && url.endsWith('.html');
+export const isLocalFile = (url: string) => !isExternal(url) && url.endsWith('.html');
 // Материал можно открыть: он уже опубликован (не «скоро») и есть файл или внешний адрес
 export const isReady = (d: { url: string; access: string }) => d.access !== 'soon';
 // Ссылка «Открыть»: для файлов на сайте — /zapusk/<slug>/ (не прямой файл), для внешних — их адрес.
@@ -41,6 +43,20 @@ export const gradeSubjects = (g: number): (keyof typeof SUBJECTS)[] => g <= 6 ? 
 export const downloadHref = (d: { url: string; access: string }) =>
   d.access === 'free' && isLocalFile(d.url) ? openHref(d.url) : '';
 export const downloadName = (url: string) => url.split('/').pop() ?? url;
+type Linked = { id: string; data: { url: string; access: string; parts: (keyof typeof PARTS)[]; sheets: { kind: string; label: string; icon: string }[] } };
+// Какие кнопки показать у материала — одно правило для каталога, полок, класса, плана и страницы материала.
+// modes и sheets — только у опубликованного файла на сайте; open — «Открыть» целиком (у внешнего — его адрес).
+export const itemLinks = (item: Linked) => {
+  const d = item.data;
+  const ready = isReady(d), local = isLocalFile(d.url);
+  return {
+    ready, local, external: isExternal(d.url),
+    open: ready ? openPageHref(item) : '',
+    modes: ready && local ? d.parts.map(part => ({ part, href: openPageHref(item, part) })) : [],
+    sheets: ready && local ? d.sheets.map(sheet => ({ ...sheet, href: sheetHref(item, sheet.kind) })) : [],
+    download: ready ? downloadHref(d) : '',
+  };
+};
 // Цвет материала → читаемые варианты (контраст ≥ 4.6:1, WCAG AA с запасом):
 // --cb — для кнопок и текста на светлой бумаге (затемняем), --cd — для текста на тёмном листе (осветляем)
 const channel = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };

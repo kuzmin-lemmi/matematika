@@ -3,13 +3,11 @@ import type { CollectionEntry } from 'astro:content';
 import Preview from './Preview.astro';
 import StudentLink from './StudentLink.astro';
 import { TYPES, ACCESS, PARTS } from '../config';
-import { openPageHref, pageHref, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady } from '../lib';
+import { pageHref, gradeLabel, subjectLabel, downloadName, colorVars, itemLinks } from '../lib';
 interface Props { item: CollectionEntry<'items'> }
 const { item } = Astro.props;
 const d = item.data;
-const external = /^https?:/.test(d.url);
-const ready = isReady(d);
-const dl = ready ? downloadHref(d) : '';
+const { open, external, download } = itemLinks(item);
 ---
 <article class="card" style={colorVars(d.color)} data-pv-host
   data-subject={d.subject ?? ''} data-grades={d.grades.join(' ')} data-parts={d.parts.join(' ')}
@@ -27,13 +25,13 @@ const dl = ready ? downloadHref(d) : '';
     <p class="sum">{d.summary}</p>
     {d.parts.length > 0 && <p class="parts">{d.parts.map(p => <span>{PARTS[p].icon} {PARTS[p].label}</span>)}{d.sheets.map(s => <span>{s.icon} {s.label}</span>)}</p>}
     <div class="act">
-      {ready && (
-        <a class="btn primary" href={openPageHref(item)} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>
+      {open && (
+        <a class="btn primary" href={open} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>
           {d.type === 'course' ? 'К курсу' : 'Открыть'} {external ? '↗' : '▶'}
         </a>
       )}
       <StudentLink item={item} />
-      {dl && <a class="btn" href={dl} download={downloadName(d.url)}>⬇ Скачать</a>}
+      {download && <a class="btn" href={download} download={downloadName(d.url)}>⬇ Скачать</a>}
       <a class="btn" href={pageHref(item.id)}>Подробнее</a>
     </div>
   </div>

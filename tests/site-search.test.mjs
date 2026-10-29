@@ -66,3 +66,27 @@ test('список тем ограничивается и раскрываетс
   assert.equal(root.querySelectorAll('.result-row').length, 35);
   assert.equal(more.hidden, true);
 });
+
+test('индекс скачивается один раз и только когда есть запрос; при ошибке — понятное сообщение', async t => {
+  const html = `<main><form data-search-form><input data-search-query><select data-search-grade><option value=""></option></select><select data-search-subject><option value=""></option></select><input type="checkbox" data-search-ready></form><p data-search-status></p><div data-search-results></div><button data-search-more hidden></button></main>`;
+  const dom = new JSDOM(html, { url:'https://matshag.ru/poisk/' });
+  t.after(() => dom.window.close());
+  const root = dom.window.document.querySelector('main');
+  let calls = 0;
+  initSiteSearch(root, async () => { calls++; return entries; });
+  assert.equal(calls, 0, 'без запроса индекс не нужен');
+  const query = root.querySelector('[data-search-query]');
+  query.value = 'дроби'; query.dispatchEvent(new dom.window.Event('input'));
+  assert.match(root.querySelector('[data-search-status]').textContent, /Загружаю/);
+  query.value = 'дробь'; query.dispatchEvent(new dom.window.Event('input'));
+  await new Promise(r => setTimeout(r, 0));
+  assert.equal(calls, 1);
+  assert.equal(root.querySelector('.result-title').textContent, 'Сравнение дробей', 'показан результат последнего запроса');
+
+  const broken = new JSDOM(html, { url:'https://matshag.ru/poisk/?q=дроби' });
+  t.after(() => broken.window.close());
+  const brokenRoot = broken.window.document.querySelector('main');
+  initSiteSearch(brokenRoot, () => Promise.reject(new Error('offline')));
+  await new Promise(r => setTimeout(r, 0));
+  assert.match(brokenRoot.querySelector('[data-search-status]').textContent, /Не удалось загрузить/);
+});

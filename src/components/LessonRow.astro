@@ -4,12 +4,11 @@ import type { CollectionEntry } from 'astro:content';
 import Preview from './Preview.astro';
 import StudentLink from './StudentLink.astro';
 import { ACCESS, PARTS, TYPES } from '../config';
-import { openPageHref, sheetHref, pageHref, downloadHref, downloadName, colorVars, isReady, isLocalFile } from '../lib';
+import { pageHref, downloadName, colorVars, itemLinks } from '../lib';
 interface Props { item: CollectionEntry<'items'>; n: number }
 const { item, n } = Astro.props;
 const d = item.data;
-const ready = isReady(d);
-const dl = ready ? downloadHref(d) : '';
+const { modes, sheets, download } = itemLinks(item);
 ---
 <article class="row" style={colorVars(d.color)}>
   <a class="media" href={pageHref(item.id)} tabindex="-1" aria-hidden="true"><Preview item={item} load="visible" /></a>
@@ -19,10 +18,10 @@ const dl = ready ? downloadHref(d) : '';
     <p class="sum">{d.summary}</p>
     {d.duration && <p class="facts">⏱ {d.duration}</p>}
     <div class="act">
-      {ready && isLocalFile(d.url) && d.parts.map(p => <a class="btn part" href={openPageHref(item, p)}>{PARTS[p].icon} {PARTS[p].label}</a>)}
-      {ready && isLocalFile(d.url) && d.sheets.map(s => <a class="btn part" href={sheetHref(item, s.kind)}>{s.icon} {s.label}</a>)}
+      {modes.map(m => <a class="btn part" href={m.href}>{PARTS[m.part].icon} {PARTS[m.part].label}</a>)}
+      {sheets.map(s => <a class="btn part" href={s.href}>{s.icon} {s.label}</a>)}
       <StudentLink item={item} />
-      {dl && <a class="btn" href={dl} download={downloadName(d.url)}>⬇ Скачать</a>}
+      {download && <a class="btn" href={download} download={downloadName(d.url)}>⬇ Скачать</a>}
       <a class="btn" href={pageHref(item.id)}>Подробнее</a>
       {d.access !== 'free' && <span class="chip">{ACCESS[d.access]}</span>}
     </div>
