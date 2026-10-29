@@ -13,11 +13,23 @@ permissions:
   pages: write
   id-token: write
 
+# Две публикации подряд не толкаются: вторая ждёт первую
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Типы, тесты материалов и карточек — до публикации, а не после
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run check && npm test
       - uses: withastro/action@v3
         with:
           node-version: 22
