@@ -21,9 +21,9 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
 ---
 <Base>
   <section class="intro">
-    <div class="hero-art" aria-hidden="true">
-      <Image src={heroUnderstanding} alt="" widths={[640, 960, 1440, 1920]} sizes="(max-width: 800px) 1px, 100vw" format="webp" quality={82} loading="eager" fetchpriority="high" />
-    </div>
+    <div class="wrap hero-frame" aria-hidden="true"><div class="hero-art">
+      <Image src={heroUnderstanding} alt="" widths={[640, 960, 1440, 1920]} sizes="(max-width: 800px) 1px, min(100vw, 1100px)" format="webp" quality={82} loading="eager" fetchpriority="high" />
+    </div></div>
     <div class="wrap intro-in">
       <div class="intro-copy">
         <p class="eyebrow">Материалы для 5–9 классов</p>
@@ -34,18 +34,10 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
         <div class="modes" aria-label="Режимы материалов">
           {Object.entries(PARTS).map(([key, part]) => <a href={`${base}catalog/?part=${key}`}>{part.label} <span aria-hidden="true">↗</span></a>)}
         </div>
+        {SITE.max && <p class="hero-talk">Какую тему сделать следующей? <a href={SITE.max} rel="noopener">Обсудим в Максе <span aria-hidden="true">↗</span></a></p>}
       </div>
     </div>
   </section>
-  {(SITE.max || SITE.form) && (
-    <section class="talk" aria-label="Обратная связь"><div class="wrap"><div class="talk-in">
-      <p><b>Какую тему сделать следующей?</b> <span class="muted">Пишите пожелания, идеи и вопросы по материалам — сайт растёт под ваши уроки.</span></p>
-      <div class="talk-act">
-        {SITE.max && <a class="btn primary" href={SITE.max} rel="noopener">Обсудить в Максе <span aria-hidden="true">↗</span></a>}
-        {SITE.form && <a class="btn" href={SITE.form} rel="noopener">Предложить тему или улучшение <span aria-hidden="true">↗</span></a>}
-      </div>
-    </div></div></section>
-  )}
   <section class="walkthrough" id="kak-rabotaet" aria-labelledby="walkthrough-title">
     <div class="wrap walkthrough-in">
       <div class="walkthrough-copy">
@@ -85,6 +77,16 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
     </section>
   ))}
   {more.length > 0 && <section><div class="wrap"><h2>{moreTitle}</h2><div class="grid">{more.map(item => <ShelfCard item={item} />)}</div></div></section>}
+  {(SITE.max || SITE.form) && (
+    <section class="talk" aria-labelledby="talk-title"><div class="wrap"><div class="talk-in">
+      <div><p class="eyebrow">Обратная связь</p><h2 id="talk-title">Какую тему сделать следующей?</h2>
+        <p class="muted">Пишите пожелания, идеи и вопросы по материалам — сайт растёт под ваши уроки.</p></div>
+      <div class="talk-act">
+        {SITE.max && <a class="btn primary" href={SITE.max} rel="noopener">Обсудить в Максе <span aria-hidden="true">↗</span></a>}
+        {SITE.form && <a class="btn" href={SITE.form} rel="noopener">Предложить тему <span aria-hidden="true">↗</span></a>}
+      </div>
+    </div></div></section>
+  )}
 </Base>
 <script>
   // Пример режима «На доске»: шаг меняет чертёж (через data-step), вопрос и запись для тетради
@@ -139,7 +141,9 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   .intro{position:relative;isolation:isolate;overflow:hidden;padding:0;background:var(--bg)}
   .intro-in{position:relative;z-index:1;display:flex;align-items:center;min-height:560px;padding-top:58px;padding-bottom:58px}
   .intro-copy{width:min(100%,490px)}
-  .hero-art{position:absolute;inset:0;max-width:1600px;margin:auto;pointer-events:none;mask-image:linear-gradient(to right,transparent 8%,#000 42%,#000 96%,transparent)}
+  /* картинка в сетке сайта: правый край совпадает с краем материалов ниже */
+  .hero-frame{position:absolute;inset:0;pointer-events:none}
+  .hero-art{position:relative;height:100%;mask-image:linear-gradient(to right,transparent 8%,#000 42%)}
   .hero-art::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,var(--bg) 10%,transparent 62%),linear-gradient(to top,var(--bg),transparent 12%)}
   .hero-art :global(img){display:block;width:100%;height:100%;object-fit:cover;object-position:center 53%}
   h1{font-size:clamp(58px,7vw,88px);line-height:1;letter-spacing:-.055em;margin:19px 0 20px;font-weight:800}
@@ -202,12 +206,18 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
   .new-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:center;padding:24px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
   .new-preview{border-radius:8px;overflow:hidden}
   .new-in h2{margin-top:12px}
-  .talk-in{display:flex;justify-content:space-between;align-items:center;gap:14px 28px;flex-wrap:wrap;padding:16px 20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
-  .talk-in p{margin:0;max-width:62ch;line-height:1.5}
+  .hero-talk{margin:18px 0 0;font-size:13px;color:var(--soft)}
+  .hero-talk a{font-weight:600;color:var(--accent);text-decoration:none;border-bottom:2px solid var(--line);white-space:nowrap}
+  .hero-talk a:hover{border-color:var(--accent)}
+  .talk{padding-top:24px}
+  .talk-in{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px 40px;align-items:center;padding:28px 32px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+  .talk-in h2{margin:10px 0 8px}
+  .talk-in .muted{margin:0;max-width:52ch}
   .talk-act{display:flex;gap:10px;flex-wrap:wrap}
+  @media(max-width:800px){.talk-in{grid-template-columns:1fr;padding:22px 20px}.talk-act .btn{flex:1 1 auto}}
   @media(prefers-color-scheme:dark){:global(:root:not([data-theme="light"])) .hero-art :global(img){filter:brightness(.72) saturate(.82)}}
   :global(:root[data-theme="dark"]) .hero-art :global(img){filter:brightness(.72) saturate(.82)}
-  @media(max-width:800px){.intro-in{min-height:0;padding-top:38px;padding-bottom:20px}.intro-copy{width:100%;max-width:520px}h1{font-size:64px}.hero-art{display:none}.walkthrough-in{grid-template-columns:1fr;gap:20px}.walkthrough{padding-top:28px}.walkthrough-copy>p:not(.eyebrow){max-width:42ch}.walkthrough-copy h2 br{display:none}.notebook{max-width:560px;width:100%;justify-self:center;transform:none}.class-grid{grid-template-columns:1fr 1fr;gap:10px;border:0}.class-grid .class-link{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 14px}.class-link:last-child:nth-child(odd){grid-column:span 2}.new-in{grid-template-columns:1fr}.section-heading{align-items:start;flex-wrap:wrap;gap:12px}}
+  @media(max-width:800px){.intro-in{min-height:0;padding-top:38px;padding-bottom:20px}.intro-copy{width:100%;max-width:520px}h1{font-size:64px}.hero-frame{display:none}.walkthrough-in{grid-template-columns:1fr;gap:20px}.walkthrough{padding-top:28px}.walkthrough-copy>p:not(.eyebrow){max-width:42ch}.walkthrough-copy h2 br{display:none}.notebook{max-width:560px;width:100%;justify-self:center;transform:none}.class-grid{grid-template-columns:1fr 1fr;gap:10px;border:0}.class-grid .class-link{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 14px}.class-link:last-child:nth-child(odd){grid-column:span 2}.new-in{grid-template-columns:1fr}.section-heading{align-items:start;flex-wrap:wrap;gap:12px}}
   @media(max-width:380px){.paper-footer button{flex:1;padding-inline:.6em}.modes{gap:14px}.notebook{padding:20px}.class-link{padding:20px 8px;gap:10px}.class-link>span:last-child{display:none}}
   @media(prefers-reduced-motion:reduce){.strip span,.strip-label,.strip-row.sum{transition:none}}
 </style>
