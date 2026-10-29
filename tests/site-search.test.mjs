@@ -24,6 +24,15 @@ test('поиск понимает регистр, ё, формы слов и с�
   assert.equal(matchesSearch({ ...entries[0], text:'трёхзначное число' }, 'трехзначное', '', '', false), true);
 });
 
+test('поиск понимает беглую гласную: углы — угол, отрезки — отрезок', () => {
+  const topic = text => ({ ...entries[3], text });
+  for (const [query, text] of [['углы', 'Угол между прямыми'], ['угол', 'Углы при параллельных прямых'], ['угла', 'Измерение углов'],
+    ['отрезки', 'Отрезок и его длина'], ['корни', 'Квадратный корень'], ['делители', 'Делитель и кратное'], ['дробь', 'Сложение дробей']]) {
+    assert.equal(matchesSearch(topic(text), query, '', '', false), true, `«${query}» находит «${text}»`);
+  }
+  assert.equal(matchesSearch(topic('Угол между прямыми'), 'уголок треугольника', '', '', false), false);
+});
+
 test('запрос из адреса, фильтры, ссылки, пустой результат и возврат в истории', t => {
   const dom = new JSDOM(`<main><form data-search-form><input data-search-query><select data-search-grade><option value="">Все</option><option value="6">6</option><option value="8">8</option></select><select data-search-subject><option value="">Все</option><option value="algebra">Алгебра</option></select><input type="checkbox" data-search-ready><button type="submit">Найти</button></form><button data-search-example="дроби"></button><p data-search-status></p><div data-search-results></div><button data-search-more hidden></button></main>`, { url:'https://matshag.ru/poisk/?q=корень' });
   t.after(() => dom.window.close());

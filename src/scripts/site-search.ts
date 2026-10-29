@@ -11,12 +11,14 @@ export interface SearchEntry {
 }
 
 // Достаточно основ слов: «дроби» найдёт «дробей», «корень» — «корни».
+// Беглую гласную перед последней согласной основы убираем: «угол» и «углы» → «угл», «отрезок» и «отрезки» → «отрезк».
 export function searchWords(text: string) {
   return (text.toLocaleLowerCase('ru').replace(/ё/g, 'е').match(/[a-zа-я0-9]+/g) ?? []).map(word => {
     const root = word.replace(/^корен(?=[ьяеюий]|$)/, 'корн');
     if (root.length < 4) return root;
     const shortened = root.replace(/(иями|ями|ами|ого|его|ему|ому|ыми|ими|иях|ий|ый|ой|ая|яя|ое|ее|ые|ие|ых|их|ей|ия|ам|ах|ов|ев|ью|а|я|ы|и|е|о|ь)$/u, '');
-    return shortened.length >= 3 ? shortened : root;
+    const stem = shortened.length >= 3 ? shortened : root;
+    return stem.replace(/(?<=[^аеиоуыэюя])[ое](?=[клнрц]$)/u, '');
   });
 }
 
