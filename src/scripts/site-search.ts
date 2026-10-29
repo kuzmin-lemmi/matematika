@@ -30,7 +30,8 @@ export function matchesSearch(entry: SearchEntry, query: string, grade: string, 
   return queryWords.every(queryWord => words.some(word => word.includes(queryWord)));
 }
 
-export function initSiteSearch(root: HTMLElement, entries: SearchEntry[]) {
+// entries — готовый список или загрузка: индекс тем тяжёлый, его скачиваем при первом запросе, а не вместе со страницей
+export function initSiteSearch(root: HTMLElement, source: SearchEntry[] | (() => Promise<SearchEntry[]>)) {
   const doc = root.ownerDocument;
   const win = doc.defaultView!;
   const form = root.querySelector<HTMLFormElement>('[data-search-form]')!;
@@ -43,6 +44,14 @@ export function initSiteSearch(root: HTMLElement, entries: SearchEntry[]) {
   const more = root.querySelector<HTMLButtonElement>('[data-search-more]')!;
   const limitStep = 30;
   let limit = limitStep;
+  let entries = Array.isArray(source) ? source : null;
+  let loading: Promise<void> | null = null;
+
+  function load() {
+    loading ??= (source as () => Promise<SearchEntry[]>)()
+      .then(list => { entries = list; render(); })
+      .catch(() => { loading = null; status.textContent = 'Не удалось загрузить поиск. Проверьте интернет и попробуйте ещё раз.'; });
+  }
 
   function updateURL() {
     const url = new URL(win.location.href);
@@ -59,6 +68,11 @@ export function initSiteSearch(root: HTMLElement, entries: SearchEntry[]) {
     more.hidden = true;
     if (!searchWords(search).length) {
       status.textContent = 'Введите тему или название материала.';
+      return;
+    }
+    if (!entries) {
+      status.textContent = 'Загружаю темы…';
+      load();
       return;
     }
     const matches = entries.filter(entry => matchesSearch(entry, search, grade.value, subject.value, ready.checked));

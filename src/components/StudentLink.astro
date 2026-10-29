@@ -1,8 +1,9 @@
 ---
 // Кнопка «Ссылка для дома»: копирует ссылку на закрытый тренажёр, её учитель отправляет в чат класса.
 // Ученик по ней попадает сразу в задания — без сайта, доски и раздатки.
+import type { CollectionEntry } from 'astro:content';
 import { studentHref } from '../lib';
-interface Props { item: any; label?: string }
+interface Props { item: CollectionEntry<'items'>; label?: string }
 const { item, label = '🔗 Ссылка для дома' } = Astro.props;
 const url = studentHref(item, Astro.site);
 ---
