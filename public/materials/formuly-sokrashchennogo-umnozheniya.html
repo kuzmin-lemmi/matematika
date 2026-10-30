@@ -86,7 +86,7 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 .icon{padding:.35em .6em;min-width:44px;min-height:44px}
 
 /* доска: на проекторе шрифт не мельче 28px */
-#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
+#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
 .bbar{display:flex;align-items:center;gap:8px;font-size:20px}
 .bbar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap;margin-right:6px}
@@ -137,6 +137,44 @@ svg .dot{fill:var(--b);stroke:var(--surface);stroke-width:3}
 svg .lbl text{font-size:32px;font-weight:700}
 svg .lbl line{stroke:var(--ink);stroke-width:3}
 svg .lbl.warm text{fill:var(--b)} svg .lbl.warm line{stroke:var(--b)}
+/* чертёжные помощники GEO (core/geom.js): линии толще 4px, подписи с подложкой цвета фона — читаются поверх линий */
+svg .g-ln{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+svg .g-thin{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round}
+svg .g-dash{fill:none;stroke:var(--soft);stroke-width:3;stroke-dasharray:12 9;stroke-linecap:round}
+svg .g-hl{fill:none;stroke:var(--b);stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+svg .g-fig{fill:var(--a-soft);fill-opacity:.6;stroke:var(--ink);stroke-width:5;stroke-linejoin:round}
+svg .g-fig.b{fill:var(--b-soft);fill-opacity:.85}
+svg .g-fig.ghost{fill:none;stroke:var(--soft);stroke-width:3;stroke-dasharray:12 9}
+svg .g-circ{fill:none;stroke:var(--ink);stroke-width:3}
+svg .g-pt{fill:var(--ink)}
+svg .g-mark{fill:none;stroke:var(--ink);stroke-width:3}
+svg .g-tick{stroke:var(--b);stroke-width:3.5;stroke-linecap:round}
+svg .g-sec{fill:var(--b-soft);stroke:var(--b);stroke-width:3}
+svg .g-sec.a{fill:var(--a-soft);stroke:var(--a)}
+svg .g-arrow{stroke:var(--b);stroke-width:5;fill:var(--b);stroke-linecap:round}
+svg .g-vl,svg .g-lab,svg .g-num{paint-order:stroke;stroke:var(--bg);stroke-width:8px;stroke-linejoin:round}
+svg .g-vl{font-size:40px;font-weight:700;font-style:italic}
+svg .g-vl .g-sub{font-size:26px;font-style:normal}
+svg .g-lab{font-size:34px;font-weight:600}
+svg .g-num{font-size:34px;font-weight:800}
+svg .g-num.b,svg .g-lab.b{fill:var(--b)} svg .g-num.a,svg .g-lab.a{fill:var(--accent)}
+/* живая доска (core/live.js): ручки — крупные, для пальца и пера; панель — под чертежом */
+.bstage svg.live{touch-action:none;user-select:none;-webkit-user-select:none}
+svg .lv-h{cursor:grab;outline:none}
+#board.dragging,#board.dragging svg .lv-h{cursor:grabbing}
+svg .lv-hit{fill:transparent}
+svg .lv-dot{fill:var(--b);stroke:var(--surface);stroke-width:5}
+svg .lv-h:hover .lv-dot{stroke:var(--accent)}
+svg .lv-h:focus-visible .lv-dot{stroke:var(--accent);stroke-width:9}
+.blive{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:center;padding:6px 0 2px;font-size:22px}
+.blive .lv-c{display:inline-flex;align-items:center;gap:12px;font-weight:600}
+.blive input[type=range]{width:min(320px,55vw);height:40px;accent-color:var(--accent);cursor:pointer}
+.blive output{min-width:3.2em;font-weight:800;color:var(--accent)}
+.blive button{min-height:48px;font-size:20px;padding:.2em .8em}
+.blive button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.blive .lv-tools{display:inline-flex;gap:8px}
+#board.preview .blive{visibility:hidden}
+@media (max-width:600px){ .blive{font-size:17px;gap:6px 14px} .blive button{font-size:16px;min-height:44px} }
 svg .new{animation:fade .6s ease-out both}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion: reduce){ svg .new, .mode:hover{animation:none;transform:none} }
@@ -218,6 +256,9 @@ table.ans .tall td{height:13mm}
 table.key{border-collapse:collapse;width:100%;font-size:10.5pt}
 table.key td,table.key th{border:1px solid #000;padding:1mm 1.2mm;text-align:center;white-space:nowrap}
 table.key td:first-child{font-weight:700}
+.page.key.land{width:297mm;min-height:210mm}
+table.key.wrap td,table.key.wrap th{white-space:normal;padding:.6mm .8mm}
+table.key.wrap td:first-child{white-space:nowrap}
 
 /* тренажёр */
 .hhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:16px}
@@ -274,13 +315,15 @@ table.key td:first-child{font-weight:700}
 
 body.student [data-act="menu"],body.student #hLinks{display:none !important}
 @page{size:A4;margin:0}
+@page land{size:A4 landscape;margin:0}
 @media print{
+  .page.key.land{page:land}
   html,body{background:#fff !important;color:#000 !important;background-image:none !important;padding:0}
   .no-print,.screen:not(#print),.topright{display:none !important}
   #print .wrap{max-width:none;padding:0}
   .sheets{display:block;overflow:visible}
   .page{box-shadow:none;margin:0;break-after:page;min-height:auto;height:297mm;overflow:hidden}
-  .page.key{height:auto;overflow:visible}
+  .page.key,.page.flow{height:auto;overflow:visible}
   table.key tr{break-inside:avoid}
   .page:last-child{break-after:auto}
   body.print-key .page:not(.key){display:none}
@@ -290,6 +333,82 @@ body.student [data-act="menu"],body.student #hLinks{display:none !important}
   .bbar{font-size:18px}
   .bctl button{font-size:18px;min-height:48px}
 }
+
+/* ---- форматы ядра: билет на выход, самостоятельная, домино, «найди ошибку» (core/formats.js) ---- */
+.page.exit-tickets{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;padding:0;gap:0;height:297mm;overflow:hidden}
+.exit-ticket{display:flex;flex-direction:column;gap:3mm;padding:9mm 10mm;border:1px dashed #888;overflow:hidden;font-size:12pt}
+.exit-ticket .shead{grid-template-columns:1fr auto;font-size:10pt}
+.exit-ticket .tt{margin:0;font-weight:700;font-size:11pt}
+.exit-ticket .tasks{grid-template-columns:1fr;gap:4mm}
+.exit-ticket .task{font-size:12pt;line-height:1.3}
+.exit-ticket .otv,.test-work .otv,.errors .otv{margin-top:2mm;font-size:11pt}
+.tasks.one{grid-template-columns:1fr}
+.test-work .pts{color:#555;font-size:10pt;white-space:nowrap}
+.page.domino .sheet{gap:2mm}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.tile{display:grid;grid-template-columns:1fr 1fr;border:1px dashed #000;min-height:31mm;font-size:12pt}
+.tile > div{display:flex;align-items:center;justify-content:center;text-align:center;padding:1mm 2mm;overflow:hidden}
+.tile > .l{border-right:1.5px solid #000}
+.chain{display:flex;flex-wrap:wrap;gap:1.5mm;margin:2mm 0 4mm}
+.tile.mini{display:inline-grid;grid-template-columns:auto auto;min-height:0;font-size:9pt;border:1px solid #000}
+.tile.mini > span{padding:1mm 1.5mm;border-right:1px solid #000}
+.tile.mini > span:last-child{border-right:0}
+.errors .case{break-inside:avoid;margin-bottom:3mm}
+.errors .cases{list-style:none;padding:0;margin:0;display:grid;gap:3mm}
+.errors .ask{font-weight:600}
+ol.elines{margin:1mm 0 1mm 0;padding-left:8mm;font-size:13pt}
+ol.elines li{margin:.6mm 0}
+/* доска: решение с ошибкой и ответы диктанта */
+#board ol.elines{font-size:clamp(20px,3.2vw,34px);font-weight:600;margin:6px 0;padding-left:1.4em}
+#board ol.elines li.wrong{color:var(--bad);text-decoration:underline wavy;text-underline-offset:5px}
+#board ol.dict-ans{margin:4px 0;padding-left:1.4em;columns:2;font-size:clamp(18px,2.6vw,30px)}
+.bbar select{font:inherit;font-size:16px;padding:.25em .4em;border:2px solid var(--line);border-radius:10px;background:var(--surface);color:inherit}
+#bTimer{min-width:5.5em;font-variant-numeric:tabular-nums}
+#board.preview .bbar select,#board.preview #bTimer{display:none}
+/* ---- расшифровка ловушек в ключе, тест с выбором, взаимопроверка, лесенка подсказок (core/print.js, core/formats.js) ---- */
+table.key .trp{display:block;font-size:8pt;color:#444;white-space:nowrap}
+table.key .trp sup{font-size:6.5pt}
+.diag{font-size:9.5pt;line-height:1.3;margin-top:2mm}
+.diag ol{margin:1mm 0 0;padding-left:6mm;columns:2;column-gap:8mm}
+.opts{display:flex;flex-wrap:wrap;gap:1mm 5mm;margin-top:1mm;font-size:11.5pt}
+.opts span{white-space:nowrap}
+table.bubbles{border-collapse:collapse;font-size:10pt;margin-top:2mm;break-inside:avoid}
+table.bubbles th,table.bubbles td{border:1px solid #000;width:7mm;height:6mm;padding:0;text-align:center}
+table.bubbles tr:first-child th:first-child{width:auto;padding:0 2mm}
+table.bubbles td.off{background:repeating-linear-gradient(45deg,#fff 0 2px,#999 2px 3px)}
+table.bubbles.stencil td.on{background:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.choice-test .sheet{display:flex;flex-direction:column}
+.choice-test table.bubbles:not(.stencil){display:inline-table;transform-origin:left top}
+.choice-test .sheet > table.bubbles{align-self:flex-start}
+.stencils{display:flex;flex-wrap:wrap;gap:4mm 6mm}
+.pairs .peer{margin-top:auto;border-top:1px dashed #555;padding-top:1.5mm;font-size:9.5pt;line-height:1.3}
+.pairs .peer span{white-space:nowrap;margin-right:2.5mm}
+.pairs .chk,.ladder .chk{font-size:9pt;color:#555;margin-left:3mm;white-space:nowrap}
+.pairs .sheet{display:flex;flex-direction:column}
+.pairs .otv{font-size:10.5pt;margin-top:.5mm}
+.lrows{display:grid;gap:0}
+.lhead,.lrow{display:grid;grid-template-columns:1fr 26% 26%}
+.lhead span{font-size:9pt;color:#555;padding:0 2mm}
+.lrow{border-top:1px solid #bbb;break-inside:avoid}
+.lrow > div{padding:2mm}
+.lrow .hint{border-left:1.5px dashed #555;font-size:10pt;line-height:1.3;display:flex;flex-direction:column;justify-content:space-between;gap:2mm}
+.lhead span + span{border-left:1.5px dashed #555}
+.ladder .lrow .task{font-size:12pt}
+.ladder .otv{margin-top:2mm;font-size:11pt}
+/* билет на выход — четверть листа: чертежи задач уменьшаются */
+.exit-ticket svg{max-height:34mm;width:auto;max-width:100%;display:block;margin:1mm auto}
+/* задача с чертежом: чертёж слева, условие и ответ справа — три задачи помещаются на четверть листа */
+.exit-ticket .task:has(> svg){display:grid;grid-template-columns:36mm 1fr;column-gap:2.5mm;align-items:start}
+.exit-ticket .task:has(> svg) > svg{grid-column:1;grid-row:1 / span 4;max-height:28mm;margin:0}
+.exit-ticket .task:has(> svg) > :not(svg){grid-column:2}
+.exit-ticket .task:has(> svg) p{margin:0;font-size:11pt;line-height:1.25}
+.exit-ticket .cells{display:none}
+/* домино: чертёж задания помещается в половину костяшки */
+.tile .r{flex-direction:column;gap:.5mm;font-size:10.5pt;line-height:1.2}
+.tile .r svg{max-height:24mm;width:auto;max-width:100%}
+.tile .r p{margin:0}
+.tile{break-inside:avoid}
+#board p.tf{font-size:clamp(22px,3.4vw,38px);font-weight:700;margin:8px 0}
 
 /* тема */
 /* Тема «Формулы сокращённого умножения» */
@@ -341,12 +460,14 @@ svg .gn{fill:none}
     <span class="cnt" id="bCnt"></span>
     <button type="button" data-act="restart" title="С первого шага" aria-label="Заново">↺<span class="t"> Заново</span></button>
     <button type="button" data-act="numbers" title="Тот же показ с другими числами" aria-label="Другие числа">🎲<span class="t"> Другие числа</span></button>
+    <button type="button" id="bTimer" data-act="timer" aria-pressed="false" title="Таймер задания" hidden>⏱</button>
     <button type="button" data-act="notes" id="bNotesBtn" aria-pressed="false" title="Что сказать на этом шаге. Подсказку видно и на проекторе — включайте, когда нужно" aria-label="Подсказка учителю">💬<span class="t"> Учителю</span></button>
     <button class="icon" type="button" data-act="theme" title="Светлая или тёмная тема" aria-label="Сменить тему">◐</button>
     <button class="icon" type="button" data-act="full" title="Во весь экран (F)" aria-label="Во весь экран">⛶</button>
   </div>
   <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
   <div class="bstage" id="bStage"></div>
+  <div class="blive" id="bLive" role="group" aria-label="Управление чертежом" hidden></div>
   <div class="brec"><span class="rt-h">Запись в тетради</span><div id="bRec"></div></div>
   <div class="bctl">
     <button type="button" data-act="prev" title="Назад (←, PageUp)">← Назад</button>
@@ -545,7 +666,7 @@ function shuffle(rnd, arr) {
   for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
   return r;
 }
-const taskRnd = (n, i) => mulberry32(GEN_VERSION * 1000003 + n * 7919 + i * 104729 + 1);
+const taskRnd = (n, i, version = GEN_VERSION) => mulberry32(version * 1000003 + n * 7919 + i * 104729 + 1);
 const plural = (n, one, few, many) => {
   const m10 = n % 10, m100 = n % 100;
   return m10 === 1 && m100 !== 11 ? one : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? few : many;
@@ -615,6 +736,165 @@ function parseVal(s) {
   const r = isqrt(under);
   return r != null ? V.q(Q(sign * r)) : { m: under, s: sign };
 }
+
+// ---------- ядро: core/geom.js ----------
+// ================= 📐 Чертёжные помощники (GEO) =================
+// Всё в одном объекте GEO, чтобы не пересекаться с именами темы: const { pt, seg, vertex } = GEO.
+// Координаты — экранные координаты SVG (y вниз), по умолчанию рамка доски 980 × 400.
+// Углы — в градусах, «математические»: 0° — вправо, 90° — вверх, положительный поворот — против часовой стрелки.
+// Рисующие функции возвращают строку SVG; классы g-* описаны в base.css и читаются на проекторе.
+const GEO = (() => {
+  const BOX = { x: 0, y: 0, w: 980, h: 400 };
+  const f1 = n => Math.round(n * 10) / 10;
+  const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const snap = (v, step) => Math.round(v / step) * step;
+  const pt = (x, y) => ({ x, y });
+  const add = (p, q) => pt(p.x + q.x, p.y + q.y);
+  const sub = (p, q) => pt(p.x - q.x, p.y - q.y);
+  const scale = (v, k) => pt(v.x * k, v.y * k);
+  const len = v => Math.hypot(v.x, v.y);
+  const dist = (p, q) => Math.hypot(q.x - p.x, q.y - p.y);
+  const mid = (p, q) => pt((p.x + q.x) / 2, (p.y + q.y) / 2);
+  const lerp = (p, q, t) => pt(p.x + (q.x - p.x) * t, p.y + (q.y - p.y) * t);
+  const unit = (p, q) => { const d = dist(p, q) || 1; return pt((q.x - p.x) / d, (q.y - p.y) / d); };
+  const perp = v => pt(v.y, -v.x);                                   // поворот на 90° против часовой стрелки
+  const polar = (V, a, r) => pt(V.x + r * Math.cos(rad(a)), V.y - r * Math.sin(rad(a)));
+  // направление луча VP: 0…360°
+  const dirDeg = (V, P) => { const a = deg(Math.atan2(V.y - P.y, P.x - V.x)); return a < 0 ? a + 360 : a; };
+  // величина угла AVB: 0…180°
+  const angleAt = (V, A, B) => { let d = Math.abs(dirDeg(V, A) - dirDeg(V, B)); if (d > 180) d = 360 - d; return d; };
+  // поворот точки P вокруг C на a градусов
+  const turn = (P, C, a) => { const c = Math.cos(rad(a)), s = Math.sin(rad(a)), dx = P.x - C.x, dy = P.y - C.y; return pt(C.x + dx * c + dy * s, C.y - dx * s + dy * c); };
+  // проекция точки на прямую AB и отражение относительно неё
+  const project = (P, A, B) => { const d = sub(B, A), k = d.x * d.x + d.y * d.y || 1, t = ((P.x - A.x) * d.x + (P.y - A.y) * d.y) / k; return lerp(A, B, t); };
+  const reflect = (P, A, B) => { const F = project(P, A, B); return pt(2 * F.x - P.x, 2 * F.y - P.y); };
+  // точка пересечения прямых p1q1 и p2q2; null — прямые параллельны
+  function cross(p1, q1, p2, q2) {
+    const d1 = sub(q1, p1), d2 = sub(q2, p2), den = d1.x * d2.y - d1.y * d2.x;
+    if (Math.abs(den) < 1e-9) return null;
+    const t = ((p2.x - p1.x) * d2.y - (p2.y - p1.y) * d2.x) / den;
+    return pt(p1.x + t * d1.x, p1.y + t * d1.y);
+  }
+  // пересечение прямой PQ с окружностью (C, R): 0, 1 или 2 точки — по направлению от P к Q
+  function lineCircle(P, Q, C, R) {
+    const u = unit(P, Q), w = sub(C, P), b = w.x * u.x + w.y * u.y, disc = b * b - (w.x * w.x + w.y * w.y - R * R);
+    if (disc < -1e-9) return [];
+    const s = Math.sqrt(Math.max(0, disc));
+    return (s < 1e-9 ? [b] : [b - s, b + s]).map(t => add(P, scale(u, t)));
+  }
+  // пересечение окружностей (построения циркулем): 0, 1 или 2 точки
+  function circles(C1, R1, C2, R2) {
+    const d = dist(C1, C2);
+    if (d < 1e-9 || d > R1 + R2 + 1e-9 || d < Math.abs(R1 - R2) - 1e-9) return [];
+    const a = (R1 * R1 - R2 * R2 + d * d) / (2 * d), h = Math.sqrt(Math.max(0, R1 * R1 - a * a));
+    const M = lerp(C1, C2, a / d), n = perp(unit(C1, C2));
+    return h < 1e-9 ? [M] : [add(M, scale(n, h)), sub(M, scale(n, h))];
+  }
+  const area = ps => Math.abs(ps.reduce((s, p, i) => { const q = ps[(i + 1) % ps.length]; return s + p.x * q.y - q.x * p.y; }, 0)) / 2;
+  const centroid = ps => pt(ps.reduce((s, p) => s + p.x, 0) / ps.length, ps.reduce((s, p) => s + p.y, 0) / ps.length);
+  // ориентация тройки на экране: > 0 — A → B → C против часовой стрелки
+  const orient = (A, B, C) => -((B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x));
+  // многоугольник «нормальный» для показа: стороны не короче side, углы не меньше angle — контроль вырожденных случаев
+  function fine(ps, { side = 40, angle = 12 } = {}) {
+    return ps.every((p, i) => {
+      const prev = ps[(i + ps.length - 1) % ps.length], next = ps[(i + 1) % ps.length], a = angleAt(p, prev, next);
+      return dist(p, next) >= side && a >= angle && a <= 180 - angle;
+    });
+  }
+  const bbox = ps => { const xs = ps.map(p => p.x), ys = ps.map(p => p.y); return { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) }; };
+  const inBox = (p, pad = 0, box = BOX) => p.x >= box.x + pad && p.x <= box.x + box.w - pad && p.y >= box.y + pad && p.y <= box.y + box.h - pad;
+  const keepIn = (p, pad = 0, box = BOX) => pt(clamp(p.x, box.x + pad, box.x + box.w - pad), clamp(p.y, box.y + pad, box.y + box.h - pad));
+  // вписать точки модели (в своих единицах, y вверх или вниз) в рамку: map(p) → точка SVG, k — масштаб
+  function fit(ps, box = BOX, { pad = 30, flipY = false } = {}) {
+    const b = bbox(ps), k = Math.min((box.w - 2 * pad) / (b.w || 1), (box.h - 2 * pad) / (b.h || 1));
+    const cx = b.x + b.w / 2, cy = b.y + b.h / 2, X = box.x + box.w / 2, Y = box.y + box.h / 2;
+    return { k, map: p => pt(X + (p.x - cx) * k, Y + (flipY ? -1 : 1) * (p.y - cy) * k) };
+  }
+  // прямая через P и Q, обрезанная рамкой (отступ pad); луч — от P через Q до края
+  function clip(P, Q, pad = 20, box = BOX, ray = false) {
+    const d = sub(Q, P), ts = [];
+    if (Math.abs(d.x) > 1e-9) ts.push((box.x + pad - P.x) / d.x, (box.x + box.w - pad - P.x) / d.x);
+    if (Math.abs(d.y) > 1e-9) ts.push((box.y + pad - P.y) / d.y, (box.y + box.h - pad - P.y) / d.y);
+    const ok = ts.filter(t => inBox(add(P, scale(d, t)), pad - 0.01, box));
+    if (!ok.length) return [P, Q];
+    const t1 = Math.max(...ok), t0 = ray ? 0 : Math.min(...ok);
+    return [add(P, scale(d, t0)), add(P, scale(d, t1))];
+  }
+
+  // ---------- рисунок ----------
+  // имя точки с индексом: 'A1' → A₁ (подстрочная цифра)
+  function name(s) {
+    let out = '', down = false;
+    for (const ch of String(s)) {
+      if (ch >= '0' && ch <= '9') { out += `<tspan${down ? '' : ' dy="9"'} class="g-sub">${ch}</tspan>`; down = true; }
+      else { out += down ? `<tspan dy="-9">${ch}</tspan>` : ch; down = false; }
+    }
+    return out;
+  }
+  const seg = (p, q, cls = 'g-ln') => `<line class="${cls}" x1="${f1(p.x)}" y1="${f1(p.y)}" x2="${f1(q.x)}" y2="${f1(q.y)}"/>`;
+  const line = (p, q, cls = 'g-ln', pad = 20) => { const [a, b] = clip(p, q, pad); return seg(a, b, cls); };
+  const ray = (p, q, cls = 'g-ln', pad = 20) => { const [a, b] = clip(p, q, pad, BOX, true); return seg(a, b, cls); };
+  const pts = ps => ps.map(p => `${f1(p.x)},${f1(p.y)}`).join(' ');
+  const poly = (ps, cls = 'g-fig') => `<polygon class="${cls}" points="${pts(ps)}"/>`;
+  const path = (ps, cls = 'g-ln') => `<polyline class="${cls}" points="${pts(ps)}"/>`;
+  const circle = (C, r, cls = 'g-circ') => `<circle class="${cls}" cx="${f1(C.x)}" cy="${f1(C.y)}" r="${f1(r)}"/>`;
+  const dot = (p, cls = 'g-pt', r = 7) => circle(p, r, cls);
+  const text = (p, s, cls = 'g-lab', anchor = 'middle') => `<text class="${cls}" x="${f1(p.x)}" y="${f1(p.y)}" text-anchor="${anchor}" dominant-baseline="central">${s}</text>`;
+  // подпись вершины P на расстоянии r — в сторону от точки from (обычно центр фигуры): подписи не налезают на стороны
+  // и на ручку живой доски в вершине
+  const vertex = (P, s, from, r = 46, cls = 'g-vl') => text(add(P, scale(unit(from, P), r)), name(s), cls);
+  // подпись стороны pq у её середины — снаружи от точки opp
+  function side(p, q, s, opp, r = 30, cls = 'g-num') {
+    const m = mid(p, q), n = perp(unit(p, q)), out = ((m.x - opp.x) * n.x + (m.y - opp.y) * n.y) >= 0 ? 1 : -1;
+    return text(add(m, scale(n, r * out)), s, cls);
+  }
+  // меньший угол AVB: [начало, конец] в градусах, конец > начала
+  function span(V, A, B) {
+    const a = dirDeg(V, A), b = dirDeg(V, B), d = (b - a + 360) % 360;
+    return d <= 180 ? [a, a + d] : [b, b + 360 - d];
+  }
+  const arcD = (V, s, e, r) => { const p = polar(V, s, r), q = polar(V, e, r); return `M${f1(p.x)} ${f1(p.y)}A${f1(r)} ${f1(r)} 0 ${e - s > 180 ? 1 : 0} 0 ${f1(q.x)} ${f1(q.y)}`; };
+  // дуга окружности с центром V от направления s до e (градусы, против часовой стрелки)
+  const arc = (V, s, e, r, cls = 'g-mark') => `<path class="${cls}" d="${arcD(V, s, e, r)}"/>`;
+  // закрашенный угол AVB (меньший), радиус r
+  const sector = (V, A, B, r = 60, cls = 'g-sec') => { const [s, e] = span(V, A, B); return `<path class="${cls}" d="M${f1(V.x)} ${f1(V.y)}L${arcD(V, s, e, r).slice(1)}Z"/>`; };
+  // n дужек равенства угла AVB
+  const arcs = (V, A, B, n = 1, r = 26, cls = 'g-mark') => { const [s, e] = span(V, A, B); let o = ''; for (let i = 0; i < n; i++) o += arc(V, s, e, r + i * 9, cls); return o; };
+  // знак прямого угла AVB
+  const right = (V, A, B, size = 22, cls = 'g-mark') => { const u = scale(unit(V, A), size), w = scale(unit(V, B), size); return path([add(V, u), add(add(V, u), w), add(V, w)], cls); };
+  // n штрихов равенства на отрезке pq
+  function ticks(p, q, n = 1, cls = 'g-tick') {
+    const d = unit(p, q), m = mid(p, q), k = perp(d);
+    let o = '';
+    for (let i = 0; i < n; i++) { const c = add(m, scale(d, (i - (n - 1) / 2) * 11)); o += seg(add(c, scale(k, 11)), sub(c, scale(k, 11)), cls); }
+    return o;
+  }
+  // подпись угла AVB на биссектрисе; у острого угла — дальше от вершины, чтобы число поместилось
+  function angleText(V, A, B, s, r = 0, cls = 'g-num') {
+    const [a, e] = span(V, A, B), rr = r || clamp(34 / Math.sin(rad(Math.max(e - a, 8) / 2)), 58, 130);
+    return text(polar(V, (a + e) / 2, rr), s, cls);
+  }
+  // стрелка от p к q (наконечник — треугольник)
+  function arrow(p, q, cls = 'g-arrow', head = 18) {
+    const d = unit(p, q), n = perp(d), b = sub(q, scale(d, head));
+    return `<g class="${cls}">${seg(p, b, '')}${poly([q, add(b, scale(n, head * .55)), sub(b, scale(n, head * .55))], '')}</g>`;
+  }
+  // знак параллельности: n уголков-стрелок посередине прямой pq
+  function parallel(p, q, n = 1, cls = 'g-mark') {
+    const d = unit(p, q), k = perp(d), m = mid(p, q);
+    let o = '';
+    for (let i = 0; i < n; i++) { const c = add(m, scale(d, (i - (n - 1) / 2) * 13 + 6)); o += path([add(sub(c, scale(d, 12)), scale(k, 10)), c, sub(sub(c, scale(d, 12)), scale(k, 10))], cls); }
+    return o;
+  }
+
+  return {
+    BOX, f1, rad, deg, clamp, snap, pt, add, sub, scale, len, dist, mid, lerp, unit, perp, polar, dirDeg, angleAt, turn,
+    project, reflect, cross, lineCircle, circles, area, centroid, orient, fine, bbox, inBox, keepIn, fit, clip,
+    name, seg, line, ray, poly, path, circle, dot, text, vertex, side, span, arc, sector, arcs, right, ticks, angleText, arrow, parallel,
+  };
+})();
+
 
 // ---------- тема: materials/formuly-sokrashchennogo-umnozheniya/topic.js ----------
 // Тема «Формулы сокращённого умножения» (7 класс, Макарычев). Только содержание — каркас даёт ядро (core/).
@@ -686,6 +966,7 @@ const bad = (cat, msg) => ({ cat, msg });
 const TYPES = {
   expand: {   // раскрыть скобки: квадрат суммы, квадрат разности, произведение разности и суммы
     input: 'poly', title: 'Раскрытие скобок',
+    statement: (t, html) => `${TYPES.expand.text(t)} = ${html}`,
     forms: ['sqsum', 'sqdif', 'diff'],
     gen: (rnd, form) => genAB(rnd, form || pick(rnd, TYPES.expand.forms), 4, 3),
     terms: t => {
@@ -734,7 +1015,8 @@ const TYPES = {
     traps(t) {
       const sa = sqOf(t.A), sb = sqOf(t.B), cr = crOf(t.A, t.B);
       const out = [[sa, sb], t.form === 'sqdif' ? [sa, neg(sb)] : [sa, neg(cr), sb]];   // забыли 2ab; перепутали знак
-      return out.slice(0, CONFIG.print.traps).map(xs => ({ key: polyKey(xs), html: poly(xs) }));
+      const cats = { sqsum: ['middle', 'sign'], sqdif: ['middle', 'diff'], diff: ['diff', 'diff'] }[t.form];   // для расшифровки ловушек в ключе
+      return out.slice(0, CONFIG.print.traps).map((xs, i) => ({ key: polyKey(xs), html: poly(xs), cat: cats[i] }));
     },
     hints(t) {
       const sa = sqOf(t.A), sb = sqOf(t.B), cr = crOf(t.A, t.B);
@@ -786,7 +1068,7 @@ const TYPES = {
     keyHTML: t => mono(TYPES.fill.want(t)),
     traps(t) {
       const w = TYPES.fill.want(t), f = TYPES.fill.factor(t);
-      return [{ k: w.k / f, m: w.m }, { k: w.k, m: w.m + 1 }].slice(0, CONFIG.print.traps).map(x => ({ key: monoKey(x), html: mono(x) }));
+      return [{ k: w.k / f, m: w.m, cat: 'coef' }, { k: w.k, m: w.m + 1, cat: 'power' }].slice(0, CONFIG.print.traps).map(x => ({ key: monoKey(x), html: mono(x), cat: x.cat }));
     },
     hints(t) {
       if (t.form === 'cube') return [FCUBE(t.sign), `Пропущен член 3${LA}${PW(2)}${LB}: коэффициент 3 · ${t.A.k}${PW(2)} · ${t.B.k}, степень ${2 * t.A.m} + ${t.B.m}.`];
@@ -796,7 +1078,7 @@ const TYPES = {
     wrongInput: t => ({ k: TYPES.fill.want(t).k + 3, m: TYPES.fill.want(t).m }),
   },
   smart: {   // вычисление удобным способом: a² − b² = (a − b)(a + b)
-    input: 'num', title: 'Удобным способом',
+    input: 'num', title: 'Удобным способом', oral: true,
     gen: (rnd, form) => {
       form = form || pick(rnd, ['int', 'dec']);
       if (form === 'dec') return { form, k: int(rnd, 11, 99), j: int(rnd, 1, 9) };
@@ -830,7 +1112,7 @@ const TYPES = {
     },
   },
   value: {   // значение выражения a² − b² при данных значениях букв
-    input: 'num', title: 'Значение выражения',
+    input: 'num', title: 'Значение выражения', oral: true,
     gen: rnd => ({ r: Q(int(rnd, 12, 40), 10), s: Q(int(rnd, 1, 11), 10) }),
     text: () => `${LA}${PW(2)} ${MINUS} ${LB}${PW(2)}`,
     ask: t => `Найдите значение выражения ${TYPES.value.text(t)}<br>при ${LA} = ${decStr(t.r)}, ${LB} = ${decStr(t.s)}.`,
@@ -861,6 +1143,7 @@ const TYPES = {
   },
   fact: {   // разложение на множители: выбрать верный вариант
     input: 'pick', title: 'Разложение на множители',
+    statement: (t, html) => `${TYPES.fact.text(t)} = ${html}`,
     forms: ['diff', 'sqsum', 'sqdif'],
     gen: (rnd, form) => {
       const t = genAB(rnd, form || pick(rnd, TYPES.fact.forms), 3, 3);
@@ -910,6 +1193,7 @@ const TYPES = {
   },
   cube: {   // куб суммы и разности: выбрать верное раскрытие
     input: 'pick', title: 'Куб суммы и разности',
+    statement: (t, html) => `${TYPES.cube.text(t)} = ${html}`,
     gen: rnd => {
       const t = genAB(rnd, 'cube', 3, 2);
       t.sign = rnd() < 0.5 ? 1 : -1;
@@ -954,6 +1238,47 @@ const TYPES = {
   },
 };
 
+// ================= Решения с одной ошибкой: «найди ошибку» =================
+// mistake(t, rnd) → { lines: строки решения, at: номер неверной строки (с 0), fix: верная строка, why: в чём ошибка }
+// неверный коэффициент квадрата: не возвели в квадрат (для k = 1 это совпало бы с верным — берём 2)
+const errLines = (lines, at, bad, why) => ({ lines: lines.map((l, i) => (i === at ? bad : l)), at, fix: lines[at], why });
+TYPES.expand.mistake = (t, rnd) => {
+  const sa = sqOf(t.A), sb = sqOf(t.B), cr = crOf(t.A, t.B), s = sgn(t.sign), a = mono(t.A), b = mono(t.B), wrongK = t.A.k === 1 ? 2 : t.A.k;
+  if (t.form === 'diff') {
+    const L = [`${TYPES.expand.text(t)} = (${a})${PW(2)} ${MINUS} (${b})${PW(2)}`, `= ${mono(sa)} ${MINUS} ${mono(sb)}`];
+    return pick(rnd, [
+      () => errLines(L, 0, `${TYPES.expand.text(t)} = (${a})${PW(2)} + (${b})${PW(2)}`, 'В разности квадратов между квадратами стоит «−», а не «+».'),
+      () => errLines(L, 0, `${TYPES.expand.text(t)} = (${a})${PW(2)} ${MINUS} 2 · ${a} · ${b} + (${b})${PW(2)}`, 'Это не квадрат разности: у произведения суммы и разности среднего члена нет, он сокращается.'),
+      () => errLines(L, 1, `= ${mono({ k: wrongK, m: sa.m })} ${MINUS} ${mono(sb)}`, `В квадрат нужно возвести и коэффициент: (${a})${PW(2)} = ${mono(sa)}, а не ${mono({ k: wrongK, m: sa.m })}.`),
+    ])();
+  }
+  const L = [`${TYPES.expand.text(t)} = (${a})${PW(2)} ${s} 2 · ${a} · ${b} + (${b})${PW(2)}`, `= ${mono(sa)} ${s} ${mono(cr)} + ${mono(sb)}`];
+  return pick(rnd, [
+    () => errLines(L, 0, `${TYPES.expand.text(t)} = (${a})${PW(2)} + (${b})${PW(2)}`, 'Потерян средний член: у квадрата суммы или разности три слагаемых, среди них удвоенное произведение 2ab.'),
+    () => errLines(L, 0, `${TYPES.expand.text(t)} = (${a})${PW(2)} ${sgn(-t.sign)} 2 · ${a} · ${b} + (${b})${PW(2)}`, `Знак среднего члена должен совпадать со знаком в скобке: ${s}.`),
+    () => errLines(L, 1, `= ${mono({ k: wrongK, m: sa.m })} ${s} ${mono(cr)} + ${mono(sb)}`, `В квадрат нужно возвести и коэффициент: (${a})${PW(2)} = ${mono(sa)}.`),
+    () => errLines(L, 1, `= ${mono(sa)} ${s} ${mono({ k: t.A.k * t.B.k, m: cr.m })} + ${mono(sb)}`, `Забыли двойку: удвоенное произведение 2 · ${a} · ${b} = ${mono(cr)}.`),
+  ])();
+};
+TYPES.smart.mistake = (t, rnd) => {
+  const E = TYPES.smart, [x, y] = E.pair(t), lo = qsub(x, y), hi = qadd(x, y), ans = E.ans(t);
+  const L = [`${E.text(t)} = (${E.dec(x)} ${MINUS} ${E.dec(y)}) · (${E.dec(x)} + ${E.dec(y)})`, `= ${E.dec(lo)} · ${E.dec(hi)}`, `= ${htmlQ(ans)}`];
+  return pick(rnd, [
+    () => errLines(L, 0, `${E.text(t)} = (${E.dec(x)} ${MINUS} ${E.dec(y)})${PW(2)}`, 'Разность квадратов — это не квадрат разности: a² − b² = (a − b)(a + b).'),
+    () => errLines(L, 1, `= ${E.dec(lo)} · ${E.dec(qadd(hi, Q(1)))}`, `Сумма ${E.dec(x)} + ${E.dec(y)} равна ${E.dec(hi)}.`),
+    () => errLines(L, 2, `= ${htmlQ(qadd(ans, Q(10)))}`, `Ошибка в умножении: ${E.dec(lo)} · ${E.dec(hi)} = ${htmlQ(ans)}.`),
+  ])();
+};
+TYPES.value.mistake = (t, rnd) => {
+  const E = TYPES.value, lo = qsub(t.r, t.s), hi = qadd(t.r, t.s), ans = E.ans(t), d = decStr;
+  const L = [`${E.text(t)} = (${LA} ${MINUS} ${LB})(${LA} + ${LB}) = (${d(t.r)} ${MINUS} ${d(t.s)}) · (${d(t.r)} + ${d(t.s)})`, `= ${d(lo)} · ${d(hi)}`, `= ${d(ans)}`];
+  return pick(rnd, [
+    () => errLines(L, 0, `${E.text(t)} = (${LA} ${MINUS} ${LB})${PW(2)} = (${d(t.r)} ${MINUS} ${d(t.s)})${PW(2)}`, 'Разность квадратов — это не квадрат разности: a² − b² = (a − b)(a + b).'),
+    () => errLines(L, 1, `= ${d(qadd(lo, Q(1, 10)))} · ${d(hi)}`, `Ошибка в вычитании: ${d(t.r)} ${MINUS} ${d(t.s)} = ${d(lo)}.`),
+    () => errLines(L, 2, `= ${d(qadd(ans, Q(1)))}`, `Ошибка в умножении: ${d(lo)} · ${d(hi)} = ${d(ans)}.`),
+  ])();
+};
+
 // ================= Ошибки: блок «Над чем поработать» =================
 const CATS = {
   middle: ['Забыт средний член', '(a ± b)² — это три слагаемых: a² ± 2ab + b². Средний член 2ab теряется чаще всего.'],
@@ -980,6 +1305,14 @@ const SECTIONS = [
 const KINDS_V1 = [['expand', 'sqsum'], ['expand', 'sqdif'], ['expand', 'diff'], ['fill', 'sqsum'], ['fill', 'sqdif'],
   ['smart', 'int'], ['smart', 'dec'], ['value', null], ['fact', 'diff']];
 const WORDS_V1 = ['ДЕЛИМОСТЬ', 'МНОЖИТЕЛЬ', 'ПРОДУКТИВ'];
+
+// Билет на выход и самостоятельная (форматы ядра): состав можно менять, пока на них нет напечатанных листов
+const EXIT_V1 = [['expand', 'sqsum'], ['fill', 'sqdif'], ['smart', 'int']];
+const TEST_V1 = {
+  parts: [['expand', 'sqsum'], ['expand', 'diff'], ['fill', 'sqdif'], ['smart', 'int'], ['value'], ['fact', ['diff', 'sqsum', 'sqdif']]],
+  points: [1, 1, 1, 1, 1, 2],
+  grades: { 5: 6, 4: 5, 3: 3 },
+};
 
 const PRINT = {
   instr: 'Выполни задание и найди свой ответ в таблице букв. Впиши букву в клеточку под номером задания, и получится слово. '
@@ -1203,6 +1536,242 @@ function generate(type, rnd, form, tries = 2000) {
   throw new Error('Генератор не нашёл задание: ' + type);
 }
 
+// ---------- ядро: core/formats.js ----------
+// ================= Печатные форматы ядра: билет на выход, самостоятельная, домино, «найди ошибку» =================
+// Тема ничего не пишет: форматы собираются из KINDS_V1 и TYPES. Тема может уточнить состав
+// (EXIT_V1, TEST_V1, DOMINO_V1) и подсказать типам (T.mistake — для «найди ошибку»).
+// Зерна форматов — в своих диапазонах taskRnd(num, …): билет 300+, самостоятельная 400+, домино 500+,
+// «найди ошибку» 700+; раздатка (0…99) и бланк ОГЭ (200+) не затронуты, их варианты не меняются.
+// Состав и разметка каждого формата — версия 1; изменил — заведи новую версию, пока на листы есть печать.
+
+const fmtKey = t => TYPES[t.type].key(t);
+// части состава: [тип], [тип, форма] или [тип, [формы]] — как в KINDS_V1
+function fmtTasks(parts, num, seedBase, version, distinct = true) {
+  const tasks = [];
+  parts.forEach(([type, forms], i) => {
+    const rnd = taskRnd(num, seedBase + i, version);
+    let t, guard = 0;
+    do t = generate(type, rnd, Array.isArray(forms) ? pick(rnd, forms) : forms);
+    while (distinct && tasks.some(u => fmtKey(u) === fmtKey(t)) && ++guard < 200);
+    tasks.push(t);
+  });
+  return tasks;
+}
+const fmtHead = (v, what = 'Вариант') => `<div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">${what} ${v.label}</span></div>`;
+function fmtKeyPage(title, vs, foot, cell = (t, v, i) => TYPES[t.type].keyHTML(t), extra = '') {
+  const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  return `<div class="page key"><h2>${title} · ${lowerTitle()}</h2>
+    <table class="key"><thead><tr><th>Вариант</th>${head}</tr></thead>
+    ${vs.map(v => `<tr><td>${v.label}</td>${v.tasks.map((t, i) => `<td>${cell(t, v, i)}</td>`).join('')}</tr>`).join('')}
+    </table><p style="font-size:10pt">${foot}</p>${extra}</div>`;
+}
+const fmtAbc = (n, a = 1) => Array.from({ length: n }, (_, i) => i + a);
+
+// ---------- Билет на выход ----------
+const EXIT_PARTS = () => typeof EXIT_V1 !== 'undefined' ? EXIT_V1 : KINDS_V1.slice(0, 3);
+const EXIT_SHEET = {
+  label: 'Билет на выход', two: false, perPage: 4, pageClass: 'exit-tickets',
+  about: 'Билет на выход: 2–3 задания на четверть листа, четыре билета на A4 — разрежьте. Раздаётся за 5 минут до звонка: за минуту видно, кто понял тему. Решают в тетради или на обороте.',
+  generate(num, version = GEN_VERSION) {
+    const tasks = fmtTasks(EXIT_PARTS(), num, 300, version);
+    return { num, version, label: version + '-' + num, tasks, answers: tasks.map(fmtKey) };
+  },
+  sheet: v => `<div class="exit-ticket">
+    <div class="shead"><span>Фамилия, имя</span><span class="vn">Билет ${v.label}</span></div>
+    <p class="tt">${META.title}</p>
+    <ol class="tasks">${v.tasks.map((t, i) => `<li class="task"><span class="no">${i + 1})</span>${sheetTask(t)}<div class="otv">Ответ: ______________</div></li>`).join('')}</ol>
+  </div>`,
+  key: vs => fmtKeyPage('Ключ учителя · билеты на выход', vs, 'Билет верен, если все ответы совпали с ключом. Номер билета — на листе: ключ можно восстановить по номеру в режиме «Раздатка».'),
+};
+
+// ---------- Самостоятельная работа ----------
+// TEST_V1 = { parts: [[тип, форма?], …], points: [баллы за задание], grades: { 5: от скольки баллов, 4: …, 3: … } }
+const testPlan = () => {
+  const plan = typeof TEST_V1 !== 'undefined' ? TEST_V1 : { parts: KINDS_V1, points: KINDS_V1.map(() => 1) };
+  const total = plan.points.reduce((s, p) => s + p, 0);
+  const grades = plan.grades || { 5: Math.ceil(total * .85), 4: Math.ceil(total * .65), 3: Math.ceil(total * .45) };
+  return { parts: plan.parts, points: plan.points, grades, total };
+};
+const TEST_SHEET = {
+  label: 'Самостоятельная', pageClass: 'test-work', flow: true,
+  about: 'Самостоятельная работа: задания по порядку, место для решения, баллы за каждое. Шкала оценок — внизу ключа. Соседние номера дают разные варианты: соседям по парте раздавайте разные.',
+  generate(num, version = GEN_VERSION) {
+    const plan = testPlan(), tasks = fmtTasks(plan.parts, num, 400, version, false);
+    return { num, version, label: version + '-' + num, tasks, answers: tasks.map(fmtKey), points: plan.points };
+  },
+  sheet: (v, space) => `<div class="sheet">
+    ${fmtHead(v)}
+    <h2>${META.title} · самостоятельная работа</h2>
+    ${PRINT.testInstr ? `<p class="instr">${PRINT.testInstr}</p>` : ''}
+    <ol class="tasks one">${v.tasks.map((t, i) => `<li class="task"><span class="no">${i + 1})</span>${sheetTask(t)} <span class="pts">(${v.points[i]} ${plural(v.points[i], 'балл', 'балла', 'баллов')})</span>${space ? '<div class="cells"></div>' : '<div class="otv">Ответ: ______________</div>'}</li>`).join('')}</ol>
+    ${CONFIG.print.answerTable ? `<table class="ans"><tr><th>Задание</th>${v.tasks.map((_, i) => `<th>${i + 1}</th>`).join('')}</tr><tr class="tall"><th>Ответ</th>${v.tasks.map(() => '<td></td>').join('')}</tr></table>` : ''}
+  </div>`,
+  key: vs => {
+    const plan = testPlan(), g = plan.grades;
+    return fmtKeyPage('Ключ учителя · самостоятельная', vs,
+      `Баллы за задания: ${plan.points.join(', ')}. Всего ${plan.total}. Оценка «5» — от ${g[5]} баллов, «4» — от ${g[4]}, «3» — от ${g[3]}.`);
+  },
+};
+
+// ---------- Домино ----------
+// 12 костяшек «ответ | задание»: справа от задания — костяшка с его ответом, цепочка замыкается в кольцо.
+const DOMINO_N = 12;
+const DOMINO_SHEET = {
+  label: 'Домино', two: false, pageClass: 'domino', flow: true,
+  about: 'Домино для групповой работы: вырежьте 12 костяшек. Ответ задания стоит на соседней костяшке; правильная цепочка замыкается в кольцо. Ключ — собранная цепочка.',
+  generate(num, version = GEN_VERSION) {
+    const src = typeof DOMINO_V1 !== 'undefined' ? DOMINO_V1 : KINDS_V1;
+    const parts = Array.from({ length: DOMINO_N }, (_, i) => src[i % src.length]);
+    const tasks = fmtTasks(parts, num, 500, version);
+    const tiles = tasks.map((t, i) => ({ left: TYPES[tasks[(i + DOMINO_N - 1) % DOMINO_N].type].keyHTML(tasks[(i + DOMINO_N - 1) % DOMINO_N]), right: sheetTask(t) }));   // формулировка как на листе: у геометрии — с чертежом
+    const order = shuffle(taskRnd(num, 599, version), fmtAbc(DOMINO_N, 0));
+    return { num, version, label: version + '-' + num, tasks, answers: tasks.map(fmtKey), tiles, order };
+  },
+  sheet: v => `<div class="sheet dom">
+    ${fmtHead(v, 'Набор')}
+    <h2>${META.title} · домино</h2>
+    <p class="instr">Вырежи костяшки. Справа от задания положи костяшку с его ответом слева. Верная цепочка замкнётся в кольцо.</p>
+    <div class="tiles">${v.order.map(i => `<div class="tile"><div class="l">${v.tiles[i].left}</div><div class="r">${v.tiles[i].right}</div></div>`).join('')}</div>
+  </div>`,
+  key: vs => `<div class="page key"><h2>Ключ учителя · домино · ${lowerTitle()}</h2>
+    ${vs.map(v => `<p class="sub-h">Набор ${v.label}: цепочка по кругу</p><div class="chain">${v.tiles.map(x => `<span class="tile mini"><span class="l">${x.left}</span><span class="r">${x.right}</span></span>`).join('')}</div>`).join('')}
+    </div>`,
+};
+
+// ---------- «Найди ошибку» ----------
+// Тип задания даёт T.mistake(t, rnd) → { lines: [строки решения], at: номер неверной строки (с 0), fix: верная строка, why: в чём ошибка }.
+const mistakeTypes = () => Object.keys(TYPES).filter(k => typeof TYPES[k].mistake === 'function');
+function errorCases(n, num, seedBase, version, distinct = true) {
+  const types = mistakeTypes(), out = [];
+  for (let i = 0; i < n; i++) {
+    const rnd = taskRnd(num, seedBase + i, version), type = types[i % types.length];
+    let t, m, guard = 0;
+    do { t = generate(type, rnd); m = TYPES[type].mistake(t, rnd); }
+    while (distinct && out.some(c => c.m.lines.join() === m.lines.join()) && ++guard < 100);
+    out.push({ t, m });
+  }
+  return out;
+}
+const ERRORS_SHEET = {
+  label: 'Найди ошибку', two: false, pageClass: 'errors', flow: true,
+  about: 'Четыре готовых решения, в каждом одна ошибка. Ученик находит строку, объясняет ошибку и записывает верную строку. Ключ — номер строки и верная запись.',
+  generate(num, version = GEN_VERSION) {
+    const cases = errorCases(4, num, 700, version);
+    return { num, version, label: version + '-' + num, tasks: cases.map(c => c.t), cases: cases.map(c => c.m), answers: cases.map(c => String(c.m.at + 1)) };
+  },
+  sheet: v => `<div class="sheet">
+    ${fmtHead(v)}
+    <h2>${META.title} · найди ошибку</h2>
+    <p class="instr">В каждом решении одна ошибка. Найди строку с ошибкой, объясни её и запиши верную строку.</p>
+    <ol class="cases">${v.tasks.map((t, i) => `<li class="case"><div class="ask">${TYPES[t.type].ask ? TYPES[t.type].ask(t) : TYPES[t.type].text(t)}</div>
+      <ol class="elines">${v.cases[i].lines.map(l => `<li>${l}</li>`).join('')}</ol>
+      <div class="otv">Ошибка в строке № ____ . Верно: ______________________________</div></li>`).join('')}</ol>
+  </div>`,
+  key: vs => `<div class="page key"><h2>Ключ учителя · найди ошибку · ${lowerTitle()}</h2>
+    <table class="key"><thead><tr><th>Вариант</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead>
+    ${vs.map(v => `<tr><td>${v.label}</td>${v.cases.map(m => `<td>строка ${m.at + 1}: ${m.fix}</td>`).join('')}</tr>`).join('')}
+    </table></div>`,
+};
+
+// ---------- Тест с выбором ответа и трафарет ----------
+// Варианты ответа — верный и ловушки на типичных ошибках (T.traps); не хватило — ответы и ловушки
+// других заданий того же варианта. У задания с выбором (input: 'choice') — его собственные варианты.
+const ABCD = 'АБВГ';
+const isNumType = t => ['num', 'frac'].includes(TYPES[t.type].input);
+function choiceOptions(t, others, rnd) {
+  const T = TYPES[t.type];
+  if (T.input === 'choice' && T.options) return shuffle(rnd, T.options.map(([val, lab]) => ({ html: lab, ok: val === T.ans(t) })));
+  const right = fmtKey(t), seen = new Set([right]), opts = [{ html: T.keyHTML(t), ok: true }];
+  const add = x => { if (opts.length < 4 && x && !seen.has(x.key)) { seen.add(x.key); opts.push({ html: x.html, ok: false }); } };
+  (T.traps?.(t) || []).forEach(add);
+  // запас: ответы и ловушки других заданий — только числа к числу, чтобы вариант не выдавал себя видом
+  for (const u of others) if (isNumType(u) === isNumType(t)) { add({ key: fmtKey(u), html: TYPES[u.type].keyHTML(u) }); (TYPES[u.type].traps?.(u) || []).forEach(add); }
+  return shuffle(rnd, opts);
+}
+const CHOICE_SHEET = {
+  label: 'Тест с выбором', two: false, pageClass: 'choice-test', flow: true,
+  about: 'Тест: у каждого задания четыре ответа, неверные — ответы при типичных ошибках. Ученик отмечает букву в бланке внизу листа. Ключ — строка букв и трафарет: положите его рядом с бланком или наложите на просвет.',
+  generate(num, version = GEN_VERSION) {
+    const parts = typeof CHOICE_V1 !== 'undefined' ? CHOICE_V1 : KINDS_V1;
+    const tasks = fmtTasks(parts, num, 800, version), rnd = taskRnd(num, 899, version);
+    const options = tasks.map(t => choiceOptions(t, tasks.filter(u => u !== t), rnd));
+    return { num, version, label: version + '-' + num, tasks, options, answers: options.map(o => ABCD[o.findIndex(x => x.ok)]) };
+  },
+  sheet: (v, space) => `<div class="sheet">
+    ${fmtHead(v)}
+    <h2>${META.title} · тест</h2>
+    <p class="instr">Реши задание и выбери ответ. Букву отметь крестиком в бланке внизу листа: в каждой строке — один крестик.</p>
+    <ol class="tasks">${v.tasks.map((t, i) => `<li class="task"><span class="no">${i + 1})</span>${sheetTask(t)}
+      <div class="opts">${v.options[i].map((o, k) => `<span><b>${ABCD[k]})</b> ${o.html}</span>`).join('')}</div>${space ? '<div class="cells"></div>' : ''}</li>`).join('')}</ol>
+    ${choiceGrid(v)}
+  </div>`,
+  key: vs => fmtKeyPage('Ключ учителя · тест с выбором', vs, 'Наложите трафарет на бланк: крестики ученика должны попасть в чёрные клетки.', (t, v, i) => v.answers[i],
+    `<p class="sub-h">Трафареты бланков</p><div class="stencils">${vs.map(v => choiceGrid(v, true)).join('')}</div>`),
+};
+// бланк ответов: строки — задания, столбцы — буквы; key — трафарет с закрашенными верными клетками
+function choiceGrid(v, key = false) {
+  return `<table class="bubbles${key ? ' stencil' : ''}"><tr><th>${key ? v.label : 'Бланк'}</th>${[...ABCD].map(c => `<th>${c}</th>`).join('')}</tr>
+    ${v.tasks.map((_, i) => `<tr><th>${i + 1}</th>${[...ABCD].map((c, k) => k < v.options[i].length ? `<td${key && v.answers[i] === c ? ' class="on"' : ''}></td>` : '<td class="off"></td>').join('')}</tr>`).join('')}</table>`;
+}
+
+// ---------- Взаимопроверка в парах ----------
+// Один номер — пара листов А и Б на одной странице. Внизу листа А — ответы к листу Б и наоборот:
+// каждый решает свой лист, затем проверяет лист соседа по ответам внизу своего — без учителя.
+const PAIR_PARTS = () => typeof PAIR_V1 !== 'undefined' ? PAIR_V1 : KINDS_V1.slice(0, 6);
+const pairHalf = (v, me, other) => `<div class="sheet">
+    <div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">Лист ${me} · ${v.label}</span></div>
+    <p class="instr">Сначала загни нижнюю полосу с ответами. Реши задания листа ${me}. Потом положите листы рядом: проверь решения соседа (лист ${other}) по ответам внизу своего листа и поставь «+» в его клетке «проверка». Не совпало — найдите ошибку вместе.</p>
+    <ol class="tasks">${v[me].map((t, i) => `<li class="task"><span class="no">${i + 1})</span>${sheetTask(t)}<div class="otv">Ответ: __________ <span class="chk">проверка: ☐</span></div></li>`).join('')}</ol>
+    <div class="peer"><b>✂ Загни до конца работы. Ответы к листу ${other}</b> (для проверки соседа): ${v[other].map((t, i) => `<span>${i + 1}) ${TYPES[t.type].keyHTML(t)}</span>`).join(' ')}</div>
+  </div>`;
+const PAIR_SHEET = {
+  label: 'Взаимопроверка', two: false, pageClass: 'half pairs',
+  about: 'Взаимопроверка в парах: на странице два листа — А и Б, разрежьте и раздайте соседям по парте. Внизу каждого листа — ответы к листу соседа, полосу загибают до конца работы. Решили — положили листы рядом и проверили друг друга.',
+  generate(num, version = GEN_VERSION) {
+    const A = fmtTasks(PAIR_PARTS(), num, 900, version), B = fmtTasks(PAIR_PARTS(), num, 950, version);
+    return { num, version, label: version + '-' + num, А: A, Б: B, tasks: A, answers: A.map(fmtKey), answersB: B.map(fmtKey) };
+  },
+  sheet: v => pairHalf(v, 'А', 'Б') + pairHalf(v, 'Б', 'А'),
+  key: vs => `<div class="page key"><h2>Ключ учителя · взаимопроверка · ${lowerTitle()}</h2>
+    <table class="key"><thead><tr><th>Номер</th><th>Лист</th>${vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('')}</tr></thead>
+    ${vs.map(v => ['А', 'Б'].map(s => `<tr><td>${v.label}</td><td>${s}</td>${v[s].map(t => `<td>${TYPES[t.type].keyHTML(t)}</td>`).join('')}</tr>`).join('')).join('')}
+    </table><p style="font-size:10pt">Ответы к каждому листу напечатаны на листе соседа; ключ нужен, если пара не договорилась.</p></div>`,
+};
+
+// ---------- Лесенка подсказок ----------
+// Задание и две подсказки из тренажёра (T.hints) в полосах справа. Полосы загибают назад до начала работы;
+// застрял — отгибаешь первую, затем вторую. Баллы: без подсказок — 2, с одной — 1, с двумя — 0.
+const LADDER_PARTS = () => typeof LADDER_V1 !== 'undefined' ? LADDER_V1 : KINDS_V1.slice(0, 5);
+const LADDER_SHEET = {
+  label: 'Лесенка подсказок', two: false, pageClass: 'ladder', flow: true,
+  about: 'Разноуровневый лист: справа от каждого задания две подсказки в полосах. До начала работы полосы загибают назад по пунктиру; застрял — отгибаешь первую подсказку, потом вторую и отмечаешь это галочкой. Сильный решает без подсказок, слабый не остаётся без помощи.',
+  generate(num, version = GEN_VERSION) {
+    const tasks = fmtTasks(LADDER_PARTS(), num, 1100, version);
+    return { num, version, label: version + '-' + num, tasks, hints: tasks.map(t => TYPES[t.type].hints(t).slice(0, 2)), answers: tasks.map(fmtKey) };
+  },
+  sheet: v => `<div class="sheet">
+    ${fmtHead(v)}
+    <h2>${META.title} · лесенка подсказок</h2>
+    <p class="instr">Загни обе полосы с подсказками назад по пунктиру. Реши сам. Застрял — отогни подсказку 1, потом подсказку 2 и отметь, какие открыл. Без подсказок — 2 балла, с одной — 1.</p>
+    <div class="lrows"><div class="lhead"><span>Задание</span><span>✂ Подсказка 1</span><span>✂ Подсказка 2</span></div>
+    ${v.tasks.map((t, i) => `<div class="lrow"><div class="task"><span class="no">${i + 1})</span>${sheetTask(t)}<div class="otv">Ответ: ______________</div></div>
+      ${v.hints[i].map(h => `<div class="hint">${h}<span class="chk">☐ открыл</span></div>`).join('')}</div>`).join('')}</div>
+  </div>`,
+  key: vs => fmtKeyPage('Ключ учителя · лесенка подсказок', vs, 'Баллы: без подсказок — 2, с одной подсказкой — 1, с двумя — 0. Галочки на полосах показывают, где ученику нужна помощь.'),
+};
+
+// форматы ядра, доступные теме: билет, самостоятельная, тест с выбором, взаимопроверка, лесенка — всегда;
+// домино — если хватает разных ответов; «найди ошибку» — если у какого-то типа есть T.mistake
+const CORE_SHEETS = {
+  exit: EXIT_SHEET,
+  test: TEST_SHEET,
+  choice: CHOICE_SHEET,
+  pair: PAIR_SHEET,
+  ladder: LADDER_SHEET,
+  ...(KINDS_V1.length >= 4 || typeof DOMINO_V1 !== 'undefined' ? { domino: DOMINO_SHEET } : {}),
+  ...(mistakeTypes().length ? { errors: ERRORS_SHEET } : {}),
+};
+
 // ---------- ядро: core/print.js ----------
 // ================= Раздатка: вариант восстанавливается по номеру =================
 // Тема задаёт состав варианта (KINDS_V1), слова (WORDS_V1) и тексты листа (PRINT).
@@ -1210,17 +1779,18 @@ function generate(type, rnd, form, tries = 2000) {
 const ABC = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ';
 const HAS_OGE = typeof OGE_V1 !== 'undefined';
 const lowerTitle = () => META.title[0].toLowerCase() + META.title.slice(1);
-function makeVariant(num, version = GEN_VERSION) {
+function wordVariantV1(num) {
+  const version = 1;
   if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
   const tasks = [];
   KINDS_V1.forEach(([type, forms], i) => {
-    const rnd = taskRnd(num, i);
+    const rnd = taskRnd(num, i, 1);
     let t, guard = 0;
     do t = generate(type, rnd, Array.isArray(forms) ? pick(rnd, forms) : forms);
     while (tasks.some(u => TYPES[u.type].key(u) === TYPES[type].key(t)) && ++guard < 200);
     tasks.push(t);
   });
-  const rnd = taskRnd(num, 99);
+  const rnd = taskRnd(num, 99, 1);
   const word = pick(rnd, WORDS_V1);
   const answers = tasks.map(t => TYPES[t.type].key(t));
   const bank = new Map();   // ответ → { html, letter }
@@ -1233,16 +1803,17 @@ function makeVariant(num, version = GEN_VERSION) {
 }
 
 // Бланк ОГЭ: задания свои (зерна 200+), поэтому один номер даёт разные листы для слова и для бланка
-function makeVariantOGE(num, version = GEN_VERSION) {
+function ogeVariantV1(num) {
+  const version = 1;
   if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
-  const tasks = OGE_V1.map((kind, i) => ogeTask(kind, taskRnd(num, 200 + i)));
+  const tasks = OGE_V1.map((kind, i) => ogeTask(kind, taskRnd(num, 200 + i, 1)));
   return { num, version, label: version + '-' + num, oge: true, tasks, answers: tasks.map(x => x.ans) };
 }
 
 // ================= 🖨 Раздатка =================
 let printNums = [];
 // вид листа из адреса (?mode=print&kind=oge) или с кнопки стартового экрана — важнее сохранённого
-let pendingKind = (HAS_OGE ? ['word', 'oge'] : ['word']).includes(P.get('kind')) ? P.get('kind') : null;
+let pendingKind = P.get('kind');
 function newNumbers(count) {
   const set = new Set();
   while (set.size < count) set.add(1000 + Math.floor(Math.random() * 9000));
@@ -1252,8 +1823,10 @@ function parseNums(text) {
   const nums = [], bad = [];
   for (const part of text.split(/[\s,;]+/).filter(Boolean)) {
     const m = part.match(/^(?:(\d+)[-–])?(\d{4})$/);
-    if (!m || (m[1] && +m[1] !== GEN_VERSION)) bad.push(part);
-    else if (!nums.includes(+m[2])) nums.push(+m[2]);
+    const version = m ? +(m[1] || GEN_VERSION) : 0;
+    const value = version === GEN_VERSION ? +m?.[2] : version + '-' + m?.[2];
+    if (!m || !PRINT_GENERATORS[version]) bad.push(part);
+    else if (!nums.includes(value)) nums.push(value);
   }
   return { nums, bad };
 }
@@ -1290,17 +1863,45 @@ function ogeSheetHTML(v) {
 function ogeKeyHTML(vs) {
   const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
   return `<div class="page key"><h2>Ключ учителя · бланк ответов · ${lowerTitle()}</h2>
-    <table class="key"><tr><th>Вариант</th>${head}</tr>
+    <table class="key"><thead><tr><th>Вариант</th>${head}</tr></thead>
     ${vs.map(v => `<tr><td>${v.label}</td>${v.answers.map(a => `<td>${a}</td>`).join('')}</tr>`).join('')}
     </table><p style="font-size:10pt">Ответ верен, если совпадает с ключом (запятая или точка — одинаково). Ключ всегда можно восстановить
     по номеру варианта: режим «Раздатка», вид листа «Бланк ответов».</p></div>`;
 }
+// Диагностика ловушек: какую ошибку означает буква-ловушка. Тема ничего не пишет: категорию даёт T.wrong
+// по значению ловушки (или trap.cat, если тема его задала). Варианты не меняются — меняется только ключ.
+function trapCat(t, trap) {
+  if (trap.cat) return trap.cat;
+  const T = TYPES[t.type];
+  // число — разбираем ловушку как ответ; выбор и кнопки (T.opts) — ключ ловушки и есть ответ;
+  // остальные виды ввода (многочлен, одночлен) — только trap.cat от темы
+  const num = ['num', 'frac'].includes(T.input), pickLike = T.input === 'choice' || typeof T.opts === 'function';
+  if (!num && !pickLike) return null;
+  try {
+    const x = num ? parseQ(trap.key) : trap.key;
+    if (!x) return null;
+    const r = T.wrong(t, x);
+    return r && r.cat !== 'calc' ? r.cat : null;   // «вычисления» — не типичная ошибка, в расшифровку не идёт
+  } catch { return null; }
+}
+const catName = c => (CATS[c] || [c])[0];
+// для каждого задания варианта: [{ letter, cat }] — буквы ловушек из таблицы букв этого варианта
+function trapLetters(v) {
+  const letter = new Map(v.bank.map(b => [b.key, b.letter]));
+  return v.tasks.map((t, i) => (TYPES[t.type].traps?.(t) || []).slice(0, CONFIG.print.traps)
+    .filter(x => x.key !== v.answers[i] && letter.has(x.key))
+    .map(x => ({ letter: letter.get(x.key), cat: trapCat(t, x) })).filter(x => x.cat));
+}
 function keyHTML(vs) {
   const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  const traps = vs.map(trapLetters), cats = [...new Set(traps.flat(2).map(x => x.cat))], no = c => cats.indexOf(c) + 1;
+  const cell = (t, x) => TYPES[t.type].keyHTML(t) + (x.length ? `<span class="trp">${x.map(y => `${y.letter}<sup>${no(y.cat)}</sup>`).join(' ')}</span>` : '');
   return `<div class="page key"><h2>Ключ учителя · ${lowerTitle()}</h2>
-    <table class="key"><tr><th>Вариант</th>${head}<th>Слово</th></tr>
-    ${vs.map(v => `<tr><td>${v.label}</td>${v.tasks.map(t => `<td>${TYPES[t.type].keyHTML(t)}</td>`).join('')}<td><b>${v.word}</b></td></tr>`).join('')}
-    </table><p style="font-size:10pt">Слово сложилось — все ответы верны. Ключ всегда можно восстановить по номеру варианта в режиме «Раздатка».</p></div>`;
+    <table class="key"><thead><tr><th>Вариант</th>${head}<th>Слово</th></tr></thead>
+    ${vs.map((v, k) => `<tr><td>${v.label}</td>${v.tasks.map((t, i) => `<td>${cell(t, traps[k][i])}</td>`).join('')}<td><b>${v.word}</b></td></tr>`).join('')}
+    </table><p style="font-size:10pt">Слово сложилось — все ответы верны. Ключ всегда можно восстановить по номеру варианта в режиме «Раздатка».</p>
+    ${cats.length ? `<div class="diag"><b>Буквы-ловушки.</b> Под ответом — буквы, которые получаются при типичной ошибке, с номером ошибки:
+      <ol>${cats.map(c => `<li>${catName(c)}</li>`).join('')}</ol></div>` : ''}</div>`;
 }
 // Номера и настройки запоминаются в браузере: напечатал листы, закрыл вкладку — ключ потом
 // печатается по тем же номерам. Без localStorage номера просто будут новыми.
@@ -1311,36 +1912,114 @@ function renderPrint() {
     $('pCount').value = printNums.length;
     $('pSpace').checked = store.get('printSpace') ? store.get('printSpace') === '1' : CONFIG.print.space;
     $('pTwo').checked = store.get('printTwo') === '1';
-    $('pKind').value = HAS_OGE && store.get('printKind') === 'oge' ? 'oge' : 'word';
+    $('pKind').value = printFormatChoices().some(([k]) => k === store.get('printKind')) ? store.get('printKind') : defaultPrintKind();
     if (saved.length) $('pMsg').textContent = 'Открыты номера, с которыми вы работали в прошлый раз. Для другого класса нажмите «Новые номера».';
   }
-  if (pendingKind) { $('pKind').value = pendingKind; pendingKind = null; }
-  $('pNums').value = printNums.map(n => GEN_VERSION + '-' + n).join(', ');
+  if (pendingKind) { $('pKind').value = SHEETS[pendingKind] ? pendingKind : defaultPrintKind(); pendingKind = null; }
+  $('pNums').value = printNums.map(n => typeof n === 'string' ? n : GEN_VERSION + '-' + n).join(', ');
   drawSheets();
 }
 function drawSheets() {
-  const oge = HAS_OGE && $('pKind').value === 'oge';
+  const kind = SHEETS[$('pKind').value] ? $('pKind').value : defaultPrintKind();
+  $('pKind').value = kind;
+  const format = SHEETS[kind];
   document.querySelectorAll('[data-kind-set]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.kindSet === $('pKind').value)));
-  const vs = printNums.map(n => oge ? makeVariantOGE(n) : makeVariant(n));
-  const sheet = oge ? ogeSheetHTML : sheetHTML, key = oge ? ogeKeyHTML : keyHTML;
-  const space = $('pSpace').checked, two = $('pTwo').checked && !space;
-  store.set('printNums', printNums.join(','));
+  const vs = printNums.map(n => printVariant(n, kind));
+  const sheet = v => format.sheet(v, $('pSpace').checked), key = format.key;
+  const space = $('pSpace').checked, two = $('pTwo').checked && !space && format.two !== false;
+  store.set('printNums', printNums.map(n => typeof n === 'string' ? n : GEN_VERSION + '-' + n).join(','));
   store.set('printSpace', space ? 1 : 0);
   store.set('printTwo', $('pTwo').checked ? 1 : 0);
-  store.set('printKind', oge ? 'oge' : 'word');
-  $('pTwo').disabled = space;
-  $('pAbout').textContent = oge ? PRINT.ogeAbout : PRINT.about;
+  store.set('printKind', kind);
+  $('pTwo').disabled = space || format.two === false;
+  $('pAbout').textContent = format.about;
+  $('pExtraKey').hidden = !format.previewKey;
+  if (!format.previewKey) { $('print').dataset.extraKey = 'false'; $('pExtraKey').textContent = 'Показать ключ'; $('pExtraKey').setAttribute('aria-expanded', 'false'); }
   let html = '';
   if (two) for (let i = 0; i < vs.length; i += 2)
-    html += `<div class="page half compact">${sheet(vs[i])}${vs[i + 1] ? sheet(vs[i + 1]) : ''}</div>`;
-  else html = vs.map(v => `<div class="page${space ? '' : ' compact'}">${sheet(v)}</div>`).join('');
+    html += `<div class="page half compact ${format.pageClass || ''}">${sheet(vs[i])}${vs[i + 1] ? sheet(vs[i + 1]) : ''}</div>`;
+  else if (format.perPage) for (let i = 0; i < vs.length; i += format.perPage)
+    html += `<div class="page ${format.pageClass || ''}">${vs.slice(i, i + format.perPage).map(v => sheet(v)).join('')}</div>`;
+  // flow — лист может занять больше страницы (сетка для решения, длинные задания): при печати он переносится,
+  // а не обрезается по высоте A4; задание не разрывается (.task — break-inside: avoid)
+  else html = vs.map(v => `<div class="page ${format.pageClass || ''}${space ? '' : ' compact'}${space || format.flow ? ' flow' : ''}">${sheet(v)}</div>`).join('');
   $('pSheets').innerHTML = (vs.length ? key(vs) : '') + html;
+  fitKeys();
   return vs;
 }
+// Ключ с длинными ответами (многочлены, 9 заданий) шире книжного листа: печатаем его на альбомном A4;
+// не хватило и его — уменьшаем шрифт до 8pt, затем разрешаем перенос внутри ячеек.
+// Размеры в мм, поэтому подгонка на экране верна и для печати.
+function fitKeys() {
+  for (const t of document.querySelectorAll('#pSheets .page.key table')) {
+    const page = t.closest('.page');
+    const avail = () => { const cs = getComputedStyle(page); return page.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight); };
+    if (!(avail() > 0)) continue;                        // лист не на экране (или jsdom без вёрстки)
+    page.classList.remove('land'); t.classList.remove('wrap'); t.style.fontSize = '';
+    if (t.offsetWidth > avail() + 1) page.classList.add('land');
+    for (let pt = 10; t.offsetWidth > avail() + 1 && pt >= 8; pt -= .5) t.style.fontSize = pt + 'pt';
+    if (t.offsetWidth > avail() + 1) t.classList.add('wrap');
+  }
+}
+// шрифт подгрузился позже первой отрисовки — ширина ответов изменилась
+document.fonts?.ready?.then(fitKeys);
+addEventListener('beforeprint', fitKeys);
 function printNow(what) {
   document.body.classList.remove('print-key', 'print-sheets');
   document.body.classList.add(what === 'key' ? 'print-key' : 'print-sheets');
   try { window.print(); } catch {}
+}
+
+// Тема регистрирует форматы и старые генераторы без подмены функций ядра.
+const SHEETS = {
+  word: { label: 'Кодовое слово', about: PRINT.about, generate: wordVariantV1, sheet: sheetHTML, key: keyHTML },
+  ...(HAS_OGE ? { oge: { label: 'Бланк ОГЭ', about: PRINT.ogeAbout, generate: ogeVariantV1, sheet: ogeSheetHTML, key: ogeKeyHTML } } : {}),
+  // форматы ядра (core/formats.js); если у темы есть свой лист с тем же названием (билет на выход), остаётся её лист
+  ...Object.fromEntries(Object.entries(CORE_SHEETS).filter(([, f]) => typeof TOPIC_SHEETS === 'undefined' || !Object.values(TOPIC_SHEETS).some(x => x.label === f.label))),
+  ...(typeof TOPIC_SHEETS === 'undefined' ? {} : TOPIC_SHEETS),
+};
+const PRINT_GENERATORS = { 1: Object.fromEntries(Object.entries(SHEETS).map(([k, f]) => [k, f.generate])),
+  ...(typeof TOPIC_PRINT_VERSIONS === 'undefined' ? {} : TOPIC_PRINT_VERSIONS) };
+// форматы ядра зависят только от версии, а не от темы: дополняем ими и версии, которые тема описала сама
+for (const gens of Object.values(PRINT_GENERATORS)) for (const [k, f] of Object.entries(CORE_SHEETS)) gens[k] = gens[k] || f.generate;
+function printVariant(num, kind = 'word', version = GEN_VERSION) {
+  if (typeof num === 'string' && num.includes('-')) { const parts = num.split('-'); version = +parts[0]; num = +parts[1]; }
+  const gen = PRINT_GENERATORS[version]?.[kind];
+  if (!gen) throw new Error('Нет генератора формата ' + kind + ' версии ' + version);
+  return gen(num, version);
+}
+function makeVariant(num, version = GEN_VERSION) { return printVariant(num, 'word', version); }
+function makeVariantOGE(num, version = GEN_VERSION) { return printVariant(num, 'oge', version); }
+// Тема может оставить в меню нужные форматы; генераторы остальных доступны для старых номеров и тестов.
+function printFormatChoices() {
+  if (!CONFIG.print.formats) return Object.entries(SHEETS);
+  const choices = CONFIG.print.formats.map(k => [k, SHEETS[k]]).filter(([, f]) => f);
+  if (!choices.length) throw new Error('CONFIG.print.formats: нет известного формата печати');
+  return choices;
+}
+function defaultPrintKind() {
+  const choices = printFormatChoices();
+  return choices.some(([k]) => k === CONFIG.print.defaultKind) ? CONFIG.print.defaultKind : choices[0][0];
+}
+function initPrintFormats() {
+  const choices = printFormatChoices();
+  const input = $('pKind');
+  const old = input.closest('.row');
+  if (old) { old.before(input); old.remove(); }
+  if (choices.length > 1) input.insertAdjacentHTML('beforebegin', '<div class="row"><b>Вид листа:</b><div class="seg" role="group" aria-label="Вид листа">' + choices.map(([k, f]) => '<button type="button" data-kind-set="' + k + '" aria-pressed="' + (k === defaultPrintKind()) + '">' + esc(f.label) + '</button>').join('') + '</div></div>');
+  const start = document.querySelector('#start [data-go="print"]')?.closest('.mode');
+  if (start) {
+    const box = document.createElement('div'); box.className = 'mode split';
+    box.innerHTML = '<b>🖨 ' + esc(CONFIG.print.label || 'Раздатка') + '</b><span>' + esc(META.modePrint) + '</span><div class="kinds">' + choices.map(([k, f]) => '<button type="button" data-go="print" data-kind="' + k + '">' + esc(f.label) + '</button>').join('') + '</div>';
+    start.replaceWith(box);
+  }
+  $('pPrintKey').insertAdjacentHTML('afterend', '<button type="button" id="pExtraKey" aria-expanded="false" hidden>Показать ключ</button>');
+  $('pExtraKey').addEventListener('click', () => {
+    const visible = $('print').dataset.extraKey !== 'true';
+    $('print').dataset.extraKey = String(visible);
+    $('pExtraKey').textContent = visible ? 'Скрыть ключ' : 'Показать ключ';
+    $('pExtraKey').setAttribute('aria-expanded', String(visible));
+  });
 }
 
 // ---------- ядро: core/board.js ----------
@@ -1348,7 +2027,10 @@ function printNow(what) {
 // На экране — то, что видит класс: короткий вопрос, ответ, чертёж и запись в тетради.
 // Что сказать словами — в подсказке учителю (кнопка «💬 Учителю»).
 const BW = 980, BH = 400;
-const B = { e: null, steps: [], i: 0, phase: 0, timer: 0, notes: false };
+const B = { e: null, m: {}, steps: [], i: 0, phase: 0, timer: 0, notes: false, show: 'main' };
+// q, a, note и rec шага могут быть строкой или функцией (m — модель живой доски, phase — 0 вопрос, 1 ответ)
+const stepVal = (x, ...args) => typeof x === 'function' ? x(...args) : x;
+const setHTML = (el, s) => { if (el.innerHTML !== s) el.innerHTML = s; };
 const svg = (inner, label) => `<svg viewBox="0 0 ${BW} ${BH}" role="img" aria-label="${label}" preserveAspectRatio="xMidYMid meet">${inner}</svg>`;
 const tx = (x, y, s, cls = 'lab', anchor = 'middle') => `<text class="${cls}" x="${x}" y="${y}" text-anchor="${anchor}">${s}</text>`;
 const sr = s => `√<tspan class="ov">${s}</tspan>`;   // корень в подписи чертежа
@@ -1381,39 +2063,61 @@ function numLine(y, a, b, step, labelEvery, hl, cls = '') {
 }
 
 // пример для показа: тема даёт boardExample(random, прошлый пример) и buildSteps(пример) → шаги
-// {q — вопрос классу, a — ответ, note — подсказка учителю, draw(phase) — SVG или '', rec(phase) — строки тетради}
+// {q — вопрос классу, a — ответ, note — подсказка учителю, draw(phase, m) — SVG или '', rec(phase, m) — строки тетради,
+//  live — что можно двигать и менять на этом шаге (core/live.js)}
 function boardNumbers(random) {
+  liveStop();
+  if (B.show !== 'main') {   // разминка, диктант и другие виды показа — core/shows.js
+    B.e = { seed: random ? (Math.random() * 4294967296) >>> 0 : 1 };
+    B.steps = SHOWS[B.show].steps(B.e.seed);
+    B.m = {}; B.i = 0; B.phase = 0; LV.entered = false;
+    liveEnter();
+    return;
+  }
   B.e = boardExample(random, B.e || {});
   B.steps = buildSteps(B.e);
+  B.m = liveModel(B.e);
   B.i = 0; B.phase = 0;
+  liveEnter();
 }
 function renderBoard() {
   if (!B.steps.length) boardNumbers(false);
-  const st = B.steps[B.i];
+  const st = B.steps[B.i], m = B.m, ph = B.phase;
   $('bCnt').textContent = `Шаг ${B.i + 1} из ${B.steps.length}`;
-  $('bQ').innerHTML = st.q;
-  $('bA').innerHTML = st.a;
-  $('bA').classList.toggle('hide', B.phase === 0);
-  const pic = st.draw(B.phase);
-  $('bStage').innerHTML = pic ? svg(pic, 'Чертёж к шагу') : '';
-  $('bRec').innerHTML = st.rec(B.phase).map(l => `<div class="ln">${l}</div>`).join('');
-  $('bNote').innerHTML = `<b>Учителю</b>${st.note}`;
+  setHTML($('bQ'), stepVal(st.q, m, ph));
+  setHTML($('bA'), stepVal(st.a, m, ph));
+  $('bA').classList.toggle('hide', ph === 0);
+  const pic = st.draw(ph, m), handles = liveHandlesSVG(st);
+  const focused = document.activeElement?.closest?.('[data-handle]')?.dataset.handle;
+  $('bStage').innerHTML = pic || handles ? svg(pic + handles, 'Чертёж к шагу').replace('<svg ', handles ? '<svg class="live" ' : '<svg ') : '';
+  if (focused) $('bStage').querySelector(`[data-handle="${focused}"]`)?.focus({ preventScroll: true });
+  setHTML($('bRec'), stepVal(st.rec, ph, m).map(l => `<div class="ln">${l}</div>`).join(''));
+  setHTML($('bNote'), `<b>Учителю</b>${stepVal(st.note, m, ph)}`);
   $('bNote').hidden = !B.notes;
   $('bNotesBtn').setAttribute('aria-pressed', String(B.notes));
-  $('bNext').textContent = B.phase === 0 ? 'Показать ответ' : 'Далее →';
-  $('bNext').disabled = B.i === B.steps.length - 1 && B.phase === 1;
+  $('bNext').textContent = ph === 0 ? 'Показать ответ' : 'Далее →';
+  $('bNext').disabled = B.i === B.steps.length - 1 && ph === 1;
+  liveRenderControls(st);
+  boardTimerSync();
 }
 function boardNext() {
-  if (B.phase === 0) B.phase = 1;
-  else if (B.i < B.steps.length - 1) { B.i++; B.phase = 0; }
-  renderBoard();
+  if (B.phase === 0) { liveStop(); B.phase = 1; renderBoard(); liveReveal(); }
+  else if (B.i < B.steps.length - 1) boardGo(B.i + 1, 0);
 }
 function boardPrev() {
-  if (B.phase === 1) B.phase = 0;
-  else if (B.i > 0) { B.i--; B.phase = 1; }
+  if (B.phase === 1) { liveStop(); B.phase = 0; liveBack(); renderBoard(); }
+  else if (B.i > 0) boardGo(B.i - 1, 1);
+}
+// переход к шагу: модель ставится, как задумано шагом (live.enter); с phase = 1 — сразу итог опыта
+function boardGo(i, phase = 0) {
+  liveStop();
+  const was = B.i;
+  B.i = Math.max(0, Math.min(i, B.steps.length - 1)); B.phase = phase ? 1 : 0;
+  if (B.i !== was || B.phase === 1 || !LV.entered) liveEnter(B.phase === 1);
   renderBoard();
 }
-function boardGo(i, phase = 0) { B.i = Math.max(0, Math.min(i, B.steps.length - 1)); B.phase = phase ? 1 : 0; renderBoard(); }
+// «Заново»: исходная модель примера и первый шаг
+function boardRestart() { liveStop(); B.m = liveModel(B.e); LV.entered = false; boardGo(0, 0); }
 function boardNotes() { B.notes = !B.notes; store.set('notes', B.notes ? 1 : 0); renderBoard(); }
 // превью на сайте: доска сама идёт по шагам до BOARD.previewUntil и начинает сначала
 function boardStartPreview() {
@@ -1427,6 +2131,357 @@ function boardStopPreview() { clearInterval(B.timer); B.timer = 0; }
 // кадр для картинки-превью (npm run posters на сайте): шаг BOARD.poster с показанным ответом
 function boardPoster() { boardStopPreview(); boardGo(BOARD.poster, 1); }
 
+
+// ---------- ядро: core/shows.js ----------
+// ================= Виды показа на доске: разминка, диктант, «верно — неверно», «найди ошибку» =================
+// Основной показ темы (buildSteps) — вид 'main'. Остальные собираются из TYPES: тема ничего не пишет, только
+// подсказывает типам флаги и методы:
+//   T.oral = true                  тип годится для устного счёта (разминка);
+//   T.statement(t, html)           утверждение «задание = ответ» для «верно — неверно» (по умолчанию для num, frac —
+//                                  «запись = ответ»; у задания с чертежом или условием словами — задание целиком и «Ответ: …»);
+//   T.mistake(t, rnd)              { lines, at, fix, why } — решение с одной ошибкой (core/formats.js, «найди ошибку»).
+// Шаги — те же {q, a, note, draw, rec}, что и в основном показе, поэтому доска, клавиши и «Другие числа» работают как обычно.
+// Зерно показа — число (B.e.seed): «Другие числа» берёт новое, первый показ — зерно 1 (повторяемо).
+
+const showOk = T => typeof T.traps === 'function' && typeof T.keyHTML === 'function';
+const showOral = () => Object.keys(TYPES).filter(k => TYPES[k].oral);
+const showTf = () => Object.keys(TYPES).filter(k => showOk(TYPES[k]) && (TYPES[k].statement || ['num', 'frac'].includes(TYPES[k].input)));
+const showTypesOf = list => [...new Set(list.map(([ty]) => ty))];
+// «AB = 5» без чертежа ничего не значит: задание с чертежом или словами показываем целиком
+function tfDefault(t, html) {
+  const q = askHTML(t), plain = String(TYPES[t.type].text(t)).replace(/<[^>]+>/g, '');
+  return /<svg/.test(q) || /[а-яё]{4,}/i.test(plain) ? `${q}<p class="tf">Ответ: ${html}</p>` : `${TYPES[t.type].text(t)} = ${html}`;
+}
+const showStep = (q, a, note, rec = () => []) => ({ q, a, note, draw: () => '', rec });
+
+const SHOWS = {
+  warmup: {
+    label: 'Разминка', timer: () => CONFIG.board.warmupSeconds || 20,
+    about: 'Устный счёт: задание крупно, ответ — по кнопке. Ответы копятся в записи — для самопроверки.',
+    available: () => showOral().length > 0,
+    steps(seed) {
+      const rnd = mulberry32(seed), types = showOral(), n = CONFIG.board.warmupCount || 8, done = [];
+      return Array.from({ length: n }, (_, i) => {
+        const type = types[i % types.length];
+        let t, guard = 0;
+        do t = generate(type, rnd); while (done.some(u => JSON.stringify(u) === JSON.stringify(t)) && ++guard < 50);
+        done.push(t);
+        const line = `${i + 1}) ${TYPES[type].keyHTML(t)}`;
+        return showStep(`<b>${i + 1}.</b> ${askHTML(t)}`, answerHTML(t),
+          'Разминка: ученики считают в уме и пишут только ответ. Таймер — по кнопке «⏱» вверху; листать и показывать ответ — когда вы решите.',
+          ph => [...done.slice(0, i).map((u, j) => `${j + 1}) ${TYPES[u.type].keyHTML(u)}`), ...(ph ? [line] : [])]);
+      });
+    },
+  },
+  dictation: {
+    label: 'Диктант', timer: () => CONFIG.board.dictationSeconds || 40,
+    about: 'Математический диктант: задания по одному, ученики пишут ответ в тетрадь. Все ответы — на последнем шаге.',
+    available: () => KINDS_V1.length > 0,
+    steps(seed) {
+      const rnd = mulberry32(seed), n = CONFIG.board.dictationCount || 6, types = showTypesOf(KINDS_V1);
+      const tasks = Array.from({ length: n }, (_, i) => generate(types[i % types.length], rnd));
+      const list = tasks.map((t, i) => `<li>${answerHTML(t)}</li>`).join('');
+      return [...tasks.map((t, i) => showStep(`<b>Задание ${i + 1} из ${n}.</b> ${askHTML(t)}`, 'Записали ответ — переходим к следующему.',
+        'Не показывайте ответы по ходу: пусть ученики пишут в тетрадь, а проверяют в конце. Таймер — по кнопке «⏱» вверху.')),
+        showStep('Проверь себя: все ответы', `<ol class="dict-ans">${list}</ol>`, 'Ученики сверяют ответы и отмечают ошибки. Тема ошибок — в «Над чем поработать» тренажёра.',
+          () => tasks.map((t, i) => `${i + 1}) ${TYPES[t.type].keyHTML(t)}`))];
+    },
+  },
+  truefalse: {
+    label: 'Верно — неверно',
+    about: 'Утверждение на экране; класс поднимает карточку: верно или неверно. Объяснение — по кнопке.',
+    available: () => showTf().length > 0,
+    steps(seed) {
+      const rnd = mulberry32(seed), types = showTf(), n = CONFIG.board.truefalseCount || 8, marks = [];
+      return Array.from({ length: n }, (_, i) => {
+        const type = types[i % types.length], T = TYPES[type], t = generate(type, rnd);
+        const traps = T.traps(t), isTrue = !traps.length || rnd() < .5;
+        const html = isTrue ? T.keyHTML(t) : pick(rnd, traps).html;
+        const text = T.statement ? T.statement(t, html) : tfDefault(t, html);
+        marks.push(isTrue);
+        return showStep(`<b>${i + 1}.</b> Верно ли: ${text}`,
+          isTrue ? `<b>Верно.</b> ${T.ok(t)}` : `<b>Неверно.</b> Правильно: ${answerHTML(t)}.`,
+          'Класс поднимает сигнальные карточки (бумага: зелёная — верно, красная — неверно). Сначала голосуют, потом «Показать ответ».',
+          ph => marks.slice(0, i + (ph ? 1 : 0)).map((v, j) => `${j + 1}) ${v ? 'верно' : 'неверно'}`));
+      });
+    },
+  },
+  errors: {
+    label: 'Найди ошибку',
+    about: 'Готовое решение с одной ошибкой: класс ищет строку. Ответ и верная строка — по кнопке.',
+    available: () => mistakeTypes().length > 0,
+    steps(seed) {
+      const rnd = mulberry32(seed), n = CONFIG.board.errorsCount || 5, cases = [], types = mistakeTypes();
+      for (let i = 0; i < n; i++) {
+        const type = types[i % types.length], t = generate(type, rnd);
+        cases.push({ t, m: TYPES[type].mistake(t, rnd) });
+      }
+      return cases.map(({ t, m }, i) => ({
+        q: (_m, ph) => `<b>${i + 1}.</b> ${askHTML(t)}<ol class="elines">${m.lines.map((l, k) => `<li${ph && k === m.at ? ' class="wrong"' : ''}>${l}</li>`).join('')}</ol>`,
+        a: `Строка ${m.at + 1}. ${m.why} Верно: ${m.fix}`,
+        note: 'Пусть класс сначала найдёт строку, потом объяснит, в чём ошибка. Ответ — по кнопке.',
+        draw: () => '',
+        rec: ph => ph ? [`Строка ${m.at + 1}: ${m.fix}`] : [],
+      }));
+    },
+  },
+};
+const showsAvailable = () => Object.entries(SHOWS).filter(([, s]) => s.available());
+
+// переключение вида показа: 'main' — основной показ темы
+function boardUseShow(name) {
+  B.show = name === 'main' || SHOWS[name]?.available() ? name : 'main';
+  boardNumbers(false);
+  const sel = $('bShow'); if (sel) sel.value = B.show;
+}
+// меню видов показа: кнопки на стартовом экране и список в панели доски
+function initBoardShows() {
+  const list = showsAvailable();
+  if (!list.length) return;
+  const sel = document.createElement('select');
+  sel.id = 'bShow'; sel.setAttribute('aria-label', 'Вид показа');
+  sel.innerHTML = '<option value="main">Показ</option>' + list.map(([k, s]) => `<option value="${k}">${esc(s.label)}</option>`).join('');
+  $('bNotesBtn').before(sel);
+  sel.addEventListener('change', () => { boardUseShow(sel.value); renderBoard(); });
+  const start = document.querySelector('#start [data-go="board"]');
+  if (start) {
+    const box = document.createElement('div'); box.className = 'mode split';
+    box.innerHTML = `<b>🖥 На доске</b><span>${esc(META.modeBoard)}</span><div class="kinds"><button type="button" data-go="board" data-show="main">Показ темы<small>шаги «вопрос → ответ»</small></button>` +
+      list.map(([k, s]) => `<button type="button" data-go="board" data-show="${k}">${esc(s.label)}<small>${esc(s.about.split(':')[0])}</small></button>`).join('') + '</div>';
+    start.replaceWith(box);
+  }
+}
+
+// ---------- таймер задания (разминка, диктант) ----------
+const TM = { t: 0, left: 0, key: '' };
+function boardTimerStop() { clearInterval(TM.t); TM.t = 0; }
+function boardTimerSync() {
+  const btn = $('bTimer'), sec = SHOWS[B.show]?.timer?.();
+  if (!btn) return;
+  btn.hidden = !sec;
+  if (!sec) { boardTimerStop(); return; }
+  const key = B.show + ':' + B.i;
+  if (TM.key !== key) { boardTimerStop(); TM.key = key; TM.left = sec; }
+  btn.textContent = TM.left ? `⏱ ${TM.left} с` : '⏱ время!';
+  btn.setAttribute('aria-pressed', String(!!TM.t));
+}
+function boardTimer() {
+  if (TM.t) return boardTimerStop(), boardTimerSync();
+  const sec = SHOWS[B.show]?.timer?.();
+  if (!sec) return;
+  if (!TM.left) TM.left = sec;
+  TM.t = setInterval(() => { TM.left--; if (TM.left <= 0) { TM.left = 0; boardTimerStop(); } boardTimerSync(); }, 1000);
+  boardTimerSync();
+}
+
+// ---------- ядро: core/live.js ----------
+// ================= 🖐 Живая доска =================
+// Тема описывает только математику: модель (const LIVE) и на шагах — что можно двигать и менять (step.live).
+// Ядро берёт на себя мышь, касание и перо (Pointer Events), клавиатуру, сброс, повтор опыта,
+// плавное движение и prefers-reduced-motion. Схема — ИНСТРУКЦИЯ.md, раздел «Живая доска».
+//
+// const LIVE = {
+//   model: e => ({ ... }),      // исходное состояние модели для примера e (простые данные: числа, строки, {x, y}, массивы)
+//   fix(m) { ... },             // необязательно: привести модель к допустимому виду — прилипание, границы
+//   ok: m => true,              // необязательно: false — положение вырождено, движение отменяется
+// };
+// step.live = {
+//   enter(m) { ... },           // как поставить модель при входе в шаг (можно liveTo — плавно)
+//   reveal(m) { ... },          // опыт по кнопке «Показать ответ» (обычно liveTo); «▶ Повторить опыт» запускает его снова
+//   handles: (m, phase) => [{ id, at: {x, y}, label, move(m, p) {...}, key?(m, dx, dy, fine), keyStep?, r? }],
+//   controls: (m, phase) => [
+//     { id, type: 'range', label, min, max, step, get: m => …, set(m, v) {...}, text?: m => '…' },
+//     { id, type: 'toggle', label, get: m => true|false, set(m, v) {...} },
+//     { id, type: 'choice', label, options: [[значение, 'подпись'], …], get, set },
+//     { id, type: 'button', label, run(m) {...} },
+//   ],
+// };
+// draw(phase, m), rec(phase, m), q(m, phase), a(m, phase), note(m, phase) читают модель m.
+const LV = { entered: false, snap: null, anim: null, drag: null, instant: false, handles: [], controls: [], ctlKey: '' };
+const liveCopy = m => JSON.parse(JSON.stringify(m ?? {}));
+const liveOf = () => B.steps[B.i]?.live || null;
+const liveModel = e => typeof LIVE !== 'undefined' && B.show === 'main' ? LIVE.model(e) : {};
+function liveFix(m) { if (typeof LIVE !== 'undefined' && LIVE.fix) LIVE.fix(m); }
+// изменение модели учителем: после fix проверяем ok, вырожденное положение откатываем
+function liveChange(fn) {
+  const before = liveCopy(B.m);
+  fn(B.m);
+  liveFix(B.m);
+  const ok = typeof LIVE === 'undefined' || !LIVE.ok || LIVE.ok(B.m);
+  if (!ok) B.m = before;
+  renderBoard();
+  return ok;
+}
+
+// ---------- шаги ----------
+function liveEnter(revealed = false) {
+  LV.entered = true;
+  const lv = liveOf();
+  if (lv?.enter) { lv.enter(B.m); liveFix(B.m); }
+  LV.snap = liveCopy(LV.anim ? LV.anim.end : B.m);   // исходное положение шага — куда ведёт движение входа
+  if (revealed) { liveStop(); liveRevealNow(); }
+}
+function liveReveal() { const lv = liveOf(); if (lv?.reveal) { lv.reveal(B.m); if (!LV.anim) { liveFix(B.m); renderBoard(); } } }
+function liveRevealNow() { LV.instant = true; try { liveOf()?.reveal?.(B.m); liveFix(B.m); } finally { LV.instant = false; } }
+// «← Назад» с ответа на вопрос — модель снова как до опыта
+function liveBack() { if (liveOf() && LV.snap) B.m = liveCopy(LV.snap); }
+// «⟲ Сбросить»: положение начала шага (на ответе — итог опыта)
+function liveReset() { liveStop(); if (LV.snap) B.m = liveCopy(LV.snap); if (B.phase === 1) liveRevealNow(); renderBoard(); }
+// «▶ Повторить опыт»: вернуть модель к началу шага и снова провести опыт
+function liveAgain() { liveStop(); if (LV.snap) B.m = liveCopy(LV.snap); renderBoard(); liveReveal(); }
+
+// ---------- плавное движение ----------
+// liveTo({ theta: 90 }) или liveTo([{ theta: 40 }, { theta: 120 }], 700) — через точки, ms на каждый отрезок.
+// Числа (и числа внутри {x, y} и массивов) меняются плавно, остальное — в конце. Учитель листает или берёт
+// ручку — движение сразу заканчивается в конечном положении. prefers-reduced-motion — сразу конечное положение.
+const liveCalm = () => typeof requestAnimationFrame !== 'function' || !window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches;
+const liveEase = u => u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2;
+function liveMix(p, q, w) {
+  if (typeof p === 'number' && typeof q === 'number') return p + (q - p) * w;
+  if (p && q && typeof p === 'object' && typeof q === 'object') {
+    const o = Array.isArray(q) ? [] : {};
+    for (const k of Object.keys(q)) o[k] = k in p ? liveMix(p[k], q[k], w) : q[k];
+    return o;
+  }
+  return w < 1 ? p : q;
+}
+function liveTo(to, ms = 800) {
+  liveStop();
+  const list = Array.isArray(to) ? to : [to], pts = [liveCopy(B.m)];
+  list.forEach(q => pts.push({ ...pts[pts.length - 1], ...liveCopy(q) }));
+  const end = pts[pts.length - 1], n = list.length;
+  if (LV.instant || liveCalm()) { Object.assign(B.m, end); return; }
+  const t0 = performance.now(), a = { end, raf: 0 };
+  const tick = now => {
+    const u = Math.min(1, (now - t0) / (ms * n));
+    if (u >= 1) { LV.anim = null; Object.assign(B.m, end); liveFix(B.m); renderBoard(); return; }
+    const k = Math.min(n - 1, Math.floor(u * n));
+    Object.assign(B.m, liveMix(pts[k], pts[k + 1], liveEase(u * n - k)));
+    renderBoard();
+    a.raf = requestAnimationFrame(tick);
+  };
+  LV.anim = a; a.raf = requestAnimationFrame(tick);
+}
+function liveStop() {
+  if (!LV.anim) return;
+  const a = LV.anim; LV.anim = null;
+  cancelAnimationFrame(a.raf);
+  Object.assign(B.m, a.end); liveFix(B.m);
+}
+
+// ---------- ручки на чертеже ----------
+function liveHandlesSVG(st) {
+  LV.handles = st.live?.handles ? st.live.handles(B.m, B.phase).filter(Boolean) : [];
+  return LV.handles.map(h => `<g class="lv-h${h.cls ? ' ' + h.cls : ''}" data-handle="${h.id}" tabindex="0" role="button" ` +
+    `aria-label="${esc(h.label)}: тяните или двигайте стрелками" transform="translate(${GEO.f1(h.at.x)} ${GEO.f1(h.at.y)})">` +
+    `<title>${esc(h.label)}</title><circle class="lv-hit" r="44"/><circle class="lv-dot" r="${h.r || 18}"/></g>`).join('');
+}
+const liveBox = { x: 0, y: 0, w: BW, h: BH };
+// перетащить ручку id в точку p (координаты чертежа); false — положение вырождено и не принято
+function liveDrag(id, p) {
+  const h = LV.handles.find(x => x.id === id);
+  if (!h) return false;
+  liveStop();
+  return liveChange(m => h.move(m, GEO.keepIn(p, 8, liveBox), h));
+}
+// сдвинуть ручку с клавиатуры: стрелки — шаг keyStep (20), с Shift — мельче; у ручки может быть свой key()
+function liveKey(id, dx, dy, fine = false) {
+  const h = LV.handles.find(x => x.id === id);
+  if (!h) return false;
+  liveStop();
+  if (h.key) return liveChange(m => h.key(m, dx, dy, fine));
+  const s = (h.keyStep || 20) / (fine ? 4 : 1);
+  return liveChange(m => h.move(m, GEO.keepIn({ x: h.at.x + dx * s, y: h.at.y + dy * s }, 8, liveBox), h));
+}
+function livePoint(e) {
+  const M = $('bStage').querySelector('svg')?.getScreenCTM?.();
+  if (!M) return null;
+  const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(M.inverse());
+  return { x: p.x, y: p.y };
+}
+$('bStage').addEventListener('pointerdown', e => {
+  const g = e.target.closest?.('[data-handle]'), h = g && LV.handles.find(x => x.id === g.dataset.handle), p = h && livePoint(e);
+  if (!p) return;
+  liveStop();
+  LV.drag = { id: h.id, dx: h.at.x - p.x, dy: h.at.y - p.y };
+  $('bStage').setPointerCapture?.(e.pointerId);
+  g.focus?.({ preventScroll: true });
+  $('board').classList.add('dragging');
+  e.preventDefault();
+});
+$('bStage').addEventListener('pointermove', e => {
+  if (!LV.drag) return;
+  const p = livePoint(e);
+  if (p) liveDrag(LV.drag.id, { x: p.x + LV.drag.dx, y: p.y + LV.drag.dy });
+});
+const liveDragEnd = () => { LV.drag = null; $('board').classList.remove('dragging'); };
+$('bStage').addEventListener('pointerup', liveDragEnd);
+$('bStage').addEventListener('pointercancel', liveDragEnd);
+// клавиатура: true — клавишу обработала живая доска, листать шаги не нужно
+function liveKeydown(e) {
+  if (e.target.closest?.('#bLive') && [' ', 'Enter'].includes(e.key)) return true;   // кнопки панели нажимаются сами
+  const g = e.target.closest?.('[data-handle]');
+  const d = g && { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+  if (!d) return false;
+  e.preventDefault();
+  liveKey(g.dataset.handle, d[0], d[1], e.shiftKey);
+  return true;
+}
+
+// ---------- панель управления под чертежом ----------
+function liveCtlHTML(c) {
+  const id = `data-ctl="${c.id}"`;
+  if (c.type === 'range') return `<label class="lv-c"><span>${c.label}</span><input type="range" ${id} min="${c.min}" max="${c.max}" step="${c.step || 1}"><output data-out="${c.id}"></output></label>`;
+  if (c.type === 'toggle') return `<button type="button" class="lv-t" ${id} aria-pressed="false">${c.label}</button>`;
+  if (c.type === 'choice') return `<span class="lv-c" role="group" aria-label="${esc(String(c.label).replace(/<[^>]+>/g, ''))}"><span>${c.label}</span><span class="seg">` +
+    c.options.map(([, t], i) => `<button type="button" ${id} data-v="${i}" aria-pressed="false">${t}</button>`).join('') + '</span></span>';
+  return `<button type="button" ${id}>${c.label}</button>`;
+}
+function liveRenderControls(st) {
+  const box = $('bLive'), lv = st.live;
+  if (!lv) { box.hidden = true; box.innerHTML = ''; LV.ctlKey = ''; LV.controls = []; return; }
+  const cs = LV.controls = lv.controls ? lv.controls(B.m, B.phase).filter(Boolean) : [];
+  const again = lv.reveal && B.phase === 1;
+  const key = `${B.i}:${B.phase}:${cs.map(c => c.id + c.type + (c.options || []).length).join(',')}`;
+  if (key !== LV.ctlKey) {
+    LV.ctlKey = key;
+    box.innerHTML = cs.map(liveCtlHTML).join('') + '<span class="lv-tools">' +
+      (again ? '<button type="button" data-live="again" title="Вернуть чертёж и провести опыт ещё раз">▶ Повторить опыт</button>' : '') +
+      '<button type="button" data-live="reset" title="Вернуть чертёж к началу шага">⟲ Сбросить</button></span>';
+  }
+  box.hidden = false;
+  for (const c of cs) {
+    const els = box.querySelectorAll(`[data-ctl="${c.id}"]`), v = c.get ? c.get(B.m) : null, off = !!c.disabled?.(B.m);
+    els.forEach(el => { el.disabled = off; });
+    if (c.type === 'range') {
+      if (+els[0].value !== v) els[0].value = v;
+      box.querySelector(`[data-out="${c.id}"]`).innerHTML = c.text ? c.text(B.m) : String(v).replace('-', MINUS).replace('.', ',');
+    }
+    if (c.type === 'toggle') els[0].setAttribute('aria-pressed', String(!!v));
+    if (c.type === 'choice') els.forEach(el => el.setAttribute('aria-pressed', String(c.options[+el.dataset.v][0] === v)));
+  }
+}
+// значение элемента управления: range — число, toggle — true/false (по умолчанию — переключить), choice — значение варианта
+function liveSet(id, value) {
+  const c = LV.controls.find(x => x.id === id);
+  if (!c) return false;
+  liveStop();
+  if (c.type === 'button') { c.run(B.m); if (!LV.anim) { liveFix(B.m); renderBoard(); } return true; }
+  if (c.type === 'toggle') return liveChange(m => c.set(m, value === undefined ? !c.get(m) : !!value));
+  return liveChange(m => c.set(m, value));
+}
+$('bLive').addEventListener('input', e => {
+  const el = e.target.closest('input[data-ctl]');
+  if (el) liveSet(el.dataset.ctl, +el.value);
+});
+$('bLive').addEventListener('click', e => {
+  const el = e.target.closest('button');
+  if (!el) return;
+  if (el.dataset.live === 'reset') return liveReset();
+  if (el.dataset.live === 'again') return liveAgain();
+  const c = LV.controls.find(x => x.id === el.dataset.ctl);
+  if (c) liveSet(c.id, c.type === 'choice' ? c.options[+el.dataset.v][0] : undefined);
+});
 
 // ---------- ядро: core/home.js ----------
 const H = { level: 0, rnd: null, n: 0, score: 0, streak: 0, clean: 0, cats: {}, task: null, hints: 0, hintLevel: 0,
@@ -1619,7 +2674,11 @@ let lastInput = null;
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-go],[data-act],[data-level],[data-copy],[data-choice],[data-count],[data-kind-set]');
   if (!el) return;
-  if (el.dataset.go) { if (el.dataset.kind) pendingKind = el.dataset.kind; return show(el.dataset.go); }
+  if (el.dataset.go) {
+    if (el.dataset.kind) pendingKind = el.dataset.kind;
+    if (el.dataset.show) boardUseShow(el.dataset.show);
+    return show(el.dataset.go);
+  }
   if (el.dataset.kindSet) { $('pKind').value = el.dataset.kindSet; return drawSheets(); }
   if (el.dataset.level) { H.level = +el.dataset.level; return homeStart(); }
   if (el.dataset.copy) return copyLevelLink(+el.dataset.copy);
@@ -1629,11 +2688,12 @@ document.addEventListener('click', e => {
   if (act === 'menu') { if (document.fullscreenElement) toggleFull(); show('start'); }
   if (act === 'next') boardNext();
   if (act === 'prev') boardPrev();
-  if (act === 'restart') boardGo(0, 0);
+  if (act === 'restart') boardRestart();
   if (act === 'numbers') { boardNumbers(true); renderBoard(); }
   if (act === 'theme') toggleTheme();
   if (act === 'full') toggleFull();
   if (act === 'notes') boardNotes();
+  if (act === 'timer') boardTimer();
   if (act === 'check') homeCheckClick();
   if (act === 'sqrt') {
     const i = lastInput && $('hStep').contains(lastInput) ? lastInput : $('hStep').querySelector('input');
@@ -1676,7 +2736,7 @@ document.addEventListener('keydown', e => {
     return;
   }
   if (screen === 'home' && e.key === 'Enter' && H.wait) { e.preventDefault(); homeContinue(); return; }
-  if (screen !== 'board') return;
+  if (screen !== 'board' || liveKeydown(e)) return;
   if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); boardNext(); }
   else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); boardPrev(); }
   else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') toggleFull();
@@ -1689,6 +2749,9 @@ document.addEventListener('keydown', e => {
   B.notes = store.get('notes') === '1';
   const back = siteHref();
   if (back) { $('toSite').href = back; $('toSite').hidden = false; }
+  initPrintFormats();
+  initBoardShows();
+  if (SHOWS[P.get('show')]?.available()) boardUseShow(P.get('show'));
   if (typeof helpInit === 'function') helpInit();   // тема дорисовывает формулы в справке
   const lvl = +P.get('level');
   if (STUDENT) document.body.classList.add('student');
@@ -1701,12 +2764,19 @@ document.addEventListener('keydown', e => {
 
 // Для автотестов и снимка превью
 window.APP = {
-  SLUG, META, CONFIG, GEN_VERSION, TYPES, SECTIONS, KINDS_V1, WORDS_V1,
+  SHEETS, CORE_SHEETS, SHOWS, PRINT_GENERATORS, printVariant, SLUG, META, CONFIG, GEN_VERSION, TYPES, SECTIONS, KINDS_V1, WORDS_V1,
   OGE_V1: HAS_OGE ? OGE_V1 : undefined, makeVariantOGE: HAS_OGE ? makeVariantOGE : undefined,
   Q, qeq, decStr, keyQ, parseQ, parseVal, eqRoots, generate, makeVariant, taskRnd, mulberry32, parseNums,
   STUDENT, show, get screen() { return screen; },
   board: { get steps() { return B.steps; }, get i() { return B.i; }, get phase() { return B.phase; }, get e() { return B.e; },
-    next: boardNext, prev: boardPrev, go: boardGo, numbers: random => { boardNumbers(random); renderBoard(); }, poster: boardPoster },
+    next: boardNext, prev: boardPrev, go: boardGo, numbers: random => { boardNumbers(random); renderBoard(); }, poster: boardPoster,
+    restart: boardRestart, get show() { return B.show; }, useShow: boardUseShow, timer: boardTimer,
+    // живая доска: модель, ручки и панель текущего шага; drag(id, {x, y}) и key(id, dx, dy) — как учитель рукой и стрелками
+    get model() { return B.m; }, get snap() { return LV.snap; }, get animating() { return !!LV.anim; },
+    get handles() { return LV.handles.map(h => ({ id: h.id, label: h.label, at: { ...h.at } })); },
+    get controls() { return LV.controls.map(c => ({ id: c.id, type: c.type, label: c.label, min: c.min, max: c.max, options: c.options })); },
+    drag: liveDrag, key: liveKey, set: liveSet, reset: liveReset, again: liveAgain },
+  GEO, HAS_LIVE: typeof LIVE !== 'undefined',
   print: { draw: drawSheets, set nums(v) { printNums = v; } },
   home: { state: H, start: homeStart, check: homeCheck, hint: homeHint, next: homeContinue, collect: homeCollect,
     setCount: n => { H.eqCount = n; homeRender(); } },
