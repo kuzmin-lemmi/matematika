@@ -61,6 +61,7 @@ const path = Astro.url.pathname;
     <div class="wrap foot">
       <span class="brand"><Logo size={28} /><b>{SITE.short}</b><span class="dot" aria-hidden="true">·</span><span>материалы по математике для 5–9 классов · <span class="nowrap">© {new Date().getFullYear()} {SITE.author}</span></span></span>
       <span class="links">
+        <a href="https://infoshag.ru/">Инфошаг — материалы по информатике</a>
         {SITE.max && <a href={SITE.max} rel="noopener">Группа в Максе</a>}
         {SITE.form && <a href={SITE.form} rel="noopener">Написать нам</a>}
         {SITE.vk && <a href={SITE.vk}>ВКонтакте</a>}
