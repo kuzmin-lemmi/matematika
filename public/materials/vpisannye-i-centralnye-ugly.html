@@ -1,0 +1,2245 @@
+<!doctype html>
+<!-- Собрано конструктором «Матшага» (D:\Конструктор математика) из materials/vpisannye-i-centralnye-ugly/. Не правь этот файл руками:
+     правь тему или ядро и пересобери — npm run build -- vpisannye-i-centralnye-ugly. -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Вписанные и центральные углы — Матшаг</title>
+<meta name="description" content="Вписанные и центральные углы, угол между касательной и хордой: живой чертёж для доски, задачи на готовых чертежах, раздатка и тренажёр. Геометрия, 8 класс.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- знаки, которых может не быть в Golos Text (∠ △ ∥ ⊥ π ≠ ∞ □ ≥ ≤ ±), — подмножество Noto Sans Math -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%E2%88%A0%E2%96%B3%E2%88%A5%E2%8A%A5%CF%80%E2%89%A0%E2%88%9E%E2%96%A1%E2%89%A5%E2%89%A4%C2%B1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F3EB; --surface:#FFFDF8; --ink:#203B31; --soft:#5C7065; --line:#D8DFD2; --grid:rgba(37,100,73,.09);
+  --accent:#256449; --accent-ink:#FFFFFF;
+  --a:#256449; --a-soft:#A8D5BA;          /* квадрат, площадь которого известна */
+  --b:#B94C2D; --b-soft:#F6DDD3;          /* выделение: искомая сторона, ловушка */
+  --ok:#256449; --ok-soft:#E1EFE5; --bad:#B3261E; --bad-soft:#F8E1DE; --info-soft:#F1ECDD;
+  --font:'Golos Text','Noto Sans Math','Cambria Math','Segoe UI Symbol','Segoe UI',system-ui,-apple-system,sans-serif;
+  --r:14px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
+    --accent:#99D7B4; --accent-ink:#153725;
+    --a:#99D7B4; --a-soft:#3F7A5C; --b:#FFAE8C; --b-soft:#5B3326;
+    --ok:#99D7B4; --ok-soft:#24402F; --bad:#FF9C8F; --bad-soft:#4A2622; --info-soft:#2E3A2F;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16231F; --surface:#20332B; --ink:#EDF5EB; --soft:#B3C5B7; --line:#405347; --grid:rgba(153,215,180,.08);
+  --accent:#99D7B4; --accent-ink:#153725;
+  --a:#99D7B4; --a-soft:#3F7A5C; --b:#FFAE8C; --b-soft:#5B3326;
+  --ok:#99D7B4; --ok-soft:#24402F; --bad:#FF9C8F; --bad-soft:#4A2622; --info-soft:#2E3A2F;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:400 18px/1.45 var(--font);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:.5em 1em;font-weight:600}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+[hidden]{display:none !important}
+.screen{min-height:100vh;min-height:100dvh}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 48px}
+
+/* дроби этажом и знак корня с чертой над подкоренным выражением */
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.1;margin:0 .12em;text-align:center}
+.frac > :last-child{border-top:.08em solid currentColor;padding:0 .15em;align-self:stretch}
+.mixed,.nw{white-space:nowrap}
+.mixed > .w{vertical-align:middle}
+.rt{white-space:nowrap}
+.rt > .rs{display:inline-block;transform:scale(1,1.12);transform-origin:50% 75%}
+.rt > .rad{display:inline-block;line-height:1;border-top:.07em solid currentColor;padding:.04em .1em 0 .02em;margin-left:-.03em}
+.rt.tall{display:inline-flex;align-items:stretch;vertical-align:middle}
+.rt.tall > .rs{display:flex;align-items:center;font-size:1.9em;line-height:1;font-weight:400;margin-right:-.06em;transform:none}
+.rt.tall > .rad{margin:.18em 0 0;display:flex;align-items:center;line-height:1.1;padding-top:0}
+.cmpbox{display:inline-block;min-width:1.4em;border:2px dashed currentColor;border-radius:8px;text-align:center;margin:0 .2em;padding:0 .1em}
+
+/* стартовый экран */
+#start .wrap{max-width:880px;padding-top:48px}
+.kicker{color:var(--soft);font-weight:600;margin:0 0 6px}
+h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing:-.01em}
+.lead{font-size:20px;color:var(--soft);margin:0 0 32px;max-width:40em}
+.modes{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.mode{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;padding:22px;border-radius:var(--r);min-height:170px}
+.mode b{font-size:26px}
+.mode span{font-weight:400;color:var(--soft)}
+.mode:hover{transform:translateY(-2px)}
+.tosite{position:fixed;top:calc(12px + env(safe-area-inset-top));left:calc(12px + env(safe-area-inset-left));z-index:5;
+  display:inline-flex;align-items:center;min-height:44px;padding:.35em .9em;border:2px solid var(--line);border-radius:12px;
+  background:var(--surface);color:var(--ink);font-weight:600;text-decoration:none}
+.tosite:hover{border-color:var(--accent)}
+.topright{position:fixed;top:calc(12px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));display:flex;gap:8px;z-index:5}
+.icon{padding:.35em .6em;min-width:44px;min-height:44px}
+
+/* доска: на проекторе шрифт не мельче 28px */
+#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
+.bbar{display:flex;align-items:center;gap:8px;font-size:20px}
+.bbar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap;margin-right:6px}
+.bbar button{font-size:18px;min-height:44px;padding:.2em .7em;white-space:nowrap}
+.btext{padding:4px 0}
+.btext .q{font-size:clamp(30px,3vw,46px);font-weight:700;line-height:1.3}
+.btext .a{font-size:clamp(28px,2.7vw,42px);line-height:1.35;margin-top:.15em;color:var(--accent);font-weight:600}
+.btext .a ul{margin:.1em 0;padding-left:1.2em;color:var(--ink)}
+.btext .a.hide{visibility:hidden}
+.bstage{min-height:0;display:flex;align-items:center;justify-content:center}
+.bstage svg{width:100%;height:100%;max-height:100%}
+.brec{border-top:2px dashed var(--line);padding:6px 0 2px;min-height:calc(2 * 1.9em + 26px);font-size:clamp(26px,2.4vw,36px);line-height:1.9}
+.brec .rt-h{display:block;font-size:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);line-height:1.2}
+.brec .ln{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bctl{display:flex;gap:12px;justify-content:center;padding-top:8px}
+.bctl button{font-size:26px;min-height:60px;padding:.25em 1em}
+.bctl .main{min-width:10em}
+.bnote{position:fixed;right:clamp(12px,3vw,40px);bottom:96px;max-width:min(520px,90vw);background:var(--surface);border:2px solid var(--accent);
+  border-radius:var(--r);padding:12px 16px;font-size:20px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:4}
+.bnote b{display:block;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+#board.preview .bctl,#board.preview .bbar button{visibility:hidden}
+#board.preview .bnote{display:none}
+@media (max-width:1150px){ .bbar .ttl{visibility:hidden} .bbar button .t{display:none} }
+
+svg text{font-family:var(--font);fill:var(--ink)}
+svg .lab{font-size:38px;font-weight:700}
+svg .lab.s{font-size:30px;font-weight:600}
+svg .lab.acc{fill:var(--accent)}
+svg .lab.warm{fill:var(--b)}
+svg .lab.soft{fill:var(--soft)}
+svg .ov{text-decoration:overline}
+svg .ge{fill:var(--surface)}
+svg .gs{fill:var(--a-soft)}
+svg .gw{fill:var(--b-soft)}
+svg .gl{stroke:var(--ink);stroke-width:1.3;opacity:.45}
+svg .gk{stroke:var(--ink);stroke-width:4;opacity:1}
+svg .gf{fill:none;stroke:var(--ink);stroke-width:4}
+svg .gx{fill:none;stroke:var(--b);stroke-width:6;stroke-dasharray:14 8}
+svg .br{fill:none;stroke:var(--ink);stroke-width:3}
+svg .br.warm{stroke:var(--b)}
+svg .axis{stroke:var(--ink);stroke-width:3}
+svg .tick{stroke:var(--ink);stroke-width:2.5}
+svg .curve{fill:none;stroke:var(--a);stroke-width:6}
+svg .hline{stroke:var(--b);stroke-width:4;stroke-dasharray:12 8}
+svg .seg{stroke:var(--b);stroke-width:12;stroke-linecap:round}
+svg .link{stroke:var(--soft);stroke-width:2;stroke-dasharray:6 6}
+svg .dot{fill:var(--b);stroke:var(--surface);stroke-width:3}
+svg .lbl text{font-size:32px;font-weight:700}
+svg .lbl line{stroke:var(--ink);stroke-width:3}
+svg .lbl.warm text{fill:var(--b)} svg .lbl.warm line{stroke:var(--b)}
+/* чертёжные помощники GEO (core/geom.js): линии толще 4px, подписи с подложкой цвета фона — читаются поверх линий */
+svg .g-ln{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+svg .g-thin{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round}
+svg .g-dash{fill:none;stroke:var(--soft);stroke-width:3;stroke-dasharray:12 9;stroke-linecap:round}
+svg .g-hl{fill:none;stroke:var(--b);stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+svg .g-fig{fill:var(--a-soft);fill-opacity:.6;stroke:var(--ink);stroke-width:5;stroke-linejoin:round}
+svg .g-fig.b{fill:var(--b-soft);fill-opacity:.85}
+svg .g-fig.ghost{fill:none;stroke:var(--soft);stroke-width:3;stroke-dasharray:12 9}
+svg .g-circ{fill:none;stroke:var(--ink);stroke-width:3}
+svg .g-pt{fill:var(--ink)}
+svg .g-mark{fill:none;stroke:var(--ink);stroke-width:3}
+svg .g-tick{stroke:var(--b);stroke-width:3.5;stroke-linecap:round}
+svg .g-sec{fill:var(--b-soft);stroke:var(--b);stroke-width:3}
+svg .g-sec.a{fill:var(--a-soft);stroke:var(--a)}
+svg .g-arrow{stroke:var(--b);stroke-width:5;fill:var(--b);stroke-linecap:round}
+svg .g-vl,svg .g-lab,svg .g-num{paint-order:stroke;stroke:var(--bg);stroke-width:8px;stroke-linejoin:round}
+svg .g-vl{font-size:40px;font-weight:700;font-style:italic}
+svg .g-vl .g-sub{font-size:26px;font-style:normal}
+svg .g-lab{font-size:34px;font-weight:600}
+svg .g-num{font-size:34px;font-weight:800}
+svg .g-num.b,svg .g-lab.b{fill:var(--b)} svg .g-num.a,svg .g-lab.a{fill:var(--accent)}
+/* живая доска (core/live.js): ручки — крупные, для пальца и пера; панель — под чертежом */
+.bstage svg.live{touch-action:none;user-select:none;-webkit-user-select:none}
+svg .lv-h{cursor:grab;outline:none}
+#board.dragging,#board.dragging svg .lv-h{cursor:grabbing}
+svg .lv-hit{fill:transparent}
+svg .lv-dot{fill:var(--b);stroke:var(--surface);stroke-width:5}
+svg .lv-h:hover .lv-dot{stroke:var(--accent)}
+svg .lv-h:focus-visible .lv-dot{stroke:var(--accent);stroke-width:9}
+.blive{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:center;padding:6px 0 2px;font-size:22px}
+.blive .lv-c{display:inline-flex;align-items:center;gap:12px;font-weight:600}
+.blive input[type=range]{width:min(320px,55vw);height:40px;accent-color:var(--accent);cursor:pointer}
+.blive output{min-width:3.2em;font-weight:800;color:var(--accent)}
+.blive button{min-height:48px;font-size:20px;padding:.2em .8em}
+.blive button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.blive .lv-tools{display:inline-flex;gap:8px}
+#board.preview .blive{visibility:hidden}
+@media (max-width:600px){ .blive{font-size:17px;gap:6px 14px} .blive button{font-size:16px;min-height:44px} }
+svg .new{animation:fade .6s ease-out both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){ svg .new, .mode:hover{animation:none;transform:none} }
+
+/* раздатка: панель */
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;margin-bottom:24px}
+.panel .row{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.panel label{display:inline-flex;gap:8px;align-items:center}
+.panel input[type=text]{width:100%;min-width:0;padding:.4em .6em;border:2px solid var(--line);border-radius:10px;background:var(--bg)}
+.panel input[type=number]{width:5em;padding:.3em .5em;border:2px solid var(--line);border-radius:10px;background:var(--bg)}
+.note{color:var(--soft);font-size:16px;margin:0}
+.err{color:var(--bad);font-weight:600}
+.sheets{display:grid;gap:24px;justify-items:center;overflow-x:auto}
+
+/* лист A4: на экране — как на бумаге */
+.page{width:210mm;min-height:297mm;padding:12mm;background:#fff;color:#000;box-shadow:0 2px 16px rgba(0,0,0,.18);font-size:12pt;line-height:1.35}
+.page.half .sheet{height:136mm;overflow:hidden;gap:1mm}
+.page.half .sheet + .sheet{border-top:1px dashed #888;padding-top:3mm}
+.half .sheet h2{display:none}
+.half .shead{font-size:10pt}
+.half .tasks{gap:.5mm 4mm}
+.half .task{font-size:12pt;line-height:1.25}
+.half .instr{font-size:8.5pt;line-height:1.15}
+.half .sub-h{display:none}
+.half .bank{font-size:10pt;gap:.8mm}
+.half .bank .bk{min-width:11mm}
+.half .bank .bk > :first-child{padding:0 1mm}
+.half table.ans{font-size:10pt}
+.half table.ans td,.half table.ans th{padding:.4mm 1mm}
+.half table.ans .tall td{height:7mm}
+.half .word{font-size:10pt}
+/* бланк ответов в стиле ОГЭ */
+.seg{display:inline-flex;flex-wrap:wrap;gap:6px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.mode.split{border:2px solid var(--line);background:var(--surface)}
+.mode.split:hover{transform:none}
+.kinds{display:grid;gap:8px;width:100%;margin-top:auto}
+.kinds button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;font-size:17px;padding:.5em .8em}
+.kinds small{font-weight:400;font-size:14px;color:var(--soft)}
+.oge .task{font-size:12pt;line-height:1.35}
+.oge .cells{height:15mm}
+.oge .otv{font-size:11pt;margin-top:1mm}
+.oge .bhead{display:flex;align-items:center;justify-content:space-between;gap:4mm;margin-top:1mm}
+.oge .sample{display:flex;align-items:center;gap:2mm;font-size:10pt}
+.oge .sample .brow b{display:none}
+.blank{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm 8mm}
+.brow{display:flex;align-items:center}
+.brow b{width:7mm;font-size:12pt}
+.brow i{width:6.5mm;height:8mm;border:1px solid #000;margin-left:-1px;display:inline-flex;align-items:center;justify-content:center;
+  font-style:normal;font-size:12pt}
+.half .oge .task{font-size:11pt;line-height:1.25}
+.half .oge .otv{display:none}
+.half .blank{gap:1.2mm 8mm}
+.half .brow i{height:6.5mm}
+.sheet{display:flex;flex-direction:column;gap:3mm}
+.shead{display:grid;grid-template-columns:1fr 22mm 28mm auto;gap:4mm;font-size:11pt;align-items:end}
+.shead span{border-bottom:1px solid #000;padding-bottom:1mm;white-space:nowrap}
+.shead .vn{border:1.5px solid #000;padding:1mm 2mm;font-weight:700}
+.sheet h2{font-size:14pt;margin:1mm 0 0}
+.sheet .instr{margin:0;font-size:10.5pt}
+.tasks{display:grid;grid-template-columns:1fr 1fr;gap:3mm 6mm;margin:0;padding:0;list-style:none}
+.task{break-inside:avoid;font-size:14pt}
+.task .no{font-weight:700;margin-right:2mm}
+.cells{height:24mm;margin-top:1.5mm;border:1px solid #bbb;
+  background-image:linear-gradient(#cfcfcf .3mm,transparent .3mm),linear-gradient(90deg,#cfcfcf .3mm,transparent .3mm);
+  background-size:5mm 5mm;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+.compact .cells{display:none}
+.bank{display:flex;flex-wrap:wrap;gap:1.5mm;font-size:12pt}
+.bank .bk{border:1px solid #000;min-width:13mm;text-align:center;display:flex;flex-direction:column}
+.bank .bk > :first-child{padding:1mm 1.5mm;flex:1;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.bank .bk > :last-child{border-top:1px solid #000;font-weight:700;padding:.5mm}
+.sub-h{font-weight:700;font-size:11pt;margin:1mm 0 0}
+table.ans{border-collapse:collapse;width:100%;font-size:11pt;table-layout:fixed}
+table.ans td,table.ans th{border:1px solid #000;padding:1mm;text-align:center}
+table.ans th:first-child{width:18mm;text-align:left}
+table.ans .tall td{height:13mm}
+.word{font-size:11pt}
+.key h2{font-size:15pt;margin:0 0 3mm}
+table.key{border-collapse:collapse;width:100%;font-size:10.5pt}
+table.key td,table.key th{border:1px solid #000;padding:1mm 1.2mm;text-align:center;white-space:nowrap}
+table.key td:first-child{font-weight:700}
+.page.key.land{width:297mm;min-height:210mm}
+table.key.wrap td,table.key.wrap th{white-space:normal;padding:.6mm .8mm}
+table.key.wrap td:first-child{white-space:nowrap}
+
+/* тренажёр */
+.hhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:16px}
+.hhead h2{margin:0;font-size:26px;flex:1;min-width:12em}
+.levels{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin:16px 0}
+.level{text-align:left;padding:16px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.level small{font-weight:400;color:var(--soft)}
+.level .lex{font-size:24px;font-weight:700;margin:4px 0}
+/* название раздела — главное в карточке; пример словами (exText в разделе темы) — мельче формулы */
+.level b{font-size:15px;color:var(--soft)}
+.level .lname{font-size:20px;font-weight:700;line-height:1.25}
+.level .lex.txt{font-size:16px;font-weight:400;color:var(--soft);margin:0}
+.stats{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--soft);font-weight:600}
+.stats b{color:var(--ink)}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:clamp(16px,3vw,28px)}
+.taskx{font-size:clamp(26px,5vw,40px);font-weight:700;margin:4px 0 16px;text-align:center;line-height:1.35}
+.inrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 14px;font-size:26px}
+.inrow input{width:3.4em;padding:.15em .2em;text-align:center;border:2px solid var(--line);border-radius:10px;background:var(--bg);font-weight:700}
+.inrow input.wide{width:5.5em}
+.inrow .frac input{width:2.6em;margin:2px 0}
+.inrow .frac.fin > :last-child{border-top:3px solid currentColor;padding-top:4px}
+.inrow .check{font-size:20px;min-height:52px}
+.choice{font-size:26px;min-width:3.2em;min-height:60px}
+.cnts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px}
+.cnts button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
+.sqrtbtn{font-size:24px;min-width:52px;min-height:52px;padding:0 .4em}
+.hbtns{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.fb{margin-top:16px;padding:14px 16px;border-radius:12px;font-size:19px;line-height:1.6}
+.fb.ok{background:var(--ok-soft);border-left:6px solid var(--ok)}
+.fb.bad{background:var(--bad-soft);border-left:6px solid var(--bad)}
+.fb.info{background:var(--info-soft);border-left:6px solid var(--soft)}
+.fb .tag{font-weight:700;display:block;margin-bottom:2px}
+.hnote{color:var(--soft);font-size:16px;text-align:center;margin:10px 0 0}
+.linkbtn{font-size:15px;padding:.2em .6em;border-width:1.5px}
+#home.playing .hhead h2{font-size:18px;color:var(--soft)}
+#home.playing .wrap{padding-top:12px}
+/* телефон: задание и «Проверить» — в верхней половине, нижнюю закрывает клавиатура */
+@media (max-width:600px){
+  #home.playing .hhead{margin-bottom:6px;flex-wrap:nowrap;justify-content:space-between}
+  #home.playing .hhead h2{display:none}
+  #home.playing .stats{font-size:15px;gap:2px 12px}
+  #home.playing .card{padding:12px 14px;margin-top:8px !important}
+  .taskx{margin:0 0 8px}
+  .inrow{font-size:23px;gap:8px 12px}
+  #home.playing .wrap{padding-bottom:50vh}
+}
+.work{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:10px}
+.work li{background:var(--bg);border-radius:10px;padding:10px 14px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px;z-index:20}
+.overlay .card{max-width:720px;max-height:90vh;overflow:auto}
+.overlay h3{margin:0 0 8px;font-size:24px}
+.overlay h4{margin:16px 0 4px}
+.overlay p{margin:4px 0}
+
+body.student [data-act="menu"],body.student #hLinks{display:none !important}
+@page{size:A4;margin:0}
+@page land{size:A4 landscape;margin:0}
+@media print{
+  .page.key.land{page:land}
+  html,body{background:#fff !important;color:#000 !important;background-image:none !important;padding:0}
+  .no-print,.screen:not(#print),.topright{display:none !important}
+  #print .wrap{max-width:none;padding:0}
+  .sheets{display:block;overflow:visible}
+  .page{box-shadow:none;margin:0;break-after:page;min-height:auto;height:297mm;overflow:hidden}
+  .page.key{height:auto;overflow:visible}
+  table.key tr{break-inside:avoid}
+  .page:last-child{break-after:auto}
+  body.print-key .page:not(.key){display:none}
+  body.print-sheets .page.key{display:none}
+}
+@media (max-width:600px){
+  .bbar{font-size:18px}
+  .bctl button{font-size:18px;min-height:48px}
+}
+
+/* тема */
+/* Дуга, на которую опирается угол, — цветом центрального угла: они равны */
+svg .va-arc { fill: none; stroke: var(--accent); stroke-width: 10; stroke-linecap: round; opacity: .75; }
+/* Чертежи задач (viewBox 400 × 300) */
+.va-task { display: block; width: 100%; max-width: 380px; max-height: 280px; margin: 5px auto; }
+svg .va-c { fill: none; stroke: var(--ink); stroke-width: 3; }
+svg .va-l { fill: none; stroke: var(--ink); stroke-width: 3.5; stroke-linecap: round; }
+svg .va-m { fill: none; stroke: var(--ink); stroke-width: 2; }
+svg .va-arc-t { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: round; }
+svg .va-p { fill: var(--ink); }
+svg .va-v, svg .va-n { paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; }
+svg .va-v { font-size: 34px; font-weight: 700; font-style: italic; }
+svg .va-n { font-size: 32px; font-weight: 800; }
+svg .va-n.q { fill: var(--b); }
+#home .va-q { font-size: clamp(20px, 3vw, 27px); line-height: 1.4; margin: 10px 0; }
+/* Лист: три задачи в ряд, чертежи мелкие */
+.sheet .tasks { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3mm; }
+.sheet .task p { margin: 1mm 0; font-size: 12pt; line-height: 1.25; }
+.sheet .va-task { height: 28mm; max-height: 28mm; margin: 0 auto 1mm; }
+.sheet .cells { height: 10mm; }
+.sheet svg { --ink: #000; --bg: #fff; --b: #000; }
+/* Два варианта на листе: четыре задачи в ряд, номер поверх чертежа, клеточки — в таблице ответов */
+.half .tasks { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.half .task { position: relative; }
+.half .task .no { position: absolute; left: 0; top: 0; }
+.half .va-task { height: 20mm; max-height: 20mm; margin: 0 auto; }
+.half .task p { font-size: 10pt; line-height: 1.1; margin: .5mm 0; }
+.half .cells { display: none; }
+/* С местом для решения: четыре задачи в ряд, чтобы лист остался одностраничным */
+.page:not(.compact) .sheet .tasks { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+</style>
+</head>
+<body>
+
+<!-- стартовый экран -->
+<section id="start" class="screen" hidden>
+  <a class="tosite no-print" id="toSite" target="_top" hidden>← Назад на сайт</a>
+  <div class="topright no-print">
+    <button class="icon" id="themeBtn" type="button" title="Светлая или тёмная тема" aria-label="Сменить тему">◐</button>
+  </div>
+  <div class="wrap">
+    <p class="kicker">8 класс · Геометрия · Мерзляк и др.</p>
+    <h1>Вписанные и центральные углы</h1>
+    <p class="lead">Тащим вершину по окружности — вписанный угол не меняется и всегда равен половине центрального.</p>
+    <div class="modes">
+      <button class="mode" type="button" data-go="board"><b>🖥 На доске</b><span>12 шагов с живым чертежом: точки двигаются по окружности, углы пересчитываются. Доказательство по трём случаям, угол на диаметр, другая дуга, касательная.</span></button>
+      <div class="mode split"><b>🖨 Раздатка</b><span>8 задач на готовых чертежах с кодовым словом, ключ по номеру варианта. Дополнительно — бланк ответов как в ОГЭ.</span>
+        <div class="kinds">
+          <button type="button" data-go="print" data-kind="word">🔤 Кодовое слово<small>верные ответы складываются в слово</small></button>
+          <button type="button" data-go="print" data-kind="oge">🧾 Бланк как в ОГЭ<small>ответ-число в клеточки бланка</small></button>
+        </div>
+      </div>
+      <button class="mode" type="button" data-go="home"><b>🏠 Тренировка</b><span>Три раздела: виды углов и дуги; одна дуга — разные углы; задачи ОГЭ. Подсказки и разбор каждой ошибки.</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- доска -->
+<section id="board" class="screen" hidden>
+  <div class="bbar">
+    <button class="icon" type="button" data-act="menu" title="Меню (Esc)" aria-label="Меню">☰</button>
+    <span class="ttl">Вписанные и центральные углы</span>
+    <span class="cnt" id="bCnt"></span>
+    <button type="button" data-act="restart" title="С первого шага" aria-label="Заново">↺<span class="t"> Заново</span></button>
+    <button type="button" data-act="numbers" title="Тот же показ с другими числами" aria-label="Другие числа">🎲<span class="t"> Другие числа</span></button>
+    <button type="button" data-act="notes" id="bNotesBtn" aria-pressed="false" title="Что сказать на этом шаге. Подсказку видно и на проекторе — включайте, когда нужно" aria-label="Подсказка учителю">💬<span class="t"> Учителю</span></button>
+    <button class="icon" type="button" data-act="theme" title="Светлая или тёмная тема" aria-label="Сменить тему">◐</button>
+    <button class="icon" type="button" data-act="full" title="Во весь экран (F)" aria-label="Во весь экран">⛶</button>
+  </div>
+  <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
+  <div class="bstage" id="bStage"></div>
+  <div class="blive" id="bLive" role="group" aria-label="Управление чертежом" hidden></div>
+  <div class="brec"><span class="rt-h">Запись в тетради</span><div id="bRec"></div></div>
+  <div class="bctl">
+    <button type="button" data-act="prev" title="Назад (←, PageUp)">← Назад</button>
+    <button type="button" class="main" data-act="next" id="bNext" title="Далее (→, Пробел, PageDown)">Показать ответ</button>
+  </div>
+  <div class="bnote" id="bNote" hidden></div>
+</section>
+
+<!-- раздатка -->
+<section id="print" class="screen" hidden>
+  <div class="wrap">
+    <div class="hhead no-print">
+      <button class="icon" type="button" data-act="menu" aria-label="Меню">☰</button>
+      <h2>Раздатка: вписанные и центральные углы</h2>
+    </div>
+    <div class="panel no-print">
+      <div class="row">
+        <b>Вид листа:</b>
+        <div class="seg" role="group" aria-label="Вид листа">
+          <button type="button" data-kind-set="word" aria-pressed="true">🔤 Кодовое слово</button>
+          <button type="button" data-kind-set="oge" aria-pressed="false">🧾 Бланк ответов, как в ОГЭ</button>
+        </div>
+        <input type="hidden" id="pKind" value="word">
+      </div>
+      <div class="row">
+        <label>Вариантов <input type="number" id="pCount" min="1" max="40"></label>
+        <button type="button" id="pNew">Новые номера</button>
+        <label><input type="checkbox" id="pSpace"> место для решения (сетка)</label>
+        <label><input type="checkbox" id="pTwo"> два варианта на листе</label>
+      </div>
+      <label style="display:grid;gap:4px">Номера вариантов (можно вписать свои — ключ восстановится по номеру)
+        <input type="text" id="pNums" autocomplete="off" spellcheck="false">
+      </label>
+      <p class="note" id="pMsg"></p>
+      <div class="row">
+        <button type="button" class="main" id="pPrint">🖨 Печать листов</button>
+        <button type="button" id="pPrintKey">🔑 Печать ключа</button>
+      </div>
+      <p class="note"><span id="pAbout"></span> Печать — A4, поля браузера — «по умолчанию» или «нет».</p>
+    </div>
+    <div class="sheets" id="pSheets"></div>
+  </div>
+</section>
+
+<!-- тренажёр -->
+<section id="home" class="screen" hidden>
+  <div class="wrap">
+    <div class="hhead">
+      <button class="icon" type="button" data-act="menu" aria-label="Меню">☰</button>
+      <h2>Тренировка: вписанные и центральные углы</h2>
+      <button type="button" data-act="help">📖 Справка</button>
+    </div>
+    <div id="hSetup">
+      <p>Выбери раздел. В каждом 10 задач на чертежах; после ошибки — разбор и новая задача того же вида.</p>
+      <div class="levels" id="hLevels"></div>
+      <p class="note" id="hLinks"></p>
+    </div>
+    <div id="hPlay" hidden>
+      <div class="stats" id="hStats"></div>
+      <div class="card" style="margin-top:12px">
+        <div class="taskx" id="hTask"></div>
+        <div id="hStep"></div>
+        <div id="hFb"></div>
+        <div class="hbtns">
+          <button type="button" id="hHint">Подсказка (−<span id="hPen"></span>)</button>
+          <button type="button" class="main" id="hNext" hidden>Дальше →</button>
+        </div>
+      </div>
+    </div>
+    <div id="hEnd" hidden></div>
+  </div>
+</section>
+
+<div class="overlay" id="help" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="helpT">
+<h3 id="helpT">Справка: вписанные и центральные углы</h3>
+<h4>Центральный угол</h4><p>Угол с вершиной в центре окружности называют центральным. Градусная мера дуги равна величине центрального угла, который на неё опирается: ∠AOB = дуга AB. Вся окружность — 360°, полуокружность — 180°.</p>
+<h4>Вписанный угол</h4><p>Угол, вершина которого лежит на окружности, а стороны пересекают окружность, называют вписанным. Он опирается на дугу, которая лежит внутри угла.</p>
+<h4>Теорема</h4><p>Вписанный угол равен половине дуги, на которую он опирается, то есть половине центрального угла на ту же дугу: <span class="nw">∠ACB = ½∠AOB</span>. Если ∠AOB = 100°, то ∠ACB = 50°.</p>
+<h4>Следствия</h4><p>Вписанные углы, опирающиеся на одну дугу, равны. Вписанный угол, опирающийся на диаметр, прямой. Если вершины C и D лежат по разные стороны от хорды AB, то <span class="nw">∠ACB + ∠ADB = 180°</span>.</p>
+<h4>Касательная и хорда</h4><p>Касательная перпендикулярна радиусу, проведённому в точку касания. Угол между касательной и хордой равен половине дуги, заключённой внутри этого угла.</p>
+<h4>Радиусы</h4><p>OA = OB, поэтому треугольник AOB равнобедренный: <span class="nw">∠OAB = (180° − ∠AOB) : 2</span>.</p>
+<h4>Ловушки</h4><p>Вписанный угол не равен центральному: он вдвое меньше. Смотри, на какую дугу опирается угол: у вершин по разные стороны от хорды дуги разные. Угол, опирающийся на диаметр, равен 90°, даже если на чертеже так не кажется.</p>
+    <div class="hbtns"><button type="button" class="main" data-act="help-close">Понятно</button></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// Материал «Вписанные и центральные углы». Собран конструктором «Матшага» из materials/vpisannye-i-centralnye-ugly/ и core/.
+const SLUG = "vpisannye-i-centralnye-ugly";
+const META = {"title":"Вписанные и центральные углы","description":"Вписанные и центральные углы, угол между касательной и хордой: живой чертёж для доски, задачи на готовых чертежах, раздатка и тренажёр. Геометрия, 8 класс.","kicker":"8 класс · Геометрия · Мерзляк и др.","lead":"Тащим вершину по окружности — вписанный угол не меняется и всегда равен половине центрального.","modeBoard":"12 шагов с живым чертежом: точки двигаются по окружности, углы пересчитываются. Доказательство по трём случаям, угол на диаметр, другая дуга, касательная.","modePrint":"8 задач на готовых чертежах с кодовым словом, ключ по номеру варианта. Дополнительно — бланк ответов как в ОГЭ.","modeHome":"Три раздела: виды углов и дуги; одна дуга — разные углы; задачи ОГЭ. Подсказки и разбор каждой ошибки.","printTitle":"Раздатка: вписанные и центральные углы","homeTitle":"Тренировка: вписанные и центральные углы","homeIntro":"Выбери раздел. В каждом 10 задач на чертежах; после ошибки — разбор и новая задача того же вида."};
+// ---------- ядро: core/shell.js ----------
+// Общие константы, адрес материала, хранилище настроек. SLUG и META вставляет сборка.
+const MINUS = '−';
+
+const P = new URLSearchParams(location.search);
+const MODE = ['board', 'print', 'home'].includes(P.get('mode')) ? P.get('mode') : null;
+const PREVIEW = P.get('preview') === '1';
+// Ссылка для учеников (?mode=home&student=1): только тренажёр — без меню, доски и раздатки
+const STUDENT = P.get('student') === '1';
+const $ = id => document.getElementById(id);
+const store = {
+  get(k) { try { return localStorage.getItem('matshag:' + SLUG + ':' + k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem('matshag:' + SLUG + ':' + k, String(v)); } catch {} },
+};
+
+// Ссылка «← Назад на сайт» на стартовом экране: материал открыт с сайта (/zapusk/<slug>/ или /materials/<slug>.html)
+// ведёт на страницу материала /item/<slug>/. Скачанный файл и ссылка для учеников её не показывают.
+function siteHref() {
+  if (STUDENT || location.protocol === 'file:') return '';
+  let top = location;
+  try { if (window.top !== window && window.top.location.origin === location.origin) top = window.top.location; } catch {}
+  const z = top.pathname.match(/^(.*\/)zapusk\/([a-z0-9-]+)\/?$/);
+  if (z) return `${top.origin}${z[1]}item/${z[2]}/`;
+  const m = location.pathname.match(/^(.*\/)materials\/([a-z0-9-]+)\.html$/);
+  return m ? `${location.origin}${m[1]}item/${m[2]}/` : '';
+}
+
+// ================= Экраны =================
+let screen = null;
+function show(name) {
+  if (STUDENT && name !== 'home') return;
+  boardStopPreview();
+  screen = name;
+  ['start', 'board', 'print', 'home'].forEach(s => { $(s).hidden = s !== name; });
+  $('help').hidden = true;
+  if (name === 'board') renderBoard();
+  if (name === 'print') renderPrint();
+  if (name === 'home') homeSetup();
+}
+function toggleTheme() {
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+  store.set('theme', document.documentElement.dataset.theme);
+}
+async function toggleFull() {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch {}
+}
+
+
+// ---------- ядро: core/math.js ----------
+// ================= Точная арифметика: числа — несократимые дроби {n, d} =================
+const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b, a % b]; return a; };
+const Q = (n, d = 1) => { if (d < 0) { n = -n; d = -d; } const g = gcd(n, d) || 1; return { n: n / g, d: d / g }; };
+const qadd = (x, y) => Q(x.n * y.d + y.n * x.d, x.d * y.d);
+const qsub = (x, y) => Q(x.n * y.d - y.n * x.d, x.d * y.d);
+const qmul = (x, y) => Q(x.n * y.n, x.d * y.d);
+const qeq = (x, y) => !!x && !!y && x.n === y.n && x.d === y.d;
+const qneg = x => Q(-x.n, x.d);
+const isqrt = n => { if (n < 0) return null; const r = Math.round(Math.sqrt(n)); return r * r === n ? r : null; };
+const qsqrt = x => { const a = isqrt(x.n), b = isqrt(x.d); return a == null || b == null ? null : Q(a, b); };
+const floorSqrt = n => { let r = Math.floor(Math.sqrt(n)); while (r * r > n) r--; while ((r + 1) * (r + 1) <= n) r++; return r; };
+const toMixed = f => { const w = Math.floor(f.n / f.d); return { w, n: f.n - w * f.d, d: f.d }; };
+// конечная десятичная запись с запятой или null
+function decStr(x) {
+  for (let k = 0; k <= 8; k++) {
+    const m = x.n * 10 ** k;
+    if (m % x.d !== 0) continue;
+    const v = Math.abs(m / x.d), s = String(v).padStart(k + 1, '0');
+    return (x.n < 0 ? MINUS : '') + (k ? s.slice(0, -k) + ',' + s.slice(-k) : s);
+  }
+  return null;
+}
+
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const int = (rnd, a, b) => a + Math.floor(rnd() * (b - a + 1));
+const pick = (rnd, arr) => arr[Math.floor(rnd() * arr.length)];
+function shuffle(rnd, arr) {
+  const r = arr.slice();
+  for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
+  return r;
+}
+const taskRnd = (n, i, version = GEN_VERSION) => mulberry32(version * 1000003 + n * 7919 + i * 104729 + 1);
+const plural = (n, one, few, many) => {
+  const m10 = n % 10, m100 = n % 100;
+  return m10 === 1 && m100 !== 11 ? one : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? few : many;
+};
+
+// ================= Запись =================
+const F = f => `<span class="frac"><span>${f.n}</span><span>${f.d}</span></span>`;
+const M = m => m.w ? `<span class="mixed"><span class="w">${m.w}</span>${m.n ? F(m) : ''}</span>` : F(m);
+// корень: √ и черта над подкоренным выражением; tall — под корнем дробь
+const RT = (inner, tall) => `<span class="rt${tall ? ' tall' : ''}"><span class="rs">√</span><span class="rad">${inner}</span></span>`;
+const X = '<i>x</i>';
+const esc = s => String(s).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// число: style 'dec' — десятичной дробью, если она конечная; 'frac' — обыкновенной (смешанной)
+function htmlQ(x, style = 'dec') {
+  if (x.d === 1) return (x.n < 0 ? MINUS : '') + Math.abs(x.n);
+  const s = style === 'dec' && decStr(x);
+  if (s) return s;
+  const a = { n: Math.abs(x.n), d: x.d };
+  return (x.n < 0 ? MINUS : '') + (a.n > a.d ? M(toMixed(a)) : F(a));
+}
+function keyQ(x, style = 'dec') {
+  if (x.d === 1) return (x.n < 0 ? MINUS : '') + Math.abs(x.n);
+  const s = style === 'dec' && decStr(x);
+  if (s) return s;
+  const a = { n: Math.abs(x.n), d: x.d }, m = toMixed(a);
+  return (x.n < 0 ? MINUS : '') + (m.w ? m.w + ' ' : '') + m.n + '/' + m.d;
+}
+const sq2 = x => htmlQ(qmul(x, x));   // квадрат числа для проверки в объяснениях
+// десятичная дробь с одной-двумя цифрами после запятой — для подкоренных выражений
+const D = x => decStr(x) || htmlQ(x, 'frac');
+
+// Значение корня уравнения: {q} — рациональное число, {m, s} — s·√m, m не квадрат
+const V = {
+  q: q => ({ q }),
+  html: (v, style) => v.q ? htmlQ(v.q, style) : (v.s < 0 ? MINUS : '') + RT(v.m),
+  key: (v, style) => v.q ? keyQ(v.q, style) : (v.s < 0 ? MINUS : '') + '√' + v.m,
+  eq: (a, b) => a.q && b.q ? qeq(a.q, b.q) : !a.q && !b.q && a.m === b.m && a.s === b.s,
+};
+function eqRoots(a) {
+  if (a.n < 0) return [];
+  if (a.n === 0) return [V.q(Q(0))];
+  const s = qsqrt(a);
+  if (s) return [V.q(s), V.q(qneg(s))];
+  return [{ m: a.n, s: 1 }, { m: a.n, s: -1 }];   // a — целое, не квадрат
+}
+const eqKey = (R, style) => !R.length ? 'нет корней' : R.length === 1 ? V.key(R[0], style) : '±' + V.key(R[0], style);
+const eqHTML = (R, style) => `<span class="nw">${!R.length ? 'корней нет' : R.length === 1 ? `${X} = ${V.html(R[0], style)}` : `${X} = ±${V.html(R[0], style)}`}</span>`;
+
+// Ввод: «0,3», «12», «−5», «5/3», «1 2/3»
+function parseQ(s) {
+  const t = String(s).trim().replace(/[−–]/g, '-').replace(/\s+/g, ' ');
+  let m = t.match(/^(-)?(\d+) (\d+)\/(\d+)$/);
+  if (m) return +m[4] ? Q((m[1] ? -1 : 1) * (+m[2] * +m[4] + +m[3]), +m[4]) : null;
+  m = t.match(/^(-)?(\d+)\/(\d+)$/);
+  if (m) return +m[3] ? Q((m[1] ? -1 : 1) * +m[2], +m[3]) : null;
+  m = t.replace(/ /g, '').replace('.', ',').match(/^(-)?(\d*)(?:,(\d+))?$/);
+  if (!m || (!m[2] && !m[3])) return null;
+  const fr = m[3] || '', k = fr.length;
+  return Q((m[1] ? -1 : 1) * (+(m[2] || 0) * 10 ** k + +(fr || 0)), 10 ** k);
+}
+// корень уравнения: число или «√7», «−√7», «2√3»
+function parseVal(s) {
+  const t = String(s).trim().replace(/[−–]/g, '-').replace(/\s+/g, '');
+  const m = t.match(/^([+-])?(\d+)?√(\d+)$/);
+  if (!m) { const q = parseQ(s); return q ? V.q(q) : null; }
+  const k = +(m[2] || 1), sign = m[1] === '-' ? -1 : 1, under = k * k * +m[3];
+  const r = isqrt(under);
+  return r != null ? V.q(Q(sign * r)) : { m: under, s: sign };
+}
+
+// ---------- ядро: core/geom.js ----------
+// ================= 📐 Чертёжные помощники (GEO) =================
+// Всё в одном объекте GEO, чтобы не пересекаться с именами темы: const { pt, seg, vertex } = GEO.
+// Координаты — экранные координаты SVG (y вниз), по умолчанию рамка доски 980 × 400.
+// Углы — в градусах, «математические»: 0° — вправо, 90° — вверх, положительный поворот — против часовой стрелки.
+// Рисующие функции возвращают строку SVG; классы g-* описаны в base.css и читаются на проекторе.
+const GEO = (() => {
+  const BOX = { x: 0, y: 0, w: 980, h: 400 };
+  const f1 = n => Math.round(n * 10) / 10;
+  const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const snap = (v, step) => Math.round(v / step) * step;
+  const pt = (x, y) => ({ x, y });
+  const add = (p, q) => pt(p.x + q.x, p.y + q.y);
+  const sub = (p, q) => pt(p.x - q.x, p.y - q.y);
+  const scale = (v, k) => pt(v.x * k, v.y * k);
+  const len = v => Math.hypot(v.x, v.y);
+  const dist = (p, q) => Math.hypot(q.x - p.x, q.y - p.y);
+  const mid = (p, q) => pt((p.x + q.x) / 2, (p.y + q.y) / 2);
+  const lerp = (p, q, t) => pt(p.x + (q.x - p.x) * t, p.y + (q.y - p.y) * t);
+  const unit = (p, q) => { const d = dist(p, q) || 1; return pt((q.x - p.x) / d, (q.y - p.y) / d); };
+  const perp = v => pt(v.y, -v.x);                                   // поворот на 90° против часовой стрелки
+  const polar = (V, a, r) => pt(V.x + r * Math.cos(rad(a)), V.y - r * Math.sin(rad(a)));
+  // направление луча VP: 0…360°
+  const dirDeg = (V, P) => { const a = deg(Math.atan2(V.y - P.y, P.x - V.x)); return a < 0 ? a + 360 : a; };
+  // величина угла AVB: 0…180°
+  const angleAt = (V, A, B) => { let d = Math.abs(dirDeg(V, A) - dirDeg(V, B)); if (d > 180) d = 360 - d; return d; };
+  // поворот точки P вокруг C на a градусов
+  const turn = (P, C, a) => { const c = Math.cos(rad(a)), s = Math.sin(rad(a)), dx = P.x - C.x, dy = P.y - C.y; return pt(C.x + dx * c + dy * s, C.y - dx * s + dy * c); };
+  // проекция точки на прямую AB и отражение относительно неё
+  const project = (P, A, B) => { const d = sub(B, A), k = d.x * d.x + d.y * d.y || 1, t = ((P.x - A.x) * d.x + (P.y - A.y) * d.y) / k; return lerp(A, B, t); };
+  const reflect = (P, A, B) => { const F = project(P, A, B); return pt(2 * F.x - P.x, 2 * F.y - P.y); };
+  // точка пересечения прямых p1q1 и p2q2; null — прямые параллельны
+  function cross(p1, q1, p2, q2) {
+    const d1 = sub(q1, p1), d2 = sub(q2, p2), den = d1.x * d2.y - d1.y * d2.x;
+    if (Math.abs(den) < 1e-9) return null;
+    const t = ((p2.x - p1.x) * d2.y - (p2.y - p1.y) * d2.x) / den;
+    return pt(p1.x + t * d1.x, p1.y + t * d1.y);
+  }
+  // пересечение прямой PQ с окружностью (C, R): 0, 1 или 2 точки — по направлению от P к Q
+  function lineCircle(P, Q, C, R) {
+    const u = unit(P, Q), w = sub(C, P), b = w.x * u.x + w.y * u.y, disc = b * b - (w.x * w.x + w.y * w.y - R * R);
+    if (disc < -1e-9) return [];
+    const s = Math.sqrt(Math.max(0, disc));
+    return (s < 1e-9 ? [b] : [b - s, b + s]).map(t => add(P, scale(u, t)));
+  }
+  // пересечение окружностей (построения циркулем): 0, 1 или 2 точки
+  function circles(C1, R1, C2, R2) {
+    const d = dist(C1, C2);
+    if (d < 1e-9 || d > R1 + R2 + 1e-9 || d < Math.abs(R1 - R2) - 1e-9) return [];
+    const a = (R1 * R1 - R2 * R2 + d * d) / (2 * d), h = Math.sqrt(Math.max(0, R1 * R1 - a * a));
+    const M = lerp(C1, C2, a / d), n = perp(unit(C1, C2));
+    return h < 1e-9 ? [M] : [add(M, scale(n, h)), sub(M, scale(n, h))];
+  }
+  const area = ps => Math.abs(ps.reduce((s, p, i) => { const q = ps[(i + 1) % ps.length]; return s + p.x * q.y - q.x * p.y; }, 0)) / 2;
+  const centroid = ps => pt(ps.reduce((s, p) => s + p.x, 0) / ps.length, ps.reduce((s, p) => s + p.y, 0) / ps.length);
+  // ориентация тройки на экране: > 0 — A → B → C против часовой стрелки
+  const orient = (A, B, C) => -((B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x));
+  // многоугольник «нормальный» для показа: стороны не короче side, углы не меньше angle — контроль вырожденных случаев
+  function fine(ps, { side = 40, angle = 12 } = {}) {
+    return ps.every((p, i) => {
+      const prev = ps[(i + ps.length - 1) % ps.length], next = ps[(i + 1) % ps.length], a = angleAt(p, prev, next);
+      return dist(p, next) >= side && a >= angle && a <= 180 - angle;
+    });
+  }
+  const bbox = ps => { const xs = ps.map(p => p.x), ys = ps.map(p => p.y); return { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) }; };
+  const inBox = (p, pad = 0, box = BOX) => p.x >= box.x + pad && p.x <= box.x + box.w - pad && p.y >= box.y + pad && p.y <= box.y + box.h - pad;
+  const keepIn = (p, pad = 0, box = BOX) => pt(clamp(p.x, box.x + pad, box.x + box.w - pad), clamp(p.y, box.y + pad, box.y + box.h - pad));
+  // вписать точки модели (в своих единицах, y вверх или вниз) в рамку: map(p) → точка SVG, k — масштаб
+  function fit(ps, box = BOX, { pad = 30, flipY = false } = {}) {
+    const b = bbox(ps), k = Math.min((box.w - 2 * pad) / (b.w || 1), (box.h - 2 * pad) / (b.h || 1));
+    const cx = b.x + b.w / 2, cy = b.y + b.h / 2, X = box.x + box.w / 2, Y = box.y + box.h / 2;
+    return { k, map: p => pt(X + (p.x - cx) * k, Y + (flipY ? -1 : 1) * (p.y - cy) * k) };
+  }
+  // прямая через P и Q, обрезанная рамкой (отступ pad); луч — от P через Q до края
+  function clip(P, Q, pad = 20, box = BOX, ray = false) {
+    const d = sub(Q, P), ts = [];
+    if (Math.abs(d.x) > 1e-9) ts.push((box.x + pad - P.x) / d.x, (box.x + box.w - pad - P.x) / d.x);
+    if (Math.abs(d.y) > 1e-9) ts.push((box.y + pad - P.y) / d.y, (box.y + box.h - pad - P.y) / d.y);
+    const ok = ts.filter(t => inBox(add(P, scale(d, t)), pad - 0.01, box));
+    if (!ok.length) return [P, Q];
+    const t1 = Math.max(...ok), t0 = ray ? 0 : Math.min(...ok);
+    return [add(P, scale(d, t0)), add(P, scale(d, t1))];
+  }
+
+  // ---------- рисунок ----------
+  // имя точки с индексом: 'A1' → A₁ (подстрочная цифра)
+  function name(s) {
+    let out = '', down = false;
+    for (const ch of String(s)) {
+      if (ch >= '0' && ch <= '9') { out += `<tspan${down ? '' : ' dy="9"'} class="g-sub">${ch}</tspan>`; down = true; }
+      else { out += down ? `<tspan dy="-9">${ch}</tspan>` : ch; down = false; }
+    }
+    return out;
+  }
+  const seg = (p, q, cls = 'g-ln') => `<line class="${cls}" x1="${f1(p.x)}" y1="${f1(p.y)}" x2="${f1(q.x)}" y2="${f1(q.y)}"/>`;
+  const line = (p, q, cls = 'g-ln', pad = 20) => { const [a, b] = clip(p, q, pad); return seg(a, b, cls); };
+  const ray = (p, q, cls = 'g-ln', pad = 20) => { const [a, b] = clip(p, q, pad, BOX, true); return seg(a, b, cls); };
+  const pts = ps => ps.map(p => `${f1(p.x)},${f1(p.y)}`).join(' ');
+  const poly = (ps, cls = 'g-fig') => `<polygon class="${cls}" points="${pts(ps)}"/>`;
+  const path = (ps, cls = 'g-ln') => `<polyline class="${cls}" points="${pts(ps)}"/>`;
+  const circle = (C, r, cls = 'g-circ') => `<circle class="${cls}" cx="${f1(C.x)}" cy="${f1(C.y)}" r="${f1(r)}"/>`;
+  const dot = (p, cls = 'g-pt', r = 7) => circle(p, r, cls);
+  const text = (p, s, cls = 'g-lab', anchor = 'middle') => `<text class="${cls}" x="${f1(p.x)}" y="${f1(p.y)}" text-anchor="${anchor}" dominant-baseline="central">${s}</text>`;
+  // подпись вершины P на расстоянии r — в сторону от точки from (обычно центр фигуры): подписи не налезают на стороны
+  // и на ручку живой доски в вершине
+  const vertex = (P, s, from, r = 46, cls = 'g-vl') => text(add(P, scale(unit(from, P), r)), name(s), cls);
+  // подпись стороны pq у её середины — снаружи от точки opp
+  function side(p, q, s, opp, r = 30, cls = 'g-num') {
+    const m = mid(p, q), n = perp(unit(p, q)), out = ((m.x - opp.x) * n.x + (m.y - opp.y) * n.y) >= 0 ? 1 : -1;
+    return text(add(m, scale(n, r * out)), s, cls);
+  }
+  // меньший угол AVB: [начало, конец] в градусах, конец > начала
+  function span(V, A, B) {
+    const a = dirDeg(V, A), b = dirDeg(V, B), d = (b - a + 360) % 360;
+    return d <= 180 ? [a, a + d] : [b, b + 360 - d];
+  }
+  const arcD = (V, s, e, r) => { const p = polar(V, s, r), q = polar(V, e, r); return `M${f1(p.x)} ${f1(p.y)}A${f1(r)} ${f1(r)} 0 ${e - s > 180 ? 1 : 0} 0 ${f1(q.x)} ${f1(q.y)}`; };
+  // дуга окружности с центром V от направления s до e (градусы, против часовой стрелки)
+  const arc = (V, s, e, r, cls = 'g-mark') => `<path class="${cls}" d="${arcD(V, s, e, r)}"/>`;
+  // закрашенный угол AVB (меньший), радиус r
+  const sector = (V, A, B, r = 60, cls = 'g-sec') => { const [s, e] = span(V, A, B); return `<path class="${cls}" d="M${f1(V.x)} ${f1(V.y)}L${arcD(V, s, e, r).slice(1)}Z"/>`; };
+  // n дужек равенства угла AVB
+  const arcs = (V, A, B, n = 1, r = 26, cls = 'g-mark') => { const [s, e] = span(V, A, B); let o = ''; for (let i = 0; i < n; i++) o += arc(V, s, e, r + i * 9, cls); return o; };
+  // знак прямого угла AVB
+  const right = (V, A, B, size = 22, cls = 'g-mark') => { const u = scale(unit(V, A), size), w = scale(unit(V, B), size); return path([add(V, u), add(add(V, u), w), add(V, w)], cls); };
+  // n штрихов равенства на отрезке pq
+  function ticks(p, q, n = 1, cls = 'g-tick') {
+    const d = unit(p, q), m = mid(p, q), k = perp(d);
+    let o = '';
+    for (let i = 0; i < n; i++) { const c = add(m, scale(d, (i - (n - 1) / 2) * 11)); o += seg(add(c, scale(k, 11)), sub(c, scale(k, 11)), cls); }
+    return o;
+  }
+  // подпись угла AVB на биссектрисе; у острого угла — дальше от вершины, чтобы число поместилось
+  function angleText(V, A, B, s, r = 0, cls = 'g-num') {
+    const [a, e] = span(V, A, B), rr = r || clamp(34 / Math.sin(rad(Math.max(e - a, 8) / 2)), 58, 130);
+    return text(polar(V, (a + e) / 2, rr), s, cls);
+  }
+  // стрелка от p к q (наконечник — треугольник)
+  function arrow(p, q, cls = 'g-arrow', head = 18) {
+    const d = unit(p, q), n = perp(d), b = sub(q, scale(d, head));
+    return `<g class="${cls}">${seg(p, b, '')}${poly([q, add(b, scale(n, head * .55)), sub(b, scale(n, head * .55))], '')}</g>`;
+  }
+  // знак параллельности: n уголков-стрелок посередине прямой pq
+  function parallel(p, q, n = 1, cls = 'g-mark') {
+    const d = unit(p, q), k = perp(d), m = mid(p, q);
+    let o = '';
+    for (let i = 0; i < n; i++) { const c = add(m, scale(d, (i - (n - 1) / 2) * 13 + 6)); o += path([add(sub(c, scale(d, 12)), scale(k, 10)), c, sub(sub(c, scale(d, 12)), scale(k, 10))], cls); }
+    return o;
+  }
+
+  return {
+    BOX, f1, rad, deg, clamp, snap, pt, add, sub, scale, len, dist, mid, lerp, unit, perp, polar, dirDeg, angleAt, turn,
+    project, reflect, cross, lineCircle, circles, area, centroid, orient, fine, bbox, inBox, keepIn, fit, clip,
+    name, seg, line, ray, poly, path, circle, dot, text, vertex, side, span, arc, sector, arcs, right, ticks, angleText, arrow, parallel,
+  };
+})();
+
+
+// ---------- тема: materials/vpisannye-i-centralnye-ugly/topic.js ----------
+// Тема «Вписанные и центральные углы»: живой чертёж — точки A, B, C двигаются по окружности,
+// вписанный угол измеряется на чертеже и сравнивается с центральным и с дугой.
+// Задачи — на готовых чертежах (как в ОГЭ): углы в градусах, ответ — целое число.
+
+// ================= Параметры =================
+const CONFIG = {
+  board: {
+    a: 220, b: 320, c: 125,  // первый пример: дуга AB = 100°, вписанный угол 50°
+    previewDelay: 2200,
+  },
+  print: { variants: 25, traps: 1, space: false },
+  home: { round: 10, points: [10, 15, 20], hintPenalty: 3, maxMultiplier: 3 },
+};
+const GEN_VERSION = 1;
+
+// ================= Задачи на готовых чертежах =================
+const bad = (cat, msg) => ({ cat, msg });
+const vaR = (d, k = 28, lo = 46, hi = 85) => GEO.clamp(k / Math.sin(GEO.rad(Math.max(d, 8) / 2)), lo, hi);   // радиус подписи угла
+// Чертёж задачи: точки на окружности по направлениям (градусы, повёрнуты на rot), отрезки, отмеченные углы.
+// spec: { rot, pts: { A: 200, … }, inner: { K: [направление, доля радиуса] }, segs: ['AB', …],
+//   angles: [['C', 'A', 'B', '40°'], …], arc: ['A', 'B', 'подпись'] (дуга от A к B против часовой), tan: ['A', 'K', 'B'] }
+function vaTaskSVG(spec, label) {
+  const O = GEO.pt(200, 150), R = 105, rot = spec.rot || 0, P = { O };
+  for (const [k, d] of Object.entries(spec.pts)) P[k] = GEO.polar(O, d + rot, R);
+  for (const [k, [d, f]] of Object.entries(spec.inner || {})) P[k] = GEO.polar(O, d + rot, R * f);
+  let back = GEO.circle(O, R, 'va-c'), lines = '', marks = '', labs = '';
+  if (spec.arc) {
+    const [p, q, s] = spec.arc, a0 = GEO.dirDeg(O, P[p]), a1 = a0 + (GEO.dirDeg(O, P[q]) - a0 + 360) % 360;
+    back += GEO.arc(O, a0, a1, R, 'va-arc-t');
+    labs += GEO.text(GEO.polar(O, (a0 + a1) / 2, R + 30), s, 'va-n');
+  }
+  if (spec.tan) {   // касательная в точке tan[0], точка tan[1] на ней — со стороны точки tan[2]
+    const [a, k, b] = spec.tan, A = P[a];
+    let t = GEO.perp(GEO.unit(O, A));
+    if ((P[b].x - A.x) * t.x + (P[b].y - A.y) * t.y < 0) t = GEO.scale(t, -1);
+    P[k] = GEO.add(A, GEO.scale(t, 110));
+    lines += GEO.seg(GEO.sub(A, GEO.scale(t, 120)), GEO.add(A, GEO.scale(t, 120)), 'va-l');
+  }
+  for (const s of spec.segs) lines += GEO.seg(P[s[0]], P[s[1]], 'va-l');
+  const near = [];   // подписи углов рядом с центром — подпись O их обходит
+  for (const [v, a, b, s, n = 1] of spec.angles || []) {
+    const d = GEO.angleAt(P[v], P[a], P[b]), [s0, s1] = GEO.span(P[v], P[a], P[b]);
+    const at = GEO.polar(P[v], (s0 + s1) / 2, v === 'O' ? 48 : vaR(d, 30, 44, 60));
+    marks += Math.abs(d - 90) < 1e-6 ? GEO.right(P[v], P[a], P[b], 14, 'va-m') : GEO.arcs(P[v], P[a], P[b], n, 18, 'va-m');
+    if (s) labs += GEO.text(at, s, s === '?' ? 'va-n q' : 'va-n');
+    if (s && GEO.dist(O, at) < 90) near.push(GEO.dirDeg(O, at));
+  }
+  let dots = '';
+  for (const k of Object.keys(P)) {
+    if (k === 'O' && !spec.center) continue;
+    dots += GEO.dot(P[k], 'va-p', 4);
+    if (k === 'O') {   // подпись центра — в сторону, свободную от отрезков
+      const busy = Object.keys(P).filter(x => x !== 'O').flatMap(x => [GEO.dirDeg(O, P[x]), GEO.dirDeg(O, P[x]) + 180]).concat(near, near);
+      let best = 0, far = -1;
+      for (let d = 0; d < 360; d += 15) { const f = Math.min(...busy.map(b => Math.min((d - b + 720) % 360, (b - d + 720) % 360))); if (f > far) { far = f; best = d; } }
+      labs += GEO.text(GEO.polar(O, best, 26), 'O', 'va-v');
+    } else labs += GEO.vertex(P[k], k, spec.inner?.[k] ? GEO.mid(P.A, P.B) : O, 26, 'va-v');
+  }
+  return `<svg class="va-task" viewBox="-5 -15 410 330" role="img" aria-label="${label}">${back}${lines}${marks}${dots}${labs}</svg>`;
+}
+const vaTraps = (ns, answer) => [...new Set(ns)].filter(n => n !== answer && n > 0 && n < 360).map(n => ({ key: String(n), html: String(n) }));
+const vaQ = s => `<p class="va-q">${s}</p>`;
+// ошибка в числовой задаче: известные неверные ответы → категория и объяснение
+function vaWrong(T, t, x, cases) {
+  for (const [v, cat, msg] of cases) if (qeq(x, Q(v))) return bad(cat, `${msg} ${T.ok(t)}`);
+  return bad('calc', T.ok(t));
+}
+const vaRot = rnd => int(rnd, 0, 23) * 15;
+
+const TYPES = {
+  kind: {
+    input: 'choice', title: 'Вид угла', options: [['cen', 'Центральный'], ['ins', 'Вписанный'], ['no', 'Ни тот, ни другой']],
+    gen: rnd => ({ form: pick(rnd, ['cen', 'ins', 'no']), x: int(rnd, 3, 7) * 10, rot: vaRot(rnd), j: int(rnd, -25, 25) }),
+    fig(t) {
+      const V = { cen: 'O', ins: 'C', no: 'K' }[t.form], pts = { A: 270 - t.x, B: 270 + t.x };
+      const spec = { rot: t.rot, pts, segs: [V + 'A', V + 'B'], angles: [[V, 'A', 'B', '']], center: true };
+      if (t.form === 'ins') pts.C = 90 + t.j;
+      if (t.form === 'no') spec.inner = { K: [90 + t.j, .5] };
+      return vaTaskSVG(spec, 'Угол с вершиной ' + V);
+    },
+    vertex: t => ({ cen: 'O', ins: 'C', no: 'K' })[t.form],
+    text: t => `∠A${TYPES.kind.vertex(t)}B`,
+    ask: t => TYPES.kind.fig(t) + vaQ(`O — центр окружности. Каким является угол A${TYPES.kind.vertex(t)}B?`),
+    sheet: t => TYPES.kind.fig(t) + `<p>O — центр. Каким является ∠A${TYPES.kind.vertex(t)}B?</p>`,
+    ans: t => t.form,
+    key: t => ({ cen: 'центральный', ins: 'вписанный', no: 'ни тот, ни другой' })[t.form],
+    keyHTML: t => TYPES.kind.key(t),
+    ok: t => ({
+      cen: 'Вершина угла — в центре окружности O, поэтому угол AOB центральный.',
+      ins: 'Вершина C лежит на окружности, а стороны пересекают окружность в точках A и B — угол ACB вписанный.',
+      no: 'Вершина K лежит внутри круга, но не в центре и не на окружности: угол AKB ни центральный, ни вписанный.',
+    })[t.form],
+    wrong: t => bad('kind', `${TYPES.kind.ok(t)} Центральный угол — вершина в центре; вписанный — вершина на окружности, стороны пересекают окружность. Здесь дуга AB = ${2 * t.x}°: центральный угол на неё равен ${2 * t.x}°, вписанный — ${t.x}°.`),
+    traps: t => ['центральный', 'вписанный', 'ни тот, ни другой'].filter(s => s !== TYPES.kind.key(t)).map(key => ({ key, html: key })),
+    hints: () => ['Посмотри, где вершина угла: в центре, на окружности или в другом месте.', 'Центральный — вершина в точке O. Вписанный — вершина на самой окружности.'],
+  },
+  ins: {
+    input: 'num', title: 'Вписанный по центральному',
+    gen: rnd => ({ x: int(rnd, 15, 80), rot: vaRot(rnd), j: pick(rnd, [-1, 1]) * int(rnd, 12, 32) }),
+    fig: t => vaTaskSVG({ rot: t.rot, pts: { A: 270 - t.x, B: 270 + t.x, C: 90 + t.j }, segs: ['OA', 'OB', 'CA', 'CB'], center: true,
+      angles: [['O', 'A', 'B', 2 * t.x + '°'], ['C', 'A', 'B', '?']] }, 'Окружность с центром O, углы AOB и ACB'),
+    text: () => '∠ACB',
+    ask: t => TYPES.ins.fig(t) + vaQ(`O — центр окружности, ∠AOB = ${2 * t.x}°. Найди ∠ACB.`),
+    sheet: t => TYPES.ins.fig(t) + `<p>O — центр, ∠AOB = ${2 * t.x}°. ∠ACB = ?</p>`,
+    ans: t => Q(t.x),
+    ok: t => `∠ACB — вписанный, ∠AOB — центральный, оба опираются на дугу AB. Вписанный угол равен половине центрального: ${2 * t.x}° : 2 = ${t.x}°.`,
+    wrong(t, x) {
+      return vaWrong(TYPES.ins, t, x, [[2 * t.x, 'equal', 'Ты приравнял вписанный угол к центральному.'], [4 * t.x, 'double', 'Ты удвоил угол, а вписанный — половина центрального.'],
+        [180 - t.x, 'arc', 'Это вписанный угол на другую дугу AB, а вершина C лежит на большей дуге.']]);
+    },
+    traps: t => vaTraps([2 * t.x, 180 - t.x, 4 * t.x], t.x),
+    hints: t => ['Какой из углов центральный, а какой вписанный? Опираются ли они на одну дугу?', `Вписанный угол равен половине центрального: ${2 * t.x}° : 2.`],
+  },
+  cen: {
+    input: 'num', title: 'Центральный по вписанному',
+    gen: rnd => ({ x: int(rnd, 15, 85), rot: vaRot(rnd), j: pick(rnd, [-1, 1]) * int(rnd, 12, 32) }),
+    fig: t => vaTaskSVG({ rot: t.rot, pts: { A: 270 - t.x, B: 270 + t.x, C: 90 + t.j }, segs: ['OA', 'OB', 'CA', 'CB'], center: true,
+      angles: [['O', 'A', 'B', '?'], ['C', 'A', 'B', t.x + '°']] }, 'Окружность с центром O, углы ACB и AOB'),
+    text: () => '∠AOB',
+    ask: t => TYPES.cen.fig(t) + vaQ(`O — центр окружности, ∠ACB = ${t.x}°. Найди ∠AOB.`),
+    sheet: t => TYPES.cen.fig(t) + `<p>O — центр, ∠ACB = ${t.x}°. ∠AOB = ?</p>`,
+    ans: t => Q(2 * t.x),
+    ok: t => `∠AOB — центральный, ∠ACB — вписанный, оба опираются на дугу AB. Центральный угол вдвое больше: 2 · ${t.x}° = ${2 * t.x}°.`,
+    wrong(t, x) {
+      return vaWrong(TYPES.cen, t, x, [[t.x, 'equal', 'Ты приравнял центральный угол к вписанному.'], [t.x / 2, 'double', 'Ты разделил на 2, а центральный угол вдвое больше вписанного.'],
+        [360 - 2 * t.x, 'arc', 'Это бо́льшая дуга AB, а угол AOB опирается на меньшую.']]);
+    },
+    traps: t => vaTraps([t.x, t.x / 2, 180 - t.x].filter(Number.isInteger), 2 * t.x),
+    hints: () => ['Оба угла опираются на дугу AB. Какой из них больше?', 'Центральный угол в 2 раза больше вписанного.'],
+  },
+  arc: {
+    input: 'num', title: 'Угол и дуга',
+    // дуга AB (против часовой от A к B), на которую опирается ∠ACB; C — на другой дуге. Дуга может быть больше 180°
+    gen: (rnd, form) => ({ form: form || pick(rnd, ['toIns', 'toArc']), arc: int(rnd, 4, 26) * 10, rot: vaRot(rnd), j: int(rnd, -15, 15) }),
+    bad: t => t.arc === 180,
+    fig(t) {
+      const a = 270 - t.arc / 2, b = 270 + t.arc / 2;
+      return vaTaskSVG({ rot: t.rot, pts: { A: a, B: b, C: b + (360 - t.arc) / 2 + t.j * (360 - t.arc) / 90 }, segs: ['CA', 'CB'],
+        arc: ['A', 'B', t.form === 'toIns' ? t.arc + '°' : '?'], angles: [['C', 'A', 'B', t.form === 'toIns' ? '?' : t.arc / 2 + '°']] }, 'Вписанный угол ACB и дуга AB');
+    },
+    text: t => t.form === 'toIns' ? '∠ACB' : 'дуга AB',
+    ask: t => TYPES.arc.fig(t) + vaQ(t.form === 'toIns' ? `Градусная мера дуги AB, отмеченной на чертеже, равна ${t.arc}°. Найди ∠ACB.` : `∠ACB = ${t.arc / 2}°. Найди градусную меру отмеченной дуги AB.`),
+    sheet: t => TYPES.arc.fig(t) + (t.form === 'toIns' ? `<p>Дуга AB = ${t.arc}°. ∠ACB = ?</p>` : `<p>∠ACB = ${t.arc / 2}°. Отмеченная дуга AB = ?</p>`),
+    ans: t => Q(t.form === 'toIns' ? t.arc / 2 : t.arc),
+    ok: t => `Вписанный угол равен половине дуги, на которую он опирается: ` + (t.form === 'toIns' ? `${t.arc}° : 2 = ${t.arc / 2}°.` : `дуга AB = 2 · ${t.arc / 2}° = ${t.arc}°.`),
+    wrong(t, x) {
+      const o = 360 - t.arc;
+      return vaWrong(TYPES.arc, t, x, t.form === 'toIns'
+        ? [[t.arc, 'equal', 'Ты приравнял вписанный угол к дуге. Дуге равен центральный угол, а вписанный — её половина.'], [o / 2, 'arc', `Ты взял другую дугу (${o}°). Угол ACB опирается на дугу, которая лежит внутри него.`]]
+        : [[t.arc / 2, 'equal', 'Ты приравнял дугу к вписанному углу.'], [t.arc / 4, 'double', 'Ты разделил на 2, а дуга вдвое больше вписанного угла.'], [o, 'arc', 'Это другая дуга AB — та, на которой лежит C.']]);
+    },
+    traps: t => t.form === 'toIns' ? vaTraps([t.arc, (360 - t.arc) / 2], t.arc / 2) : vaTraps([t.arc / 2, 360 - t.arc], t.arc),
+    hints: t => ['Найди дугу, которая лежит внутри угла ACB, — на неё он опирается.', t.form === 'toIns' ? `Вписанный угол — половина дуги: ${t.arc}° : 2.` : `Дуга вдвое больше вписанного угла: 2 · ${t.arc / 2}°.`],
+  },
+  same: {
+    input: 'num', title: 'Углы на одну дугу',
+    gen: rnd => ({ x: int(rnd, 20, 80), rot: vaRot(rnd), j: int(rnd, 25, 45) }),
+    fig: t => vaTaskSVG({ rot: t.rot, pts: { A: 270 - t.x, B: 270 + t.x, C: 90 + t.j, D: 90 - t.j }, segs: ['CA', 'CB', 'DA', 'DB'],
+      angles: [['C', 'A', 'B', t.x + '°'], ['D', 'A', 'B', '?', 2]] }, 'Вписанные углы ACB и ADB'),
+    text: () => '∠ADB',
+    ask: t => TYPES.same.fig(t) + vaQ(`Точки A, B, C, D лежат на окружности, ∠ACB = ${t.x}°. Найди ∠ADB.`),
+    sheet: t => TYPES.same.fig(t) + `<p>∠ACB = ${t.x}°. ∠ADB = ?</p>`,
+    ans: t => Q(t.x),
+    ok: t => `∠ACB и ∠ADB — вписанные, C и D лежат по одну сторону от хорды AB, углы опираются на одну дугу AB. Такие углы равны: ∠ADB = ${t.x}°.`,
+    wrong(t, x) {
+      return vaWrong(TYPES.same, t, x, [[2 * t.x, 'double', 'Ты удвоил угол — так находят центральный угол, а здесь оба угла вписанные.'], [180 - t.x, 'arc', 'Сумма 180° — у вписанных углов по разные стороны от хорды AB, а C и D лежат по одну сторону.']]);
+    },
+    traps: t => vaTraps([2 * t.x, 180 - t.x], t.x),
+    hints: () => ['Оба угла вписанные. На какие дуги они опираются?', 'Вписанные углы, опирающиеся на одну дугу, равны.'],
+  },
+  opp: {
+    input: 'num', title: 'Вершины по разные стороны хорды',
+    gen: rnd => ({ x: int(rnd, 25, 80), rot: vaRot(rnd), j: int(rnd, -25, 25), k: int(rnd, -6, 6) }),
+    fig: t => vaTaskSVG({ rot: t.rot, pts: { A: 270 - t.x, B: 270 + t.x, C: 90 + t.j, D: 270 + t.k * t.x / 20 }, segs: ['CA', 'CB', 'DA', 'DB'],
+      angles: [['C', 'A', 'B', t.x + '°'], ['D', 'A', 'B', '?', 2]] }, 'Вписанные углы ACB и ADB по разные стороны от AB'),
+    text: () => '∠ADB',
+    ask: t => TYPES.opp.fig(t) + vaQ(`Точки A, B, C, D лежат на окружности, C и D — по разные стороны от хорды AB. ∠ACB = ${t.x}°. Найди ∠ADB.`),
+    sheet: t => TYPES.opp.fig(t) + `<p>∠ACB = ${t.x}°. ∠ADB = ?</p>`,
+    ans: t => Q(180 - t.x),
+    ok: t => `∠ACB опирается на дугу AB, равную 2 · ${t.x}° = ${2 * t.x}°. ∠ADB опирается на другую дугу: 360° − ${2 * t.x}° = ${360 - 2 * t.x}°, поэтому ∠ADB = ${360 - 2 * t.x}° : 2 = ${180 - t.x}°. Короче: ∠ACB + ∠ADB = 180°.`,
+    wrong(t, x) {
+      return vaWrong(TYPES.opp, t, x, [[t.x, 'arc', 'Углы равны, только если вершины по одну сторону от хорды. Здесь C и D по разные стороны.'], [2 * t.x, 'double', 'Ты нашёл дугу, на которую опирается ∠ACB.']]);
+    },
+    traps: t => vaTraps([t.x, 2 * t.x], 180 - t.x),
+    hints: () => ['C и D по разные стороны от AB: углы опираются на разные дуги, вместе дуги дают 360°.', 'Сумма таких вписанных углов равна 360° : 2 = 180°.'],
+  },
+  diam: {
+    input: 'num', title: 'Угол, опирающийся на диаметр',
+    gen: rnd => ({ x: int(rnd, 15, 75), rot: vaRot(rnd), j: int(rnd, 30, 150) }),
+    bad: t => t.x === 45 || t.x === 30 || t.x === 60,
+    // AB — диаметр, C на окружности так, что ∠ABC = x: дуга AC = 2x
+    fig: t => vaTaskSVG({ rot: t.rot, pts: { A: 180, B: 0, C: 180 - 2 * t.x }, segs: ['AB', 'CA', 'CB'], center: true,
+      angles: [['B', 'A', 'C', t.x + '°'], ['A', 'B', 'C', '?', 2]] }, 'AB — диаметр, треугольник ABC'),
+    text: () => '∠BAC',
+    ask: t => TYPES.diam.fig(t) + vaQ(`AB — диаметр окружности, C — точка окружности, ∠ABC = ${t.x}°. Найди ∠BAC.`),
+    sheet: t => TYPES.diam.fig(t) + `<p>AB — диаметр, ∠ABC = ${t.x}°. ∠BAC = ?</p>`,
+    ans: t => Q(90 - t.x),
+    ok: t => `∠ACB опирается на диаметр AB, поэтому ∠ACB = 90°. В треугольнике ABC: ∠BAC = 180° − 90° − ${t.x}° = ${90 - t.x}°.`,
+    wrong(t, x) {
+      return vaWrong(TYPES.diam, t, x, [[180 - t.x, 'diam', 'Ты не учёл угол C. Он опирается на диаметр и равен 90°.'], [t.x, 'diam', 'Треугольник ABC не равнобедренный: углы A и B не обязаны быть равны.'],
+        [90 + t.x, 'calc', 'Сумма углов треугольника 180°, а не 90° + ∠B.']]);
+    },
+    traps: t => vaTraps([180 - t.x, t.x, 2 * t.x], 90 - t.x),
+    hints: () => ['Чему равен угол ACB, если он опирается на диаметр?', '∠ACB = 90°. Дальше — сумма углов треугольника ABC.'],
+  },
+  iso: {
+    input: 'num', title: 'Угол при основании треугольника AOB',
+    gen: rnd => ({ x: int(rnd, 20, 80), rot: vaRot(rnd), j: pick(rnd, [-1, 1]) * int(rnd, 12, 32) }),
+    bad: t => t.x === 30 || t.x === 45 || t.x === 60,
+    fig: t => vaTaskSVG({ rot: t.rot, pts: { A: 270 - t.x, B: 270 + t.x, C: 90 + t.j }, segs: ['CA', 'CB', 'OA', 'OB', 'AB'], center: true,
+      angles: [['C', 'A', 'B', t.x + '°'], ['A', 'O', 'B', '?', 2]] }, 'Вписанный угол ACB и треугольник AOB'),
+    text: () => '∠OAB',
+    ask: t => TYPES.iso.fig(t) + vaQ(`O — центр окружности, ∠ACB = ${t.x}°. Найди ∠OAB.`),
+    sheet: t => TYPES.iso.fig(t) + `<p>O — центр, ∠ACB = ${t.x}°. ∠OAB = ?</p>`,
+    ans: t => Q(90 - t.x),
+    ok: t => `Центральный ∠AOB = 2 · ${t.x}° = ${2 * t.x}°. OA = OB как радиусы, треугольник AOB равнобедренный: ∠OAB = (180° − ${2 * t.x}°) : 2 = ${90 - t.x}°.`,
+    wrong(t, x) {
+      return vaWrong(TYPES.iso, t, x, [[2 * t.x, 'iso', 'Ты нашёл ∠AOB, а нужен угол OAB при основании.'], [180 - 2 * t.x, 'iso', 'Ты нашёл сумму двух углов при основании; раздели её пополам.'],
+        [t.x, 'equal', 'Угол OAB не равен вписанному углу.'], [90 - t.x / 2, 'equal', 'Ты взял ∠AOB = ∠ACB, а центральный угол вдвое больше вписанного.']].filter(([v]) => Number.isInteger(v)));
+    },
+    traps: t => vaTraps([2 * t.x, 180 - 2 * t.x, t.x], 90 - t.x),
+    hints: t => ['Сначала найди центральный угол AOB.', `∠AOB = ${2 * t.x}°. Треугольник AOB равнобедренный: OA = OB.`],
+  },
+  diam2: {
+    input: 'num', title: 'Два диаметра',
+    gen: rnd => ({ x: int(rnd, 10, 80), rot: vaRot(rnd) }),
+    bad: t => t.x === 45 || t.x === 60,
+    // AC и BD — диаметры; ∠ACB вписанный, опирается на дугу AB = 2x
+    fig: t => vaTaskSVG({ rot: t.rot, pts: { A: 270 - t.x, B: 270 + t.x, C: 90 - t.x, D: 90 + t.x }, segs: ['AC', 'BD', 'CB'], center: true,
+      angles: [['C', 'A', 'B', t.x + '°'], ['O', 'A', 'D', '?', 2]] }, 'Диаметры AC и BD'),
+    text: () => '∠AOD',
+    ask: t => TYPES.diam2.fig(t) + vaQ(`AC и BD — диаметры окружности с центром O, ∠ACB = ${t.x}°. Найди ∠AOD.`),
+    sheet: t => TYPES.diam2.fig(t) + `<p>AC и BD — диаметры, ∠ACB = ${t.x}°. ∠AOD = ?</p>`,
+    ans: t => Q(180 - 2 * t.x),
+    ok: t => `∠ACB — вписанный, опирается на дугу AB, поэтому центральный ∠AOB = 2 · ${t.x}° = ${2 * t.x}°. BD — диаметр, углы AOB и AOD смежные: ∠AOD = 180° − ${2 * t.x}° = ${180 - 2 * t.x}°.`,
+    wrong(t, x) {
+      return vaWrong(TYPES.diam2, t, x, [[2 * t.x, 'adj', 'Ты нашёл ∠AOB, а нужен смежный с ним угол AOD.'], [180 - t.x, 'equal', 'Ты взял ∠AOB = ∠ACB, а центральный угол вдвое больше вписанного.']]);
+    },
+    traps: t => vaTraps([2 * t.x, 180 - t.x], 180 - 2 * t.x),
+    hints: () => ['Найди центральный угол, опирающийся на ту же дугу, что и ∠ACB.', 'Углы AOB и AOD смежные: в сумме 180°.'],
+  },
+  tan: {
+    input: 'num', title: 'Касательная и хорда',
+    gen: rnd => ({ x: int(rnd, 28, 80), rot: vaRot(rnd) }),
+    bad: t => t.x === 45,
+    fig: t => vaTaskSVG({ rot: t.rot, pts: { A: 270 - t.x, B: 270 + t.x }, tan: ['A', 'K', 'B'], segs: ['OA', 'OB', 'AB'], center: true,
+      angles: [['O', 'A', 'B', 2 * t.x + '°'], ['A', 'K', 'B', '?', 2]] }, 'Касательная AK и хорда AB'),
+    text: () => '∠KAB',
+    ask: t => TYPES.tan.fig(t) + vaQ(`AK — касательная к окружности с центром O, ∠AOB = ${2 * t.x}°. Найди угол KAB между касательной и хордой.`),
+    sheet: t => TYPES.tan.fig(t) + `<p>AK — касательная, ∠AOB = ${2 * t.x}°. ∠KAB = ?</p>`,
+    ans: t => Q(t.x),
+    ok: t => `Угол между касательной и хордой равен половине дуги, заключённой внутри него: дуга AB = ∠AOB = ${2 * t.x}°, ∠KAB = ${t.x}°. Проверка: ∠OAK = 90°, ∠OAB = (180° − ${2 * t.x}°) : 2 = ${90 - t.x}°, ∠KAB = 90° − ${90 - t.x}° = ${t.x}°.`,
+    wrong(t, x) {
+      return vaWrong(TYPES.tan, t, x, [[2 * t.x, 'tan', 'Ты приравнял угол к дуге, а он равен её половине.'], [90 - t.x, 'tan', 'Ты нашёл ∠OAB, а не угол между касательной и хордой.'], [90 + t.x, 'tan', 'Касательная перпендикулярна радиусу OA: ∠KAB = 90° − ∠OAB.']]);
+    },
+    traps: t => vaTraps([2 * t.x, 90 - t.x], t.x),
+    hints: () => ['Угол между касательной и хордой — как вписанный: половина дуги внутри него.', 'Дуга AB равна центральному углу AOB. Возьми её половину.'],
+  },
+};
+
+// ответ в разборе — с градусами: «∠ACB = 40°»
+for (const T of Object.values(TYPES)) if (T.input === 'num') T.answer = t => `${T.text(t)} = ${T.ans(t).n}°`;
+
+// Типы ошибок для «Над чем поработать»
+const CATS = {
+  equal: ['Вписанный угол приравняли к центральному', 'Центральный угол равен дуге, вписанный — половине дуги, на которую опирается.'],
+  double: ['Половина или удвоение', 'Центральный угол вдвое больше вписанного; вписанные углы на одну дугу равны.'],
+  arc: ['Не та дуга', 'Угол опирается на дугу внутри него. Вершины по разные стороны хорды — углы в сумме дают 180°.'],
+  diam: ['Угол, опирающийся на диаметр', 'Вписанный угол, опирающийся на диаметр, равен 90°.'],
+  iso: ['Равнобедренный треугольник с радиусами', 'OA = OB как радиусы: углы при основании равны (180° − ∠AOB) : 2.'],
+  adj: ['Смежные углы', 'Если BD — диаметр, углы AOB и AOD смежные: в сумме 180°.'],
+  tan: ['Касательная и хорда', 'Угол между касательной и хордой равен половине дуги внутри него; касательная ⟂ радиусу.'],
+  kind: ['Вид угла', 'Центральный — вершина в центре; вписанный — вершина на окружности, стороны пересекают окружность.'],
+  calc: ['Вычисления', 'Проверь, какую дугу ты взял, и пересчитай.'],
+};
+
+const SECTIONS = [
+  { title: 'Виды углов и дуги', text: 'Центральный, вписанный, дуга', types: ['kind', 'ins', 'cen', 'arc'], ex: () => 'найди угол по центральному углу или по дуге', exText: true },
+  { title: 'Одна дуга — разные углы', text: 'Равные углы, сумма 180°, диаметр', types: ['same', 'opp', 'diam'], ex: () => 'углы на одну дугу и на диаметр', exText: true },
+  { title: 'Задачи ОГЭ', text: 'Радиусы, диаметры, касательная', types: ['iso', 'diam2', 'tan'], ex: () => 'два шага: центральный угол, затем треугольник', exText: true },
+];
+
+// ================= Раздатка и бланк =================
+const KINDS_V1 = [['ins'], ['cen'], ['arc'], ['same'], ['diam'], ['iso'], ['diam2'], ['kind']];
+const WORDS_V1 = ['ТРАПЕЦИЯ', 'ДОКУМЕНТ', 'ГРУЗОВИК', 'КОНДИТЕР'];
+const PRINT = {
+  instr: 'В № 1–7 ответ — величина угла или дуги в градусах, в № 8 — «центральный», «вписанный» или «ни тот, ни другой». O — центр окружности. Найди ответ в таблице букв и впиши букву — получится слово. Чертежи схематические.',
+  about: 'Восемь задач на готовых чертежах: вписанный и центральный угол, дуга, углы на одну дугу и на диаметр, треугольник AOB, два диаметра, вид угла. Ключ восстанавливается по номеру.',
+  ogeAbout: 'Восемь задач на готовых чертежах в духе ОГЭ, ответ — число градусов. Каждая цифра вписывается в отдельную клеточку.',
+};
+const OGE_V1 = ['ins', 'cen', 'arc', 'opp', 'diam', 'iso', 'diam2', 'tan'];
+function ogeTask(kind, rnd) {
+  const t = generate(kind, rnd), T = TYPES[kind];
+  return { kind, t, ask: T.sheet(t), ans: String(T.ans(t).n) };
+}
+
+// ================= Живая доска =================
+// Окружность с центром VA_O; точки A, B, C, D задаются направлениями из центра (градусы, против часовой).
+const VA_O = GEO.pt(285, 200), VA_R = 130;
+const vaNorm = d => ((d % 360) + 360) % 360;
+const vaCcw = (from, to) => vaNorm(to - from);                          // дуга от from до to против часовой
+const vaSep = (x, y) => Math.min(vaCcw(x, y), vaCcw(y, x));
+const vaAt = d => GEO.polar(VA_O, d, VA_R);
+const vaDeg = x => String(Math.round(x * 10) / 10).replace('.', ',') + '°';
+// меньшая дуга AB — пока вершины C нет на чертеже
+function vaMinor(m) { const L = vaCcw(m.a, m.b); return L <= 180 ? { s: m.a, len: L } : { s: m.b, len: 360 - L }; }
+// дуга AB, на которую опирается вписанный угол ACB (не содержит C): начало s и длина len против часовой
+function vaArc(m) {
+  if (!m.showC) return vaMinor(m);
+  const L = vaCcw(m.a, m.b);
+  return vaCcw(m.a, m.c) < L ? { s: m.b, len: 360 - L } : { s: m.a, len: L };
+}
+const vaSide = (m, x) => vaCcw(m.a, x) < vaCcw(m.a, m.b);               // точка на дуге от A к B против часовой
+const vaIns = m => GEO.angleAt(vaAt(m.c), vaAt(m.a), vaAt(m.b));        // измеренный вписанный угол
+const vaCen = m => GEO.angleAt(VA_O, vaAt(m.a), vaAt(m.b));             // измеренный центральный угол (до 180°)
+// где центр O относительно угла ACB: на стороне, внутри, вне
+function vaCase(m) {
+  const r = vaArc(m), t = vaCcw(r.s, m.c + 180);
+  if (Math.min(t, 360 - t) < .5 || Math.abs(t - r.len) < .5) return 'side';
+  return t < r.len ? 'in' : 'out';
+}
+function vaCasePos(m, v) {
+  const r = vaArc(m);
+  if (v === 'side') return vaNorm(m.b + 180);
+  if (v === 'in') return vaNorm(r.s + r.len * .3 + 180);
+  const d = Math.min(40, (180 - r.len) / 2);
+  return d < 10 ? m.c : vaNorm(r.s - d);
+}
+
+const LIVE = {
+  model: e => ({ a: e.a, b: e.b, c: e.c, arc0: vaCcw(e.a, e.b), showC: true, lock: true, ghosts: false, pair: false, d: 0, tan: 0 }),
+  fix(m) {
+    m.a = vaNorm(Math.round(m.a / 5) * 5);
+    m.b = vaNorm(Math.round(m.b / 5) * 5);
+    m.c = vaNorm(Math.round(m.c));
+    for (const t of [m.a + 180, m.b + 180]) if (vaSep(m.c, t) <= 1.5) m.c = vaNorm(t);   // прилипание: сторона угла — диаметр
+    m.d = vaNorm(Math.round(m.d));
+  },
+  ok(m) {
+    if (vaSep(m.a, m.b) < 20) return false;
+    if (!m.showC) return true;
+    if (vaSep(m.c, m.a) < 8 || vaSep(m.c, m.b) < 8) return false;
+    if (m.lock && vaArc(m).len > 180) return false;            // C — на большей дуге: угол не тупой
+    if (m.pair && (vaSide(m, m.d) === vaSide(m, m.c) || vaSep(m.d, m.a) < 8 || vaSep(m.d, m.b) < 8)) return false;
+    return true;
+  },
+};
+// поставить C на допустимое место (после шагов, где C не было или угол был другим)
+function vaPlaceC(m) {
+  m.showC = true; m.lock = true; m.pair = false; m.tan = 0; m.ghosts = false;
+  if (vaMinor(m).len > 160) m.b = vaNorm(m.a + (m.arc0 <= 180 ? m.arc0 : 120));
+  if (!LIVE.ok(m)) { const r = vaMinor(m); m.c = vaNorm(r.s + 180 + r.len / 2); }
+  LIVE.fix(m);
+}
+// ручки: точка движется по окружности; стрелки — вдоль окружности в сторону нажатой стрелки
+function vaHandle(id, label, step) {
+  return m => ({
+    id, at: vaAt(m[id]), label,
+    move(m, p) { if (GEO.dist(p, VA_O) > 1) m[id] = GEO.dirDeg(VA_O, p); },
+    key(m, dx, dy, fine) {
+      const th = GEO.rad(m[id]), t = -dx * Math.sin(th) - dy * Math.cos(th);
+      m[id] += (Math.abs(t) < .35 ? (dx || -dy) : Math.sign(t)) * (fine ? 1 : step);
+    },
+  });
+}
+const vaHA = vaHandle('a', 'Точка A', 5), vaHB = vaHandle('b', 'Точка B', 5), vaHC = vaHandle('c', 'Вершина C', 5), vaHD = vaHandle('d', 'Вершина D', 5);
+
+// Чертёж. o: { cen — центральный угол, ins — вписанный, arc — дуга, vals — величины на чертеже,
+//   ghosts — ещё вершины на той же дуге, diam — диаметр CD, tri — треугольник AOC для доказательства,
+//   pair — вершина D на другой дуге, tan — касательная в точке A, panel — строки справа [текст, класс] }
+function vaDraw(m, o = {}) {
+  const A = vaAt(m.a), Bp = vaAt(m.b), C = vaAt(m.c), r = vaArc(m), ins = vaIns(m);
+  let back = GEO.circle(VA_O, VA_R), lines = '', marks = '', dots = '', labs = '';
+  const pts = [['A', A], ['B', Bp]];
+  if (o.arc) back += GEO.arc(VA_O, r.s, r.s + r.len, VA_R, 'va-arc');
+  if (o.cen) {
+    back += GEO.sector(VA_O, A, Bp, 44, 'g-sec a');
+    lines += GEO.seg(VA_O, A, 'g-thin') + GEO.seg(VA_O, Bp, 'g-thin');
+    if (o.vals && !(o.ins && r.len > 180)) labs += GEO.angleText(VA_O, A, Bp, vaDeg(vaCen(m)), 74, 'g-num a');   // C на другой дуге — величина ∠AOB только в панели
+  }
+  if (o.tri) {
+    const E = vaSep(m.c, m.b + 180) < .5 ? A : Bp;   // треугольник с вершиной, сторона к которой — не диаметр
+    back += GEO.poly([E, VA_O, C], 'g-fig');
+    marks += GEO.ticks(VA_O, E, 1) + GEO.ticks(VA_O, C, 1) + GEO.arcs(E, VA_O, C, 1, 34) + GEO.arcs(C, VA_O, E, 1, 34);
+  }
+  if (o.ghosts) {   // ещё две вершины на той же дуге: углы такие же
+    const e = r.s + r.len, L = 360 - r.len;
+    [[.2, 'C1'], [.8, 'C2']].forEach(([k, n]) => {
+      const g = e + L * k;
+      if (vaSep(g, m.c) < 18) return;
+      const G = vaAt(g);
+      back += GEO.sector(G, A, Bp, 40, 'g-sec');
+      lines += GEO.seg(G, A, 'g-thin') + GEO.seg(G, Bp, 'g-thin');
+      labs += GEO.angleText(G, A, Bp, vaDeg(GEO.angleAt(G, A, Bp)), vaR(ins, 30, 62, 100), 'g-num b');
+      pts.push([n, G]);
+    });
+  }
+  if (o.pair) {
+    const Dp = vaAt(m.d);
+    back += GEO.sector(Dp, A, Bp, 44, 'g-sec a');
+    lines += GEO.seg(Dp, A, 'g-thin') + GEO.seg(Dp, Bp, 'g-thin');
+    labs += GEO.angleText(Dp, A, Bp, vaDeg(GEO.angleAt(Dp, A, Bp)), vaR(GEO.angleAt(Dp, A, Bp), 30, 62, 100), 'g-num a');
+    pts.push(['D', Dp]);
+  }
+  if (o.diam) {
+    const Dp = vaAt(m.c + 180);
+    lines += GEO.seg(C, Dp, 'g-dash');
+    pts.push(['D', Dp]);
+  }
+  if (o.tan && m.tan > 0) {
+    const M = vaAt(r.s + r.len / 2);
+    let t = GEO.perp(GEO.unit(VA_O, A));
+    if ((M.x - A.x) * t.x + (M.y - A.y) * t.y < 0) t = GEO.scale(t, -1);
+    const T = GEO.add(A, GEO.scale(t, 100));
+    lines += `<g opacity="${GEO.f1(m.tan)}">${GEO.line(GEO.sub(A, t), T, 'g-ln')}${GEO.seg(A, Bp, 'g-thin')}${GEO.sector(A, T, Bp, 54, 'g-sec')}${GEO.angleText(A, T, Bp, vaDeg(GEO.angleAt(A, T, Bp)), vaR(GEO.angleAt(A, T, Bp), 30, 70, 110), 'g-num b')}</g>`;
+  }
+  if (o.ins) {
+    if (Math.abs(ins - 90) < 1e-6) marks += GEO.right(C, A, Bp, 26);
+    else if (!(o.tan && m.tan > .5)) back += GEO.sector(C, A, Bp, 50, 'g-sec');
+    lines += GEO.seg(C, A) + GEO.seg(C, Bp);
+    if (o.vals && !(o.tan && m.tan > .5)) labs += GEO.angleText(C, A, Bp, vaDeg(ins), vaR(ins, 30, 62, 92), 'g-num b');
+    if (!(o.tan && m.tan > .5)) pts.push(['C', C]);   // у касательной C почти совпала с A: подпись C не нужна
+    else dots += GEO.dot(C);
+  }
+  for (const [n, p] of pts) { dots += GEO.dot(p); labs += GEO.vertex(p, n, VA_O); }
+  if (o.cen || o.tri || o.diam) {
+    dots += GEO.dot(VA_O);
+    // подпись O — в направлении, дальше всего от отрезков из центра и от сторон угла C
+    const busy = [m.a, m.b].concat(o.ins || o.tri || o.diam ? [m.c, m.c + 180] : []);
+    let best = 0, far = -1;
+    for (let d = 15; d < 360; d += 30) { const f = Math.min(...busy.map(b => vaSep(d, b))); if (f > far) { far = f; best = d; } }
+    labs += GEO.text(GEO.polar(VA_O, best, 36), 'O', 'g-vl');
+  }
+  const panel = (o.panel || []).filter(Boolean).map(([s, cls], i) => GEO.text(GEO.pt(530, 80 + i * 62), s, cls || 'g-lab', 'start')).join('');
+  return back + lines + marks + dots + labs + panel;
+}
+// строки панели справа: величины, измеренные на чертеже
+const vaRowArc = m => [`дуга AB = ${vaArc(m).len}°`, 'g-lab a'];
+const vaRowCen = m => [`∠AOB = ${vaDeg(vaCen(m))}`, 'g-lab a'];
+const vaRowIns = m => [`∠ACB = ${vaDeg(vaIns(m))}`, 'g-lab b'];
+
+// Пример для доски: дуга AB внизу, вершина C наверху
+function boardExample(random, old) {
+  if (!random) return { a: CONFIG.board.a, b: CONFIG.board.b, c: CONFIG.board.c };
+  const rnd = mulberry32((Math.random() * 4294967296) >>> 0);
+  let arc; do arc = pick(rnd, [60, 70, 80, 100, 110, 120, 140]); while (arc === vaCcw(old.a, old.b));
+  return { a: 270 - arc / 2, b: 270 + arc / 2, c: 90 + pick(rnd, [-1, 1]) * int(rnd, 25, 40) };
+}
+
+function buildSteps(e) {
+  const x = vaCcw(e.a, e.b) / 2;   // вписанный угол примера (для задачи и ловушки)
+  const ex = { ...LIVE.model(e) };
+  const enterC = m => vaPlaceC(m);
+  const caseText = m => {
+    const k = vaCase(m), C = vaAt(m.c), Dp = vaAt(m.c + 180), A = vaAt(m.a), Bp = vaAt(m.b);
+    const ad = GEO.angleAt(C, A, Dp), bd = GEO.angleAt(C, Bp, Dp);
+    if (k === 'side') { const T = vaSep(m.c, m.b + 180) < .5 ? 'AOC' : 'BOC'; return `Центр на стороне угла: △${T} равнобедренный, внешний угол при O равен сумме двух равных углов: ∠AOB = 2∠ACB = ${vaDeg(vaCen(m))}.`; }
+    if (k === 'in') return `Центр внутри угла: ∠ACB = ∠ACD + ∠DCB = ½∠AOD + ½∠DOB = ½∠AOB. Здесь ${vaDeg(ad)} + ${vaDeg(bd)} = ${vaDeg(vaIns(m))}.`;
+    const [p, q, P, Q2] = ad > bd ? ['A', 'B', ad, bd] : ['B', 'A', bd, ad];
+    return `Центр вне угла: ∠ACB = ∠${p}CD − ∠${q}CD = ½∠${p}OD − ½∠${q}OD = ½∠AOB. Здесь ${vaDeg(P)} − ${vaDeg(Q2)} = ${vaDeg(vaIns(m))}.`;
+  };
+  return [
+    { id: 'central',
+      q: 'Вершина угла AOB — в центре окружности. Как называется такой угол? Как он связан с дугой AB?',
+      a: m => `Это центральный угол. Градусная мера дуги AB равна центральному углу: ${vaArc(m).len}°.`,
+      note: 'Двигайте точки A и B мышью, пальцем или стрелками: угол и дуга меняются вместе. Спросите, какой угол у полуокружности (180°).',
+      live: { enter(m) { m.showC = false; m.ghosts = false; m.pair = false; m.tan = 0; }, handles: m => [vaHA(m), vaHB(m)] },
+      draw: (ph, m) => vaDraw(m, { cen: true, arc: true, vals: true, panel: [vaRowCen(m), ph && vaRowArc(m)] }),
+      rec: (ph, m) => ph ? ['Центральный угол: вершина в центре окружности.', `∠AOB = дуга AB = ${vaArc(m).len}°`] : [] },
+    { id: 'inscribed',
+      q: 'Вершина C лежит на окружности, стороны угла пересекают окружность. Это вписанный угол ACB. На какую дугу он опирается?',
+      a: 'На дугу AB, которая лежит внутри угла: точка C на ней не лежит.',
+      note: 'Пусть ученик покажет дугу рукой. Подвигайте C: дуга внутри угла остаётся той же, пока C не перейдёт через A или B.',
+      live: { enter: enterC, handles: m => [vaHC(m), vaHA(m), vaHB(m)] },
+      draw: (ph, m) => vaDraw(m, { ins: true, arc: !!ph, panel: [ph && vaRowArc(m)] }),
+      rec: (ph, m) => ph ? ['Вписанный угол: вершина на окружности,', 'стороны пересекают окружность.', `∠ACB опирается на дугу AB = ${vaArc(m).len}°`] : [] },
+    { id: 'predict',
+      q: m => `Сейчас ∠ACB = ${vaDeg(vaIns(m))}. Будем двигать вершину C по окружности. Как изменится угол? Запишите прогноз.`,
+      a: m => `Не изменится: ∠ACB = ${vaDeg(vaIns(m))} при любом положении C на этой дуге.`,
+      note: 'Сначала прогноз в тетради. «Показать ответ» прокатит C по дуге; «Ещё вершины» покажет сразу три угла. Пусть ученик сам потащит C.',
+      live: {
+        enter(m) { vaPlaceC(m); },
+        reveal(m) {   // C едет по своей дуге, не переходя через A и B
+          const r = vaArc(m), e0 = r.s + r.len, L = 360 - r.len;
+          m.c = e0 + vaCcw(e0, m.c);
+          liveTo([{ c: e0 + L * .15 }, { c: e0 + L * .85 }, { c: e0 + L * .65 }], 1100);
+        },
+        handles: m => [vaHC(m), vaHA(m), vaHB(m)],
+        controls: () => [{ id: 'ghosts', type: 'toggle', label: 'Ещё вершины', get: m => m.ghosts, set(m, v) { m.ghosts = v; } }],
+      },
+      draw: (ph, m) => vaDraw(m, { ins: true, arc: true, vals: true, ghosts: m.ghosts, panel: [vaRowIns(m), vaRowArc(m)] }),
+      rec: (ph, m) => ph ? ['Вписанные углы, опирающиеся на одну дугу, равны.'] : [] },
+    { id: 'half',
+      q: 'Сравните вписанный угол ACB и центральный угол AOB — они опираются на одну дугу. Подвигайте точки A и B.',
+      a: m => `Вписанный угол равен половине центрального: ${vaDeg(vaIns(m))} = ${vaDeg(vaCen(m))} : 2.`,
+      note: 'Пусть ученик у доски сделает дугу маленькой, затем почти полуокружностью. Отношение 1 : 2 сохраняется.',
+      live: { enter: enterC, handles: m => [vaHA(m), vaHB(m), vaHC(m)] },
+      draw: (ph, m) => vaDraw(m, { ins: true, cen: true, arc: true, vals: true, panel: [vaRowArc(m), vaRowCen(m), vaRowIns(m), ph && [`${vaDeg(vaIns(m))} = ${vaDeg(vaCen(m))} : 2`, 'g-lab']] }),
+      rec: (ph, m) => ph ? ['Вписанный угол — половина центрального на ту же дугу:', `∠ACB = ½∠AOB = ½ дуги AB = ${vaDeg(vaIns(m))}`] : [] },
+    { id: 'trap',
+      q: `Ученик решил: «∠AOB = ${2 * x}°, а ∠ACB опирается на ту же дугу, значит, ∠ACB = ${2 * x}°». Где ошибка?`,
+      a: `Вписанный угол не равен центральному, он равен его половине: ∠ACB = ${2 * x}° : 2 = ${x}°. Равны между собой вписанные углы на одну дугу.`,
+      note: 'Самая частая ошибка темы. Попросите сформулировать, какие углы равны, а какие — вдвое отличаются.',
+      draw: ph => vaDraw(ex, { ins: true, cen: true, arc: true, vals: !!ph, panel: [[`∠AOB = ${2 * x}°`, 'g-lab a'], [ph ? `∠ACB = ${x}°` : '∠ACB = ?', 'g-lab b']] }),
+      rec: ph => ph ? [`∠ACB = ½∠AOB = ${x}°, а не ${2 * x}°`] : [] },
+    { id: 'proof-side',
+      q: 'Докажем теорему. Сначала случай, когда сторона CB проходит через центр O. Что можно сказать о треугольнике AOC?',
+      a: 'OA = OC как радиусы, △AOC равнобедренный: ∠OAC = ∠OCA. Угол AOB — внешний угол треугольника: ∠AOB = ∠OAC + ∠OCA = 2∠ACB.',
+      note: 'Внешний угол треугольника равен сумме двух углов, не смежных с ним. Дужки отмечают равные углы при основании.',
+      live: { enter(m) { vaPlaceC(m); m.c = vaCasePos(m, 'side'); LIVE.fix(m); } },
+      draw: (ph, m) => vaDraw(m, { ins: true, cen: true, tri: true, arc: true, vals: !!ph, panel: [['OA = OC — радиусы', 'g-lab'], ph && ['∠A = ∠C', 'g-lab b'], ph && ['∠AOB = ∠A + ∠C', 'g-lab a'], ph && ['∠AOB = 2∠ACB', 'g-lab a']] }),
+      rec: ph => ph ? ['△AOC равнобедренный: ∠A = ∠C', '∠AOB — внешний: ∠AOB = ∠A + ∠C = 2∠ACB'] : [] },
+    { id: 'proof-cases',
+      q: 'А если центр O лежит внутри угла ACB или вне его? Проведём диаметр CD — каждый кусок сведётся к первому случаю.',
+      a: m => caseText(m),
+      note: 'Переключайте «Центр O»: внутри, на стороне, вне угла. Можно тащить C. Диаметр CD делит задачу на два угла из первого случая.',
+      live: {
+        enter(m) { vaPlaceC(m); m.c = vaCasePos(m, 'in'); LIVE.fix(m); },
+        handles: m => [vaHC(m)],
+        controls: () => [{ id: 'case', type: 'choice', label: 'Центр O', options: [['in', 'внутри угла'], ['side', 'на стороне'], ['out', 'вне угла']], get: vaCase, set(m, v) { m.c = vaCasePos(m, v); } }],
+      },
+      draw: (ph, m) => vaDraw(m, { ins: true, cen: true, diam: vaCase(m) !== 'side', tri: vaCase(m) === 'side', arc: true, vals: true,
+        panel: [vaRowCen(m), vaRowIns(m), ['центр O ' + { in: 'внутри угла', side: 'на стороне', out: 'вне угла' }[vaCase(m)], 'g-lab']] }),
+      rec: (ph, m) => ph ? [{ side: '∠AOB = ∠A + ∠C = 2∠ACB (△ с радиусами)', in: '∠ACB = ∠ACD + ∠DCB = ½∠AOD + ½∠DOB = ½∠AOB', out: '∠ACB = разность двух углов первого случая = ½∠AOB' }[vaCase(m)]] : [] },
+    { id: 'diameter',
+      q: 'Растянем дугу AB до полуокружности: AB станет диаметром. Каким станет угол ACB?',
+      a: 'Прямым: ∠ACB = ½ · 180° = 90°. Вписанный угол, опирающийся на диаметр, — прямой.',
+      note: '«Показать ответ» растянет дугу. Потом подвигайте C: угол остаётся прямым. Это пригодится в задачах ОГЭ.',
+      live: {
+        enter: enterC,
+        reveal(m) {   // дуга AB растягивается до 180°, C уходит на середину другой полуокружности
+          const r = vaArc(m), s = r.s, toB = s === m.a;
+          m.c = s + vaCcw(s, m.c);
+          if (toB) { m.b = m.a + r.len; liveTo({ b: m.a + 180, c: m.a + 270 }, 1300); }
+          else { m.a = m.b + r.len; liveTo({ a: m.b + 180, c: m.b + 270 }, 1300); }
+        },
+        handles: (m, ph) => ph ? [vaHC(m)] : [vaHC(m), vaHA(m), vaHB(m)],
+      },
+      draw: (ph, m) => vaDraw(m, { ins: true, arc: true, vals: true, cen: !ph, panel: [vaRowArc(m), vaRowIns(m)] }),
+      rec: ph => ph ? ['Вписанный угол, опирающийся на диаметр, равен 90°.'] : [] },
+    { id: 'other-arc',
+      q: 'Переведём вершину C на другую дугу. Останется ли ∠ACB равным половине ∠AOB?',
+      a: m => `Нет: теперь угол опирается на другую дугу AB, она равна ${vaArc(m).len}°. ∠ACB = ½ · ${vaArc(m).len}° = ${vaDeg(vaIns(m))}, а ∠AOB = ${vaDeg(vaCen(m))}.`,
+      note: 'Включите «Обе вершины»: вершины C и D по разные стороны от хорды AB, ∠ACB + ∠ADB = 180°. Это ключ к вписанному четырёхугольнику.',
+      live: {
+        enter(m) { vaPlaceC(m); },
+        reveal(m) {   // C переходит через конец дуги на середину дуги AB
+          const r = vaArc(m);
+          m.lock = false;
+          m.c = r.s + vaCcw(r.s, m.c);
+          liveTo({ c: r.s + r.len * .3 }, 1400);
+        },
+        handles: (m, ph) => [vaHC(m)].concat(m.pair ? [vaHD(m)] : []),
+        controls: (m, ph) => ph ? [{ id: 'pair', type: 'toggle', label: 'Обе вершины', get: m => m.pair, set(m, v) { m.pair = v; if (v) { const r = vaArc(m); m.d = vaNorm(r.s + r.len / 2); } } }] : [],
+      },
+      draw: (ph, m) => vaDraw(m, { ins: true, cen: true, arc: true, vals: true, pair: m.pair,
+        panel: [vaRowArc(m), vaRowCen(m), vaRowIns(m), m.pair && [`∠ACB + ∠ADB = ${vaDeg(vaIns(m) + GEO.angleAt(vaAt(m.d), vaAt(m.a), vaAt(m.b)))}`, 'g-lab']] }),
+      rec: (ph, m) => ph ? ['Угол опирается на дугу, которая лежит внутри него.', m.pair ? 'C и D по разные стороны от AB: ∠ACB + ∠ADB = 180°' : ''].filter(Boolean) : [] },
+    { id: 'tangent',
+      q: 'Приблизим вершину C к точке A. Во что превратится прямая CA?',
+      a: m => `В касательную к окружности в точке A. Угол между касательной и хордой AB тоже равен половине дуги внутри него: ${vaArc(m).len}° : 2 = ${vaDeg(vaArc(m).len / 2)}.`,
+      note: '«Показать ответ» подведёт C к A и проведёт касательную. Переключатель «Касательная» убирает и возвращает её; C можно тащить.',
+      live: {
+        enter(m) { vaPlaceC(m); },
+        reveal(m) {   // C едет к A по своей дуге
+          const r = vaArc(m), e0 = r.s + r.len, toEnd = r.s === m.a;
+          m.c = e0 + vaCcw(e0, m.c);
+          liveTo([{ c: toEnd ? r.s + 344 : e0 + 16 }, { tan: 1 }], 900);
+        },
+        handles: m => [vaHC(m)],
+        controls: (m, ph) => ph ? [{ id: 'tan', type: 'toggle', label: 'Касательная', get: m => m.tan > .5, set(m, v) { m.tan = v ? 1 : 0; } }] : [],
+      },
+      draw: (ph, m) => vaDraw(m, { ins: true, arc: true, vals: true, tan: true,
+        panel: [vaRowArc(m), vaRowIns(m), m.tan > .5 && [`касательная и AB: ${vaDeg(vaArc(m).len / 2)}`, 'g-lab b']] }),
+      rec: ph => ph ? ['Угол между касательной и хордой — половина дуги внутри него.'] : [] },
+    { id: 'solve',
+      q: `Задача. O — центр окружности, ∠ACB = ${x}°. Найдите ∠AOB и ∠OAB.`,
+      a: `∠AOB = 2 · ${x}° = ${2 * x}°. OA = OB, △AOB равнобедренный: ∠OAB = (180° − ${2 * x}°) : 2 = ${90 - x}°.`,
+      note: 'Типичная задача ОГЭ: сначала центральный угол, затем равнобедренный треугольник с радиусами. «Другие числа» меняет условие.',
+      draw: ph => vaDraw(ex, { ins: true, cen: true, vals: false, panel: [[`∠ACB = ${x}°`, 'g-lab b'], [ph ? `∠AOB = ${2 * x}°` : '∠AOB = ?', 'g-lab a'], [ph ? `∠OAB = ${90 - x}°` : '∠OAB = ?', 'g-lab']] })
+        + GEO.seg(vaAt(ex.a), vaAt(ex.b), 'g-thin') + GEO.ticks(VA_O, vaAt(ex.a), 1) + GEO.ticks(VA_O, vaAt(ex.b), 1),
+      rec: ph => ph ? [`∠AOB = 2∠ACB = ${2 * x}°`, `∠OAB = (180° − ${2 * x}°) : 2 = ${90 - x}°`] : [] },
+    { id: 'rule',
+      q: 'Что мы узнали? Сформулируйте правила.',
+      a: 'Центральный угол равен дуге. Вписанный — половине дуги, на которую он опирается. Вписанные углы на одну дугу равны, на диаметр — прямые.',
+      note: 'Пусть класс сам продиктует правила по записям в тетради.',
+      draw: () => '',
+      rec: () => ['∠AOB = дуга AB', '∠ACB = ½ дуги AB = ½∠AOB', 'На одну дугу — равны; на диаметр — 90°', 'По разные стороны хорды — в сумме 180°', 'Касательная и хорда — ½ дуги внутри угла'] },
+  ];
+}
+const BOARD = { previewUntil: 3, poster: 3 };
+
+// ---------- ядро: core/types.js ----------
+// число — ответ: same по умолчанию, ключ и ловушки по умолчанию
+for (const T of Object.values(TYPES)) {
+  if (T.input === 'num' || T.input === 'frac') {
+    T.same = T.same || ((t, v) => qeq(v, T.ans(t)));
+    T.key = T.key || (t => keyQ(T.ans(t)));
+    T.keyHTML = T.keyHTML || (t => htmlQ(T.ans(t)));
+  }
+  if (T.input === 'choice') T.same = T.same || ((t, v) => v === T.ans(t));
+}
+function generate(type, rnd, form, tries = 2000) {
+  for (let k = 0; k < tries; k++) {
+    const t = TYPES[type].gen(rnd, form);
+    if (!TYPES[type].bad?.(t)) return { type, ...t };
+  }
+  throw new Error('Генератор не нашёл задание: ' + type);
+}
+
+// ---------- ядро: core/print.js ----------
+// ================= Раздатка: вариант восстанавливается по номеру =================
+// Тема задаёт состав варианта (KINDS_V1), слова (WORDS_V1) и тексты листа (PRINT).
+// Бланк ОГЭ есть, если тема задала OGE_V1 и ogeTask(kind, rnd).
+const ABC = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ';
+const HAS_OGE = typeof OGE_V1 !== 'undefined';
+const lowerTitle = () => META.title[0].toLowerCase() + META.title.slice(1);
+function wordVariantV1(num) {
+  const version = 1;
+  if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
+  const tasks = [];
+  KINDS_V1.forEach(([type, forms], i) => {
+    const rnd = taskRnd(num, i, 1);
+    let t, guard = 0;
+    do t = generate(type, rnd, Array.isArray(forms) ? pick(rnd, forms) : forms);
+    while (tasks.some(u => TYPES[u.type].key(u) === TYPES[type].key(t)) && ++guard < 200);
+    tasks.push(t);
+  });
+  const rnd = taskRnd(num, 99, 1);
+  const word = pick(rnd, WORDS_V1);
+  const answers = tasks.map(t => TYPES[t.type].key(t));
+  const bank = new Map();   // ответ → { html, letter }
+  tasks.forEach((t, i) => bank.set(answers[i], { key: answers[i], html: TYPES[t.type].keyHTML(t), letter: word[i] }));
+  const decoys = shuffle(rnd, [...ABC].filter(ch => !word.includes(ch)));
+  tasks.forEach(t => (TYPES[t.type].traps?.(t) || []).slice(0, CONFIG.print.traps).forEach(x => {
+    if (!bank.has(x.key)) bank.set(x.key, { ...x, letter: decoys.shift() });
+  }));
+  return { num, version, label: version + '-' + num, tasks, answers, word, bank: shuffle(rnd, [...bank.values()]) };
+}
+
+// Бланк ОГЭ: задания свои (зерна 200+), поэтому один номер даёт разные листы для слова и для бланка
+function ogeVariantV1(num) {
+  const version = 1;
+  if (version !== 1) throw new Error('Неизвестная версия генератора: ' + version);
+  const tasks = OGE_V1.map((kind, i) => ogeTask(kind, taskRnd(num, 200 + i, 1)));
+  return { num, version, label: version + '-' + num, oge: true, tasks, answers: tasks.map(x => x.ans) };
+}
+
+// ================= 🖨 Раздатка =================
+let printNums = [];
+// вид листа из адреса (?mode=print&kind=oge) или с кнопки стартового экрана — важнее сохранённого
+let pendingKind = P.get('kind');
+function newNumbers(count) {
+  const set = new Set();
+  while (set.size < count) set.add(1000 + Math.floor(Math.random() * 9000));
+  return [...set];
+}
+function parseNums(text) {
+  const nums = [], bad = [];
+  for (const part of text.split(/[\s,;]+/).filter(Boolean)) {
+    const m = part.match(/^(?:(\d+)[-–])?(\d{4})$/);
+    const version = m ? +(m[1] || GEN_VERSION) : 0;
+    const value = version === GEN_VERSION ? +m?.[2] : version + '-' + m?.[2];
+    if (!m || !PRINT_GENERATORS[version]) bad.push(part);
+    else if (!nums.includes(value)) nums.push(value);
+  }
+  return { nums, bad };
+}
+// как задание записано на листе: TYPES[type].sheet, по умолчанию «запись =»
+const sheetTask = t => TYPES[t.type].sheet ? TYPES[t.type].sheet(t) : `${TYPES[t.type].text(t)} =`;
+function sheetHTML(v) {
+  const bank = v.bank.map(x => `<div class="bk"><div>${x.html}</div><div>${x.letter}</div></div>`).join('');
+  const cols = v.tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  const empty = v.tasks.map(() => '<td></td>').join('');
+  return `<div class="sheet">
+    <div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">Вариант ${v.label}</span></div>
+    <h2>${META.title}</h2>
+    <p class="instr">${PRINT.instr}</p>
+    <ol class="tasks">${v.tasks.map((t, i) => `<li class="task"><span class="no">${i + 1})</span>${sheetTask(t)}<div class="cells"></div></li>`).join('')}</ol>
+    <p class="sub-h">Таблица букв</p><div class="bank">${bank}</div>
+    <table class="ans"><tr><th>Задание</th>${cols}</tr><tr class="tall"><th>Ответ</th>${empty}</tr><tr><th>Буква</th>${empty}</tr></table>
+    <div class="word">Слово: ______________________</div>
+  </div>`;
+}
+// бланк: строка «номер задания — клеточки», по символу в клеточку, как в бланке ответов ОГЭ
+const OGE_CELLS = 10;
+const cellsRow = (no, text = '') => `<div class="brow"><b>${no}</b>${[...text.padEnd(OGE_CELLS)].map(ch => `<i>${ch.trim()}</i>`).join('')}</div>`;
+function ogeSheetHTML(v) {
+  return `<div class="sheet oge">
+    <div class="shead"><span>Фамилия, имя</span><span>Класс</span><span>Дата</span><span class="vn">Вариант ${v.label}</span></div>
+    <h2>${META.title} · бланк ответов</h2>
+    <p class="instr">Ответом к каждому заданию является число. Запиши его в бланк ответов справа от номера задания,
+    начиная с первой клеточки. Каждый символ — в отдельной клеточке, минус и запятая тоже.</p>
+    <ol class="tasks">${v.tasks.map((x, i) => `<li class="task"><span class="no">${i + 1}.</span>${x.ask}<div class="cells"></div><div class="otv">Ответ: ______________</div></li>`).join('')}</ol>
+    <div class="bhead"><p class="sub-h">Бланк ответов</p><div class="sample">Образец: ${cellsRow('', '−0,5')}</div></div>
+    <div class="blank">${v.tasks.map((_, i) => cellsRow(i + 1)).join('')}</div>
+  </div>`;
+}
+function ogeKeyHTML(vs) {
+  const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  return `<div class="page key"><h2>Ключ учителя · бланк ответов · ${lowerTitle()}</h2>
+    <table class="key"><thead><tr><th>Вариант</th>${head}</tr></thead>
+    ${vs.map(v => `<tr><td>${v.label}</td>${v.answers.map(a => `<td>${a}</td>`).join('')}</tr>`).join('')}
+    </table><p style="font-size:10pt">Ответ верен, если совпадает с ключом (запятая или точка — одинаково). Ключ всегда можно восстановить
+    по номеру варианта: режим «Раздатка», вид листа «Бланк ответов».</p></div>`;
+}
+function keyHTML(vs) {
+  const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
+  return `<div class="page key"><h2>Ключ учителя · ${lowerTitle()}</h2>
+    <table class="key"><thead><tr><th>Вариант</th>${head}<th>Слово</th></tr></thead>
+    ${vs.map(v => `<tr><td>${v.label}</td>${v.tasks.map(t => `<td>${TYPES[t.type].keyHTML(t)}</td>`).join('')}<td><b>${v.word}</b></td></tr>`).join('')}
+    </table><p style="font-size:10pt">Слово сложилось — все ответы верны. Ключ всегда можно восстановить по номеру варианта в режиме «Раздатка».</p></div>`;
+}
+// Номера и настройки запоминаются в браузере: напечатал листы, закрыл вкладку — ключ потом
+// печатается по тем же номерам. Без localStorage номера просто будут новыми.
+function renderPrint() {
+  if (!printNums.length) {
+    const saved = parseNums(store.get('printNums') || '').nums;
+    printNums = saved.length ? saved : newNumbers(CONFIG.print.variants);
+    $('pCount').value = printNums.length;
+    $('pSpace').checked = store.get('printSpace') ? store.get('printSpace') === '1' : CONFIG.print.space;
+    $('pTwo').checked = store.get('printTwo') === '1';
+    $('pKind').value = SHEETS[store.get('printKind')] ? store.get('printKind') : 'word';
+    if (saved.length) $('pMsg').textContent = 'Открыты номера, с которыми вы работали в прошлый раз. Для другого класса нажмите «Новые номера».';
+  }
+  if (pendingKind) { $('pKind').value = SHEETS[pendingKind] ? pendingKind : 'word'; pendingKind = null; }
+  $('pNums').value = printNums.map(n => typeof n === 'string' ? n : GEN_VERSION + '-' + n).join(', ');
+  drawSheets();
+}
+function drawSheets() {
+  const kind = SHEETS[$('pKind').value] ? $('pKind').value : 'word';
+  const format = SHEETS[kind];
+  document.querySelectorAll('[data-kind-set]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.kindSet === $('pKind').value)));
+  const vs = printNums.map(n => printVariant(n, kind));
+  const sheet = v => format.sheet(v, $('pSpace').checked), key = format.key;
+  const space = $('pSpace').checked, two = $('pTwo').checked && !space && format.two !== false;
+  store.set('printNums', printNums.map(n => typeof n === 'string' ? n : GEN_VERSION + '-' + n).join(','));
+  store.set('printSpace', space ? 1 : 0);
+  store.set('printTwo', $('pTwo').checked ? 1 : 0);
+  store.set('printKind', kind);
+  $('pTwo').disabled = space || format.two === false;
+  $('pAbout').textContent = format.about;
+  $('pExtraKey').hidden = !format.previewKey;
+  if (!format.previewKey) { $('print').dataset.extraKey = 'false'; $('pExtraKey').textContent = 'Показать ключ'; $('pExtraKey').setAttribute('aria-expanded', 'false'); }
+  let html = '';
+  if (two) for (let i = 0; i < vs.length; i += 2)
+    html += `<div class="page half compact ${format.pageClass || ''}">${sheet(vs[i])}${vs[i + 1] ? sheet(vs[i + 1]) : ''}</div>`;
+  else html = vs.map(v => `<div class="page ${format.pageClass || ''}${space ? '' : ' compact'}">${sheet(v)}</div>`).join('');
+  $('pSheets').innerHTML = (vs.length ? key(vs) : '') + html;
+  fitKeys();
+  return vs;
+}
+// Ключ с длинными ответами (многочлены, 9 заданий) шире книжного листа: печатаем его на альбомном A4;
+// не хватило и его — уменьшаем шрифт до 8pt, затем разрешаем перенос внутри ячеек.
+// Размеры в мм, поэтому подгонка на экране верна и для печати.
+function fitKeys() {
+  for (const t of document.querySelectorAll('#pSheets .page.key table')) {
+    const page = t.closest('.page');
+    const avail = () => { const cs = getComputedStyle(page); return page.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight); };
+    if (!(avail() > 0)) continue;                        // лист не на экране (или jsdom без вёрстки)
+    page.classList.remove('land'); t.classList.remove('wrap'); t.style.fontSize = '';
+    if (t.offsetWidth > avail() + 1) page.classList.add('land');
+    for (let pt = 10; t.offsetWidth > avail() + 1 && pt >= 8; pt -= .5) t.style.fontSize = pt + 'pt';
+    if (t.offsetWidth > avail() + 1) t.classList.add('wrap');
+  }
+}
+// шрифт подгрузился позже первой отрисовки — ширина ответов изменилась
+document.fonts?.ready?.then(fitKeys);
+addEventListener('beforeprint', fitKeys);
+function printNow(what) {
+  document.body.classList.remove('print-key', 'print-sheets');
+  document.body.classList.add(what === 'key' ? 'print-key' : 'print-sheets');
+  try { window.print(); } catch {}
+}
+
+// Тема регистрирует форматы и старые генераторы без подмены функций ядра.
+const SHEETS = {
+  word: { label: 'Кодовое слово', about: PRINT.about, generate: wordVariantV1, sheet: sheetHTML, key: keyHTML },
+  ...(HAS_OGE ? { oge: { label: 'Бланк ОГЭ', about: PRINT.ogeAbout, generate: ogeVariantV1, sheet: ogeSheetHTML, key: ogeKeyHTML } } : {}),
+  ...(typeof TOPIC_SHEETS === 'undefined' ? {} : TOPIC_SHEETS),
+};
+const PRINT_GENERATORS = { 1: Object.fromEntries(Object.entries(SHEETS).map(([k, f]) => [k, f.generate])),
+  ...(typeof TOPIC_PRINT_VERSIONS === 'undefined' ? {} : TOPIC_PRINT_VERSIONS) };
+function printVariant(num, kind = 'word', version = GEN_VERSION) {
+  if (typeof num === 'string' && num.includes('-')) { const parts = num.split('-'); version = +parts[0]; num = +parts[1]; }
+  const gen = PRINT_GENERATORS[version]?.[kind];
+  if (!gen) throw new Error('Нет генератора формата ' + kind + ' версии ' + version);
+  return gen(num);
+}
+function makeVariant(num, version = GEN_VERSION) { return printVariant(num, 'word', version); }
+function makeVariantOGE(num, version = GEN_VERSION) { return printVariant(num, 'oge', version); }
+function initPrintFormats() {
+  const choices = Object.entries(SHEETS);
+  const input = $('pKind');
+  const old = input.closest('.row');
+  if (old) { old.before(input); old.remove(); }
+  input.insertAdjacentHTML('beforebegin', '<div class="row"><b>Вид листа:</b><div class="seg" role="group" aria-label="Вид листа">' + choices.map(([k, f]) => '<button type="button" data-kind-set="' + k + '" aria-pressed="' + (k === 'word') + '">' + esc(f.label) + '</button>').join('') + '</div></div>');
+  const start = document.querySelector('#start [data-go="print"]')?.closest('.mode');
+  if (start) {
+    const box = document.createElement('div'); box.className = 'mode split';
+    box.innerHTML = '<b>🖨 Раздатка</b><span>' + esc(META.modePrint) + '</span><div class="kinds">' + choices.map(([k, f]) => '<button type="button" data-go="print" data-kind="' + k + '">' + esc(f.label) + '</button>').join('') + '</div>';
+    start.replaceWith(box);
+  }
+  $('pPrintKey').insertAdjacentHTML('afterend', '<button type="button" id="pExtraKey" aria-expanded="false" hidden>Показать ключ</button>');
+  $('pExtraKey').addEventListener('click', () => {
+    const visible = $('print').dataset.extraKey !== 'true';
+    $('print').dataset.extraKey = String(visible);
+    $('pExtraKey').textContent = visible ? 'Скрыть ключ' : 'Показать ключ';
+    $('pExtraKey').setAttribute('aria-expanded', String(visible));
+  });
+}
+
+// ---------- ядро: core/board.js ----------
+// ================= 🖥 На доске =================
+// На экране — то, что видит класс: короткий вопрос, ответ, чертёж и запись в тетради.
+// Что сказать словами — в подсказке учителю (кнопка «💬 Учителю»).
+const BW = 980, BH = 400;
+const B = { e: null, m: {}, steps: [], i: 0, phase: 0, timer: 0, notes: false };
+// q, a, note и rec шага могут быть строкой или функцией (m — модель живой доски, phase — 0 вопрос, 1 ответ)
+const stepVal = (x, ...args) => typeof x === 'function' ? x(...args) : x;
+const setHTML = (el, s) => { if (el.innerHTML !== s) el.innerHTML = s; };
+const svg = (inner, label) => `<svg viewBox="0 0 ${BW} ${BH}" role="img" aria-label="${label}" preserveAspectRatio="xMidYMid meet">${inner}</svg>`;
+const tx = (x, y, s, cls = 'lab', anchor = 'middle') => `<text class="${cls}" x="${x}" y="${y}" text-anchor="${anchor}">${s}</text>`;
+const sr = s => `√<tspan class="ov">${s}</tspan>`;   // корень в подписи чертежа
+const ds = x => decStr(x) || `${x.n}/${x.d}`;
+// клетчатый квадрат cols × rows клеток размера c; fill — заливка, every — жирная линия через every клеток
+function grid(x, y, cols, rows, c, fill = 'ge', every = 0) {
+  let s = `<rect class="${fill}" x="${x}" y="${y}" width="${cols * c}" height="${rows * c}"/>`;
+  for (let i = 1; i < cols; i++) s += `<line class="gl${every && i % every === 0 ? ' gk' : ''}" x1="${x + i * c}" x2="${x + i * c}" y1="${y}" y2="${y + rows * c}"/>`;
+  for (let j = 1; j < rows; j++) s += `<line class="gl${every && j % every === 0 ? ' gk' : ''}" x1="${x}" x2="${x + cols * c}" y1="${y + j * c}" y2="${y + j * c}"/>`;
+  return s + `<rect class="gf" x="${x}" y="${y}" width="${cols * c}" height="${rows * c}"/>`;
+}
+// скобка под отрезком и подпись
+const under = (x, y, w, s, cls = '') => `<path class="br ${cls}" d="M${x} ${y + 10}v12H${x + w}v-12"/>` + tx(x + w / 2, y + 62, s, 'lab' + (cls ? ' ' + cls : ''));
+function svgFrac(cx, cy, n, d, cls = '') {
+  const w = Math.max(String(n).length, String(d).length) * 10 + 10;
+  return `<g class="lbl ${cls}"><text x="${cx}" y="${cy - 8}" text-anchor="middle">${n}</text><line x1="${cx - w}" x2="${cx + w}" y1="${cy}" y2="${cy}"/><text x="${cx}" y="${cy + 31}" text-anchor="middle">${d}</text></g>`;
+}
+// числовая прямая от a до b (в десятых), подсветка [h, h + step]
+function numLine(y, a, b, step, labelEvery, hl, cls = '') {
+  const x0 = 90, x1 = 890, k = (x1 - x0) / (b - a);
+  let s = `<line class="axis" x1="${x0 - 20}" x2="${x1 + 20}" y1="${y}" y2="${y}"/>`;
+  const n = Math.round((b - a) / step);
+  for (let i = 0; i <= n; i++) {
+    const v = a + i * step, x = x0 + i * step * k;
+    s += `<line class="tick" x1="${x}" x2="${x}" y1="${y - 12}" y2="${y + 12}"/>`;
+    if (i % labelEvery === 0) s += tx(x, y + 48, String(Math.round(v * 1000) / 1000).replace('.', ',').replace('-', MINUS), 'lab s');
+  }
+  if (hl != null) s += `<line class="seg ${cls}" x1="${x0 + (hl - a) * k}" x2="${x0 + (hl + step - a) * k}" y1="${y}" y2="${y}"/>`;
+  return s;
+}
+
+// пример для показа: тема даёт boardExample(random, прошлый пример) и buildSteps(пример) → шаги
+// {q — вопрос классу, a — ответ, note — подсказка учителю, draw(phase, m) — SVG или '', rec(phase, m) — строки тетради,
+//  live — что можно двигать и менять на этом шаге (core/live.js)}
+function boardNumbers(random) {
+  liveStop();
+  B.e = boardExample(random, B.e || {});
+  B.steps = buildSteps(B.e);
+  B.m = liveModel(B.e);
+  B.i = 0; B.phase = 0;
+  liveEnter();
+}
+function renderBoard() {
+  if (!B.steps.length) boardNumbers(false);
+  const st = B.steps[B.i], m = B.m, ph = B.phase;
+  $('bCnt').textContent = `Шаг ${B.i + 1} из ${B.steps.length}`;
+  setHTML($('bQ'), stepVal(st.q, m, ph));
+  setHTML($('bA'), stepVal(st.a, m, ph));
+  $('bA').classList.toggle('hide', ph === 0);
+  const pic = st.draw(ph, m), handles = liveHandlesSVG(st);
+  const focused = document.activeElement?.closest?.('[data-handle]')?.dataset.handle;
+  $('bStage').innerHTML = pic || handles ? svg(pic + handles, 'Чертёж к шагу').replace('<svg ', handles ? '<svg class="live" ' : '<svg ') : '';
+  if (focused) $('bStage').querySelector(`[data-handle="${focused}"]`)?.focus({ preventScroll: true });
+  setHTML($('bRec'), stepVal(st.rec, ph, m).map(l => `<div class="ln">${l}</div>`).join(''));
+  setHTML($('bNote'), `<b>Учителю</b>${stepVal(st.note, m, ph)}`);
+  $('bNote').hidden = !B.notes;
+  $('bNotesBtn').setAttribute('aria-pressed', String(B.notes));
+  $('bNext').textContent = ph === 0 ? 'Показать ответ' : 'Далее →';
+  $('bNext').disabled = B.i === B.steps.length - 1 && ph === 1;
+  liveRenderControls(st);
+}
+function boardNext() {
+  if (B.phase === 0) { liveStop(); B.phase = 1; renderBoard(); liveReveal(); }
+  else if (B.i < B.steps.length - 1) boardGo(B.i + 1, 0);
+}
+function boardPrev() {
+  if (B.phase === 1) { liveStop(); B.phase = 0; liveBack(); renderBoard(); }
+  else if (B.i > 0) boardGo(B.i - 1, 1);
+}
+// переход к шагу: модель ставится, как задумано шагом (live.enter); с phase = 1 — сразу итог опыта
+function boardGo(i, phase = 0) {
+  liveStop();
+  const was = B.i;
+  B.i = Math.max(0, Math.min(i, B.steps.length - 1)); B.phase = phase ? 1 : 0;
+  if (B.i !== was || B.phase === 1 || !LV.entered) liveEnter(B.phase === 1);
+  renderBoard();
+}
+// «Заново»: исходная модель примера и первый шаг
+function boardRestart() { liveStop(); B.m = liveModel(B.e); LV.entered = false; boardGo(0, 0); }
+function boardNotes() { B.notes = !B.notes; store.set('notes', B.notes ? 1 : 0); renderBoard(); }
+// превью на сайте: доска сама идёт по шагам до BOARD.previewUntil и начинает сначала
+function boardStartPreview() {
+  $('board').classList.add('preview');
+  B.timer = setInterval(() => {
+    if (B.i >= BOARD.previewUntil && B.phase === 1) boardGo(0, 0);
+    else boardNext();
+  }, CONFIG.board.previewDelay);
+}
+function boardStopPreview() { clearInterval(B.timer); B.timer = 0; }
+// кадр для картинки-превью (npm run posters на сайте): шаг BOARD.poster с показанным ответом
+function boardPoster() { boardStopPreview(); boardGo(BOARD.poster, 1); }
+
+
+// ---------- ядро: core/live.js ----------
+// ================= 🖐 Живая доска =================
+// Тема описывает только математику: модель (const LIVE) и на шагах — что можно двигать и менять (step.live).
+// Ядро берёт на себя мышь, касание и перо (Pointer Events), клавиатуру, сброс, повтор опыта,
+// плавное движение и prefers-reduced-motion. Схема — ИНСТРУКЦИЯ.md, раздел «Живая доска».
+//
+// const LIVE = {
+//   model: e => ({ ... }),      // исходное состояние модели для примера e (простые данные: числа, строки, {x, y}, массивы)
+//   fix(m) { ... },             // необязательно: привести модель к допустимому виду — прилипание, границы
+//   ok: m => true,              // необязательно: false — положение вырождено, движение отменяется
+// };
+// step.live = {
+//   enter(m) { ... },           // как поставить модель при входе в шаг (можно liveTo — плавно)
+//   reveal(m) { ... },          // опыт по кнопке «Показать ответ» (обычно liveTo); «▶ Повторить опыт» запускает его снова
+//   handles: (m, phase) => [{ id, at: {x, y}, label, move(m, p) {...}, key?(m, dx, dy, fine), keyStep?, r? }],
+//   controls: (m, phase) => [
+//     { id, type: 'range', label, min, max, step, get: m => …, set(m, v) {...}, text?: m => '…' },
+//     { id, type: 'toggle', label, get: m => true|false, set(m, v) {...} },
+//     { id, type: 'choice', label, options: [[значение, 'подпись'], …], get, set },
+//     { id, type: 'button', label, run(m) {...} },
+//   ],
+// };
+// draw(phase, m), rec(phase, m), q(m, phase), a(m, phase), note(m, phase) читают модель m.
+const LV = { entered: false, snap: null, anim: null, drag: null, instant: false, handles: [], controls: [], ctlKey: '' };
+const liveCopy = m => JSON.parse(JSON.stringify(m ?? {}));
+const liveOf = () => B.steps[B.i]?.live || null;
+const liveModel = e => typeof LIVE !== 'undefined' ? LIVE.model(e) : {};
+function liveFix(m) { if (typeof LIVE !== 'undefined' && LIVE.fix) LIVE.fix(m); }
+// изменение модели учителем: после fix проверяем ok, вырожденное положение откатываем
+function liveChange(fn) {
+  const before = liveCopy(B.m);
+  fn(B.m);
+  liveFix(B.m);
+  const ok = typeof LIVE === 'undefined' || !LIVE.ok || LIVE.ok(B.m);
+  if (!ok) B.m = before;
+  renderBoard();
+  return ok;
+}
+
+// ---------- шаги ----------
+function liveEnter(revealed = false) {
+  LV.entered = true;
+  const lv = liveOf();
+  if (lv?.enter) { lv.enter(B.m); liveFix(B.m); }
+  LV.snap = liveCopy(LV.anim ? LV.anim.end : B.m);   // исходное положение шага — куда ведёт движение входа
+  if (revealed) { liveStop(); liveRevealNow(); }
+}
+function liveReveal() { const lv = liveOf(); if (lv?.reveal) { lv.reveal(B.m); if (!LV.anim) { liveFix(B.m); renderBoard(); } } }
+function liveRevealNow() { LV.instant = true; try { liveOf()?.reveal?.(B.m); liveFix(B.m); } finally { LV.instant = false; } }
+// «← Назад» с ответа на вопрос — модель снова как до опыта
+function liveBack() { if (liveOf() && LV.snap) B.m = liveCopy(LV.snap); }
+// «⟲ Сбросить»: положение начала шага (на ответе — итог опыта)
+function liveReset() { liveStop(); if (LV.snap) B.m = liveCopy(LV.snap); if (B.phase === 1) liveRevealNow(); renderBoard(); }
+// «▶ Повторить опыт»: вернуть модель к началу шага и снова провести опыт
+function liveAgain() { liveStop(); if (LV.snap) B.m = liveCopy(LV.snap); renderBoard(); liveReveal(); }
+
+// ---------- плавное движение ----------
+// liveTo({ theta: 90 }) или liveTo([{ theta: 40 }, { theta: 120 }], 700) — через точки, ms на каждый отрезок.
+// Числа (и числа внутри {x, y} и массивов) меняются плавно, остальное — в конце. Учитель листает или берёт
+// ручку — движение сразу заканчивается в конечном положении. prefers-reduced-motion — сразу конечное положение.
+const liveCalm = () => typeof requestAnimationFrame !== 'function' || !window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches;
+const liveEase = u => u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2;
+function liveMix(p, q, w) {
+  if (typeof p === 'number' && typeof q === 'number') return p + (q - p) * w;
+  if (p && q && typeof p === 'object' && typeof q === 'object') {
+    const o = Array.isArray(q) ? [] : {};
+    for (const k of Object.keys(q)) o[k] = k in p ? liveMix(p[k], q[k], w) : q[k];
+    return o;
+  }
+  return w < 1 ? p : q;
+}
+function liveTo(to, ms = 800) {
+  liveStop();
+  const list = Array.isArray(to) ? to : [to], pts = [liveCopy(B.m)];
+  list.forEach(q => pts.push({ ...pts[pts.length - 1], ...liveCopy(q) }));
+  const end = pts[pts.length - 1], n = list.length;
+  if (LV.instant || liveCalm()) { Object.assign(B.m, end); return; }
+  const t0 = performance.now(), a = { end, raf: 0 };
+  const tick = now => {
+    const u = Math.min(1, (now - t0) / (ms * n));
+    if (u >= 1) { LV.anim = null; Object.assign(B.m, end); liveFix(B.m); renderBoard(); return; }
+    const k = Math.min(n - 1, Math.floor(u * n));
+    Object.assign(B.m, liveMix(pts[k], pts[k + 1], liveEase(u * n - k)));
+    renderBoard();
+    a.raf = requestAnimationFrame(tick);
+  };
+  LV.anim = a; a.raf = requestAnimationFrame(tick);
+}
+function liveStop() {
+  if (!LV.anim) return;
+  const a = LV.anim; LV.anim = null;
+  cancelAnimationFrame(a.raf);
+  Object.assign(B.m, a.end); liveFix(B.m);
+}
+
+// ---------- ручки на чертеже ----------
+function liveHandlesSVG(st) {
+  LV.handles = st.live?.handles ? st.live.handles(B.m, B.phase).filter(Boolean) : [];
+  return LV.handles.map(h => `<g class="lv-h${h.cls ? ' ' + h.cls : ''}" data-handle="${h.id}" tabindex="0" role="button" ` +
+    `aria-label="${esc(h.label)}: тяните или двигайте стрелками" transform="translate(${GEO.f1(h.at.x)} ${GEO.f1(h.at.y)})">` +
+    `<title>${esc(h.label)}</title><circle class="lv-hit" r="44"/><circle class="lv-dot" r="${h.r || 18}"/></g>`).join('');
+}
+const liveBox = { x: 0, y: 0, w: BW, h: BH };
+// перетащить ручку id в точку p (координаты чертежа); false — положение вырождено и не принято
+function liveDrag(id, p) {
+  const h = LV.handles.find(x => x.id === id);
+  if (!h) return false;
+  liveStop();
+  return liveChange(m => h.move(m, GEO.keepIn(p, 8, liveBox), h));
+}
+// сдвинуть ручку с клавиатуры: стрелки — шаг keyStep (20), с Shift — мельче; у ручки может быть свой key()
+function liveKey(id, dx, dy, fine = false) {
+  const h = LV.handles.find(x => x.id === id);
+  if (!h) return false;
+  liveStop();
+  if (h.key) return liveChange(m => h.key(m, dx, dy, fine));
+  const s = (h.keyStep || 20) / (fine ? 4 : 1);
+  return liveChange(m => h.move(m, GEO.keepIn({ x: h.at.x + dx * s, y: h.at.y + dy * s }, 8, liveBox), h));
+}
+function livePoint(e) {
+  const M = $('bStage').querySelector('svg')?.getScreenCTM?.();
+  if (!M) return null;
+  const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(M.inverse());
+  return { x: p.x, y: p.y };
+}
+$('bStage').addEventListener('pointerdown', e => {
+  const g = e.target.closest?.('[data-handle]'), h = g && LV.handles.find(x => x.id === g.dataset.handle), p = h && livePoint(e);
+  if (!p) return;
+  liveStop();
+  LV.drag = { id: h.id, dx: h.at.x - p.x, dy: h.at.y - p.y };
+  $('bStage').setPointerCapture?.(e.pointerId);
+  g.focus?.({ preventScroll: true });
+  $('board').classList.add('dragging');
+  e.preventDefault();
+});
+$('bStage').addEventListener('pointermove', e => {
+  if (!LV.drag) return;
+  const p = livePoint(e);
+  if (p) liveDrag(LV.drag.id, { x: p.x + LV.drag.dx, y: p.y + LV.drag.dy });
+});
+const liveDragEnd = () => { LV.drag = null; $('board').classList.remove('dragging'); };
+$('bStage').addEventListener('pointerup', liveDragEnd);
+$('bStage').addEventListener('pointercancel', liveDragEnd);
+// клавиатура: true — клавишу обработала живая доска, листать шаги не нужно
+function liveKeydown(e) {
+  if (e.target.closest?.('#bLive') && [' ', 'Enter'].includes(e.key)) return true;   // кнопки панели нажимаются сами
+  const g = e.target.closest?.('[data-handle]');
+  const d = g && { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+  if (!d) return false;
+  e.preventDefault();
+  liveKey(g.dataset.handle, d[0], d[1], e.shiftKey);
+  return true;
+}
+
+// ---------- панель управления под чертежом ----------
+function liveCtlHTML(c) {
+  const id = `data-ctl="${c.id}"`;
+  if (c.type === 'range') return `<label class="lv-c"><span>${c.label}</span><input type="range" ${id} min="${c.min}" max="${c.max}" step="${c.step || 1}"><output data-out="${c.id}"></output></label>`;
+  if (c.type === 'toggle') return `<button type="button" class="lv-t" ${id} aria-pressed="false">${c.label}</button>`;
+  if (c.type === 'choice') return `<span class="lv-c" role="group" aria-label="${esc(String(c.label).replace(/<[^>]+>/g, ''))}"><span>${c.label}</span><span class="seg">` +
+    c.options.map(([, t], i) => `<button type="button" ${id} data-v="${i}" aria-pressed="false">${t}</button>`).join('') + '</span></span>';
+  return `<button type="button" ${id}>${c.label}</button>`;
+}
+function liveRenderControls(st) {
+  const box = $('bLive'), lv = st.live;
+  if (!lv) { box.hidden = true; box.innerHTML = ''; LV.ctlKey = ''; LV.controls = []; return; }
+  const cs = LV.controls = lv.controls ? lv.controls(B.m, B.phase).filter(Boolean) : [];
+  const again = lv.reveal && B.phase === 1;
+  const key = `${B.i}:${B.phase}:${cs.map(c => c.id + c.type + (c.options || []).length).join(',')}`;
+  if (key !== LV.ctlKey) {
+    LV.ctlKey = key;
+    box.innerHTML = cs.map(liveCtlHTML).join('') + '<span class="lv-tools">' +
+      (again ? '<button type="button" data-live="again" title="Вернуть чертёж и провести опыт ещё раз">▶ Повторить опыт</button>' : '') +
+      '<button type="button" data-live="reset" title="Вернуть чертёж к началу шага">⟲ Сбросить</button></span>';
+  }
+  box.hidden = false;
+  for (const c of cs) {
+    const els = box.querySelectorAll(`[data-ctl="${c.id}"]`), v = c.get ? c.get(B.m) : null, off = !!c.disabled?.(B.m);
+    els.forEach(el => { el.disabled = off; });
+    if (c.type === 'range') {
+      if (+els[0].value !== v) els[0].value = v;
+      box.querySelector(`[data-out="${c.id}"]`).innerHTML = c.text ? c.text(B.m) : String(v).replace('-', MINUS).replace('.', ',');
+    }
+    if (c.type === 'toggle') els[0].setAttribute('aria-pressed', String(!!v));
+    if (c.type === 'choice') els.forEach(el => el.setAttribute('aria-pressed', String(c.options[+el.dataset.v][0] === v)));
+  }
+}
+// значение элемента управления: range — число, toggle — true/false (по умолчанию — переключить), choice — значение варианта
+function liveSet(id, value) {
+  const c = LV.controls.find(x => x.id === id);
+  if (!c) return false;
+  liveStop();
+  if (c.type === 'button') { c.run(B.m); if (!LV.anim) { liveFix(B.m); renderBoard(); } return true; }
+  if (c.type === 'toggle') return liveChange(m => c.set(m, value === undefined ? !c.get(m) : !!value));
+  return liveChange(m => c.set(m, value));
+}
+$('bLive').addEventListener('input', e => {
+  const el = e.target.closest('input[data-ctl]');
+  if (el) liveSet(el.dataset.ctl, +el.value);
+});
+$('bLive').addEventListener('click', e => {
+  const el = e.target.closest('button');
+  if (!el) return;
+  if (el.dataset.live === 'reset') return liveReset();
+  if (el.dataset.live === 'again') return liveAgain();
+  const c = LV.controls.find(x => x.id === el.dataset.ctl);
+  if (c) liveSet(c.id, c.type === 'choice' ? c.options[+el.dataset.v][0] : undefined);
+});
+
+// ---------- ядро: core/home.js ----------
+const H = { level: 0, rnd: null, n: 0, score: 0, streak: 0, clean: 0, cats: {}, task: null, hints: 0, hintLevel: 0,
+  wait: false, taskDone: false, repeat: null, finished: false, gain: 0, eqCount: null, history: [] };
+
+function homeSetup() {
+  $('hSetup').hidden = false; $('hPlay').hidden = true; $('hEnd').hidden = true;
+  $('hLevels').innerHTML = SECTIONS.map((S, i) => {
+    const best = +store.get('best' + i) || 0;
+    return `<button type="button" class="level" data-level="${i}"><b>${S.title} →</b><span class="lname">${S.text}</span><span class="lex${S.exText ? ' txt' : ''}">${S.ex()}</span><small>Рекорд: ${best}</small></button>`;
+  }).join('');
+  $('home').classList.remove('playing');
+  // учителю: ссылка сразу на раздел, чтобы отправить её в чат класса
+  $('hLinks').innerHTML = 'Учителю — ссылка сразу на раздел: ' + SECTIONS.map((S, i) =>
+    `<button type="button" class="linkbtn" data-copy="${i + 1}">раздел ${i + 1}</button>`).join(' ') + ' <span id="hCopied"></span>';
+}
+function levelLink(n) {
+  let loc = location;
+  try { if (window.top !== window && window.top.location.origin === location.origin) loc = window.top.location; } catch {}
+  return `${loc.origin}${loc.pathname}?mode=home&level=${n}&student=1`;
+}
+async function copyLevelLink(n) {
+  const url = levelLink(n);
+  let ok = false;
+  try { await navigator.clipboard.writeText(url); ok = true; } catch {}
+  $('hCopied').innerHTML = ok ? `Скопировано: ${url}` : `Скопируйте ссылку: <b>${url}</b>`;
+}
+function homeStart({ level = H.level, seed } = {}) {
+  Object.assign(H, { level, n: 0, score: 0, streak: 0, clean: 0, cats: {}, repeat: null, finished: false, history: [], last: null,
+    rnd: mulberry32(seed ?? ((Math.random() * 4294967296) >>> 0)) });
+  $('hSetup').hidden = true; $('hEnd').hidden = true; $('hPlay').hidden = false;
+  $('home').classList.add('playing');
+  homeNewTask();
+}
+function homeNewTask() {
+  const types = SECTIONS[H.level].types;
+  // после ошибки — задание того же типа с другими числами; иначе — другой тип, чем в прошлый раз
+  let type = H.repeat;
+  if (!type) { const rest = types.filter(x => x !== H.task?.type); type = pick(H.rnd, rest.length ? rest : types); }
+  const prev = H.task;
+  let t, guard = 0;
+  do t = generate(type, H.rnd);
+  while (prev && JSON.stringify(t) === JSON.stringify(prev) && ++guard < 50);
+  H.task = t;
+  H.n++; H.hints = 0; H.hintLevel = 0; H.wait = false; H.taskDone = false; H.repeat = null; H.eqCount = null; H.last = null;
+  homeRender();
+}
+// Проверка. x: num/frac — {n, d}; choice — строка; eq — {roots: [...]}; est — {lo, hi}
+function homeCheck(x) {
+  if (H.wait || H.finished) return null;
+  if (x == null || x.empty) return { ok: false, empty: true, msg: x?.msg || 'Впиши ответ.' };
+  const t = H.task, T = TYPES[t.type];
+  let r;
+  if (T.same(t, x)) {
+    H.streak++; H.clean++;
+    const mult = Math.min(CONFIG.home.maxMultiplier, 1 + Math.floor((H.streak - 1) / 3));
+    H.gain = Math.max(0, CONFIG.home.points[H.level] - H.hints * CONFIG.home.hintPenalty) * mult;
+    H.score += H.gain;
+    r = { ok: true, msg: T.ok(t) };
+  } else {
+    H.streak = 0; H.gain = 0;
+    r = { ok: false, ...T.wrong(t, x) };
+    H.cats[r.cat] = (H.cats[r.cat] || 0) + 1;
+    H.repeat = t.type;
+  }
+  H.history.push({ n: H.n, type: t.type, ok: r.ok, cat: r.cat });
+  H.wait = true; H.taskDone = true; H.last = r;
+  homeRender(r);
+  return r;
+}
+function homeContinue() {
+  if (!H.wait) return;
+  if (H.n >= CONFIG.home.round) return homeEnd();
+  homeNewTask();
+}
+function homeHint() {
+  if (H.wait || H.finished) return null;
+  const hints = TYPES[H.task.type].hints(H.task);
+  const text = hints[Math.min(H.hintLevel, hints.length - 1)];
+  if (H.hintLevel < hints.length) { H.hints++; H.hintLevel++; }
+  H.lastHint = text;
+  homeRender({ hint: text });
+  return text;
+}
+function homeEnd() {
+  H.finished = true;
+  const key = 'best' + H.level, best = +store.get(key) || 0, record = H.score > best;
+  if (record) store.set(key, H.score);
+  const cats = Object.entries(H.cats).sort((x, y) => y[1] - x[1]);
+  $('hPlay').hidden = true; $('hEnd').hidden = false;
+  $('hEnd').innerHTML = `<div class="card">
+    <h2 style="margin-top:0">Итоги: ${SECTIONS[H.level].title.toLowerCase()}</h2>
+    <p style="font-size:22px">Очки: <b>${H.score}</b>${record ? ' — новый рекорд!' : ` (рекорд: ${Math.max(best, H.score)})`}<br>
+    Без ошибок: <b>${H.clean} из ${CONFIG.home.round}</b></p>
+    <h3>Над чем поработать</h3>
+    ${cats.length ? `<ul class="work">${cats.map(([c, k]) => `<li><b>${CATS[c][0]}</b> — ошибок: ${k}<br>${esc(CATS[c][1])}</li>`).join('')}</ul>`
+      : `<p>Ошибок нет. ${H.level < SECTIONS.length - 1 ? 'Попробуй следующий раздел.' : 'Отличная работа!'}</p>`}
+    <div class="hbtns"><button type="button" class="main" data-act="again">Ещё раз</button>
+    ${H.level < SECTIONS.length - 1 && !cats.length ? `<button type="button" data-act="nextlevel">Следующий раздел</button>` : ''}
+    <button type="button" data-act="setup">Выбрать раздел</button></div></div>`;
+}
+
+const inp = (k, label, cls = '', mode = 'decimal') => `<input data-k="${k}" class="${cls}" inputmode="${mode}" autocomplete="off" aria-label="${label}">`;
+const checkBtn = '<button type="button" class="main check" data-act="check">Проверить</button>';
+// вопрос в тренажёре: TYPES[type].ask, по умолчанию «запись = ?»
+const askHTML = t => TYPES[t.type].ask ? TYPES[t.type].ask(t) : `${TYPES[t.type].text(t)} = ?`;
+// Виды ввода ответа. html(t) — поля, collect(get) — ответ для T.same/T.wrong или { empty, msg }.
+// Тема может добавить свой вид: const TOPIC_INPUTS = { имя: { html, collect } }.
+const readInt = s => { const v = String(s).replace(/\s+/g, ''); return /^\d+$/.test(v) ? +v : null; };
+const INPUTS = {
+  num: {   // число: целое, десятичная или обыкновенная дробь → {n, d}
+    html: t => `<div class="inrow">${TYPES[t.type].text(t)} = ${inp('v', 'ответ', 'wide')} ${checkBtn}</div>`,
+    collect: get => parseQ(get('v')) || { empty: true, msg: get('v').trim() ? 'Не понял число. Пиши, например, 0,3 или 12.' : 'Впиши ответ.' },
+  },
+  frac: {  // дробь этажом, целая часть необязательна → {n, d}
+    html: t => `<div class="inrow">${TYPES[t.type].text(t)} = ${inp('w', 'целая часть', '', 'numeric')} <span class="frac fin">${inp('n', 'числитель', '', 'numeric')}${inp('d', 'знаменатель', '', 'numeric')}</span> ${checkBtn}</div>` +
+      '<p class="hnote">Целую часть можно не писать — подойдёт и неправильная дробь.</p>',
+    collect: get => {
+      const w = get('w').trim() ? readInt(get('w')) : 0, n = readInt(get('n')), d = readInt(get('d'));
+      if (w == null || n == null || !d) return { empty: true, msg: 'Заполни числитель и знаменатель (целую часть — если есть).' };
+      return Q(w * d + n, d);
+    },
+  },
+  choice: {   // кнопки TYPES[type].options = [[значение, подпись]]; ответ — строка, проверка сразу по нажатию
+    html: t => `<div class="inrow">${TYPES[t.type].options.map(([v, l]) => `<button type="button" class="choice" data-choice="${v}">${l}</button>`).join('')}</div>`,
+    collect: () => null,
+  },
+  est: {   // два соседних целых: lo < запись < hi → {lo, hi}
+    html: t => `<div class="inrow">${inp('lo', 'меньшее число', '', 'numeric')} &lt; ${TYPES[t.type].text(t)} &lt; ${inp('hi', 'большее число', '', 'numeric')} ${checkBtn}</div>`,
+    collect: get => { const lo = readInt(get('lo')), hi = readInt(get('hi')); return lo == null || hi == null ? { empty: true, msg: 'Впиши оба числа.' } : { lo, hi }; },
+  },
+  eq: {   // корни уравнения: сначала число корней, потом сами корни (числа или √m) → {roots}
+    html: () => {
+      const c = H.eqCount, b = (n, l) => `<button type="button" data-count="${n}" aria-pressed="${c === n}">${l}</button>`;
+      let html = `<div class="cnts">${b(0, 'Корней нет')}${b(1, 'Один корень')}${b(2, 'Два корня')}</div>`;
+      const sqrtBtn = '<button type="button" class="sqrtbtn" data-act="sqrt" title="Вставить знак корня" aria-label="Вставить знак корня">√</button>';
+      if (c === 0) html += `<div class="inrow">${checkBtn}</div>`;
+      if (c === 1) html += `<div class="inrow"><span class="nw">${X} =</span> ${inp('r1', 'корень', 'wide', 'text')} ${sqrtBtn} ${checkBtn}</div>`;
+      if (c === 2) html += `<div class="inrow"><span class="nw">${X}<sub>1</sub> =</span> ${inp('r1', 'первый корень', 'wide', 'text')} <span class="nw">${X}<sub>2</sub> =</span> ${inp('r2', 'второй корень', 'wide', 'text')} ${sqrtBtn} ${checkBtn}</div>`;
+      if (c) html += '<p class="hnote">Корень можно записать числом (−0,9; 2/3) или со знаком корня: √7, −√7.</p>';
+      return html;
+    },
+    collect: get => {
+      if (H.eqCount == null) return { empty: true, msg: 'Сначала выбери, сколько корней у уравнения.' };
+      const roots = [];
+      for (let i = 1; i <= H.eqCount; i++) {
+        const s = get('r' + i), v = parseVal(s);
+        if (!v) return { empty: true, msg: s.trim() ? `Не понял корень «${esc(s)}». Пиши число (−0,9; 2/3) или корень (√7, −√7).` : 'Впиши корни.' };
+        roots.push(v);
+      }
+      return { roots };
+    },
+  },
+};
+const inputKind = t => (typeof TOPIC_INPUTS !== 'undefined' && TOPIC_INPUTS[TYPES[t.type].input]) || INPUTS[TYPES[t.type].input];
+const inputHTML = t => inputKind(t).html(t);
+function homeRender(fb) {
+  const t = H.task, T = TYPES[t.type];
+  const mult = Math.min(CONFIG.home.maxMultiplier, 1 + Math.floor(H.streak / 3));
+  $('hStats').innerHTML = `<span>Задание <b>${H.n}</b> из ${CONFIG.home.round}</span><span>Очки: <b>${H.score}</b></span>` +
+    `<span>Серия: <b>${H.streak}</b>${mult > 1 ? ` (×${mult})` : ''}</span><span>${SECTIONS[H.level].title}</span>`;
+  $('hTask').innerHTML = askHTML(t);
+  $('hPen').textContent = CONFIG.home.hintPenalty;
+  $('hStep').innerHTML = H.wait ? '' : inputHTML(t);
+  let html = '';
+  if (fb && fb.hint) html = `<div class="fb info"><span class="tag">Подсказка</span>${fb.hint}</div>`;
+  else if (fb && fb.empty) html = `<div class="fb info">${fb.msg}</div>`;
+  else if (fb) html = `<div class="fb ${fb.ok ? 'ok' : 'bad'}"><span class="tag">${fb.ok ? `Верно! +${H.gain}` : 'Ошибка'}</span>${fb.msg}</div>`;
+  if (H.taskDone && !fb?.ok) html += `<div class="fb info"><span class="tag">Ответ</span>${answerHTML(t)}. Дальше — такое же задание с другими числами.</div>`;
+  $('hFb').innerHTML = html;
+  $('hHint').hidden = H.wait; $('hNext').hidden = !H.wait;
+  $('hNext').textContent = H.n >= CONFIG.home.round ? 'Итоги →' : 'Следующее задание →';
+  if (!PREVIEW) {
+    const first = $('hStep').querySelector('input');
+    if (first) first.focus(); else if (H.wait) $('hNext').focus();
+  }
+}
+// верный ответ после ошибки: TYPES[type].answer, по умолчанию «запись = ответ»
+const answerHTML = t => TYPES[t.type].answer ? TYPES[t.type].answer(t) : `${TYPES[t.type].text(t)} = ${TYPES[t.type].keyHTML(t)}`;
+function homeCollect() {
+  const get = k => $('hStep').querySelector(`[data-k="${k}"]`)?.value ?? '';
+  return inputKind(H.task).collect(get);
+}
+function homeCheckClick(x = homeCollect()) { const r = homeCheck(x); if (r && r.empty) homeRender(r); }
+
+
+// ---------- ядро: core/boot.js ----------
+// ================= Управление =================
+let lastInput = null;
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-go],[data-act],[data-level],[data-copy],[data-choice],[data-count],[data-kind-set]');
+  if (!el) return;
+  if (el.dataset.go) { if (el.dataset.kind) pendingKind = el.dataset.kind; return show(el.dataset.go); }
+  if (el.dataset.kindSet) { $('pKind').value = el.dataset.kindSet; return drawSheets(); }
+  if (el.dataset.level) { H.level = +el.dataset.level; return homeStart(); }
+  if (el.dataset.copy) return copyLevelLink(+el.dataset.copy);
+  if (el.dataset.choice) return homeCheckClick(el.dataset.choice);
+  if (el.dataset.count) { H.eqCount = +el.dataset.count; return homeRender(); }
+  const act = el.dataset.act;
+  if (act === 'menu') { if (document.fullscreenElement) toggleFull(); show('start'); }
+  if (act === 'next') boardNext();
+  if (act === 'prev') boardPrev();
+  if (act === 'restart') boardRestart();
+  if (act === 'numbers') { boardNumbers(true); renderBoard(); }
+  if (act === 'theme') toggleTheme();
+  if (act === 'full') toggleFull();
+  if (act === 'notes') boardNotes();
+  if (act === 'check') homeCheckClick();
+  if (act === 'sqrt') {
+    const i = lastInput && $('hStep').contains(lastInput) ? lastInput : $('hStep').querySelector('input');
+    if (i) { const p = i.selectionStart ?? i.value.length; i.value = i.value.slice(0, p) + '√' + i.value.slice(p); i.focus(); i.setSelectionRange?.(p + 1, p + 1); }
+  }
+  if (act === 'help') $('help').hidden = false;
+  if (act === 'help-close') $('help').hidden = true;
+  if (act === 'again') homeStart();
+  if (act === 'nextlevel') { H.level++; homeStart(); }
+  if (act === 'setup') homeSetup();
+});
+$('hStep').addEventListener('focusin', e => { if (e.target.matches('input')) lastInput = e.target; });
+$('help').addEventListener('click', e => { if (e.target === $('help')) $('help').hidden = true; });
+$('themeBtn').addEventListener('click', toggleTheme);
+$('hHint').addEventListener('click', homeHint);
+$('hNext').addEventListener('click', homeContinue);
+// открылась клавиатура телефона — подтягиваем «Проверить» в видимую часть экрана
+window.visualViewport?.addEventListener('resize', () => {
+  if (screen === 'home' && !PREVIEW) $('hStep').querySelector('.check')?.scrollIntoView({ block: 'nearest' });
+});
+$('hStep').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); homeCheckClick(); } });
+$('pNew').addEventListener('click', () => { $('pMsg').textContent = ''; printNums = newNumbers(Math.max(1, Math.min(40, +$('pCount').value || CONFIG.print.variants))); renderPrint(); });
+$('pCount').addEventListener('change', () => $('pNew').click());
+$('pSpace').addEventListener('change', drawSheets);
+$('pTwo').addEventListener('change', drawSheets);
+$('pNums').addEventListener('change', () => {
+  const { nums, bad } = parseNums($('pNums').value);
+  $('pMsg').innerHTML = bad.length ? `<span class="err">Не понял номера: ${esc(bad.join(', '))}. Номер — как на листе, например ${GEN_VERSION}-4817.</span>` : '';
+  if (nums.length) { printNums = nums.slice(0, 40); $('pCount').value = printNums.length; drawSheets(); }
+});
+$('pPrint').addEventListener('click', () => printNow('sheets'));
+$('pPrintKey').addEventListener('click', () => printNow('key'));
+addEventListener('afterprint', () => document.body.classList.remove('print-key', 'print-sheets'));
+
+document.addEventListener('keydown', e => {
+  if (e.target.matches?.('input') && e.key !== 'Escape') return;
+  if (e.key === 'Escape') {
+    if (!$('help').hidden) { $('help').hidden = true; return; }
+    if (screen !== 'start' && !STUDENT) show('start');
+    return;
+  }
+  if (screen === 'home' && e.key === 'Enter' && H.wait) { e.preventDefault(); homeContinue(); return; }
+  if (screen !== 'board' || liveKeydown(e)) return;
+  if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); boardNext(); }
+  else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); boardPrev(); }
+  else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') toggleFull();
+});
+
+// ================= Запуск =================
+(() => {
+  const th = store.get('theme');
+  if (th === 'dark' || th === 'light') document.documentElement.dataset.theme = th;
+  B.notes = store.get('notes') === '1';
+  const back = siteHref();
+  if (back) { $('toSite').href = back; $('toSite').hidden = false; }
+  initPrintFormats();
+  if (typeof helpInit === 'function') helpInit();   // тема дорисовывает формулы в справке
+  const lvl = +P.get('level');
+  if (STUDENT) document.body.classList.add('student');
+  if (PREVIEW) { show('board'); boardStartPreview(); }
+  else if ((MODE === 'home' || STUDENT) && lvl >= 1 && lvl <= SECTIONS.length) {
+    H.level = lvl - 1;
+    show('home'); homeStart();
+  } else show(STUDENT ? 'home' : MODE || 'start');
+})();
+
+// Для автотестов и снимка превью
+window.APP = {
+  SHEETS, PRINT_GENERATORS, printVariant, SLUG, META, CONFIG, GEN_VERSION, TYPES, SECTIONS, KINDS_V1, WORDS_V1,
+  OGE_V1: HAS_OGE ? OGE_V1 : undefined, makeVariantOGE: HAS_OGE ? makeVariantOGE : undefined,
+  Q, qeq, decStr, keyQ, parseQ, parseVal, eqRoots, generate, makeVariant, taskRnd, mulberry32, parseNums,
+  STUDENT, show, get screen() { return screen; },
+  board: { get steps() { return B.steps; }, get i() { return B.i; }, get phase() { return B.phase; }, get e() { return B.e; },
+    next: boardNext, prev: boardPrev, go: boardGo, numbers: random => { boardNumbers(random); renderBoard(); }, poster: boardPoster,
+    restart: boardRestart,
+    // живая доска: модель, ручки и панель текущего шага; drag(id, {x, y}) и key(id, dx, dy) — как учитель рукой и стрелками
+    get model() { return B.m; }, get snap() { return LV.snap; }, get animating() { return !!LV.anim; },
+    get handles() { return LV.handles.map(h => ({ id: h.id, label: h.label, at: { ...h.at } })); },
+    get controls() { return LV.controls.map(c => ({ id: c.id, type: c.type, label: c.label, min: c.min, max: c.max, options: c.options })); },
+    drag: liveDrag, key: liveKey, set: liveSet, reset: liveReset, again: liveAgain },
+  GEO, HAS_LIVE: typeof LIVE !== 'undefined',
+  print: { draw: drawSheets, set nums(v) { printNums = v; } },
+  home: { state: H, start: homeStart, check: homeCheck, hint: homeHint, next: homeContinue, collect: homeCollect,
+    setCount: n => { H.eqCount = n; homeRender(); } },
+};
+
+</script>
+</body>
+</html>

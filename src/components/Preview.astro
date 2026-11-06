@@ -5,13 +5,14 @@
 // а на телефоне и планшете (нет мыши) — тоже когда карточка на экране.
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { openHref, isReady } from '../lib';
+import type { CollectionEntry } from 'astro:content';
+import { openHref, isReady, isLocalFile } from '../lib';
 import MaterialArt from './MaterialArt.astro';
-interface Props { item: any; load?: 'visible' | 'hover'; }
+interface Props { item: CollectionEntry<'items'>; load?: 'visible' | 'hover'; }
 const { item, load = 'hover' } = Astro.props;
 const d = item.data;
 const base = import.meta.env.BASE_URL;
-const live = isReady(d) && !d.video && !/^https?:/.test(d.url) && d.url.endsWith('.html');
+const live = isReady(d) && !d.video && isLocalFile(d.url);
 // тёмный кадр рядом с обычным: posts/<slug>-dark.jpg — подставляется в тёмной теме
 const posterDark = d.poster?.replace(/(\.\w+)$/, '-dark$1');
 const hasDark = posterDark && existsSync(join(process.cwd(), 'public', posterDark));

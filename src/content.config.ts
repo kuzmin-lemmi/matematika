@@ -15,7 +15,7 @@ const items = defineCollection({
       kind: z.string().regex(/^[a-z0-9-]+$/),
       label: z.string(),            // «Бланк ОГЭ» — коротко, это текст кнопки
       icon: z.string().default('🧾'),
-    })).default([]),
+    }).strict()).default([]),
     summary: z.string(),
     emoji: z.string().default('✨'),
     color: z.string().default('#2F6FD6'),
@@ -43,7 +43,7 @@ const items = defineCollection({
     featured: z.boolean().default(false),     // при равных датах added — показать в блоке «Новое» первым
     added: z.coerce.date().optional(),        // дата публикации: самый свежий материал попадает в блок «Новое» на главной
     updated: z.coerce.date().optional(),
-  }),
+  }).strict(),                                // опечатка в имени поля (posters:, planLesson:) — ошибка сборки, а не тихий пропуск
 });
 
 export const collections = { items };

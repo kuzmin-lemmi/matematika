@@ -18,7 +18,7 @@ export function initLessonPlan(root: HTMLElement, today = new Date()) {
   let quarter = '1';
   function updateRails() {
     rails.forEach(group => {
-      const rail = group.querySelector<HTMLElement>('[data-rail]')!;
+      const rail = group.querySelector<HTMLElement>('[data-plan-rail]')!;
       const controls = group.querySelector<HTMLElement>('[data-rail-controls]')!;
       controls.hidden = rail.clientWidth === 0 || rail.scrollWidth <= rail.clientWidth + 1;
       group.querySelectorAll<HTMLButtonElement>('[data-scroll]').forEach(button => {
@@ -69,7 +69,7 @@ export function initLessonPlan(root: HTMLElement, today = new Date()) {
   quarters.forEach(button => button.addEventListener('click', () => { quarter = button.dataset.quarterButton!; render(true); }));
   ready.addEventListener('change', () => render(true));
   rails.forEach(group => {
-    const rail = group.querySelector<HTMLElement>('[data-rail]')!;
+    const rail = group.querySelector<HTMLElement>('[data-plan-rail]')!;
     group.querySelectorAll<HTMLButtonElement>('[data-scroll]').forEach(button => button.addEventListener('click', () => rail.scrollBy({left: Number(button.dataset.scroll) * Math.max(140, rail.clientWidth * .8), behavior: 'auto'})));
     rail.addEventListener('scroll', updateRails, {passive:true});
   });

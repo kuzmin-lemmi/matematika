@@ -3,13 +3,11 @@
 import type { CollectionEntry } from 'astro:content';
 import Preview from './Preview.astro';
 import { ACCESS, PARTS, TYPES } from '../config';
-import { openPageHref, pageHref, gradeLabel, subjectLabel, downloadHref, downloadName, colorVars, isReady } from '../lib';
+import { pageHref, gradeLabel, subjectLabel, downloadName, colorVars, itemLinks } from '../lib';
 interface Props { item: CollectionEntry<'items'> }
 const { item } = Astro.props;
 const d = item.data;
-const external = /^https?:/.test(d.url);
-const ready = isReady(d);
-const dl = ready ? downloadHref(d) : '';
+const { open, external, download } = itemLinks(item);
 ---
 <article class="sc" style={colorVars(d.color)} data-pv-host>
   <!-- обложка — только для мыши; клавиатуре и скринридеру хватает ссылки в заголовке -->
@@ -24,13 +22,13 @@ const dl = ready ? downloadHref(d) : '';
     {d.topic && <p class="topic">{d.topic}</p>}
     {d.parts.length > 0 && <p class="parts" aria-label={[...d.parts.map(p => PARTS[p].label), ...d.sheets.map(s => s.label)].join(', ')}>{d.parts.map(p => <span title={PARTS[p].label}>{PARTS[p].icon}</span>)}{d.sheets.map(s => <span title={s.label}>{s.icon}</span>)}</p>}
     <div class="act">
-      {ready && (
-        <a class="play" href={openPageHref(item)} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>
+      {open && (
+        <a class="play" href={open} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>
           {external ? 'Открыть ↗' : '▶ Открыть'}
         </a>
       )}
-      {dl && <a class="dl" href={dl} download={downloadName(d.url)} title="Скачать бесплатно — один HTML-файл">⬇ Скачать</a>}
-      {!ready && <a class="dl" href={pageHref(item.id)}>Подробнее</a>}
+      {download && <a class="dl" href={download} download={downloadName(d.url)} title="Скачать бесплатно — один HTML-файл">⬇ Скачать</a>}
+      {!open && <a class="dl" href={pageHref(item.id)}>Подробнее</a>}
     </div>
   </div>
 </article>

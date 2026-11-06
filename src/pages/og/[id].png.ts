@@ -1,6 +1,6 @@
 // Картинка для превью ссылки (ВК, мессенджеры) — 1200×630, собирается при сборке для каждого материала
 import type { APIRoute } from 'astro';
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import sharp from 'sharp';
@@ -30,8 +30,8 @@ function wrap(text: string, max: number, lines: number) {
 const W = 660, EM_TITLE = .66, EM_TOPIC = .7, EM_TAG = .62;
 const FONT = "'Golos Text','Segoe UI','DejaVu Sans','Liberation Sans',Arial,sans-serif";
 
-export const GET: APIRoute = async ({ props }) => {
-  const d = (props as any).item.data;
+export const GET: APIRoute<{ item: CollectionEntry<'items'> }> = async ({ props }) => {
+  const d = props.item.data;
   const logo = (await readFile(join(process.cwd(), 'public/favicon.svg'))).toString('base64');
   const title = wrap(d.title, 18, 2);
   const topic = wrap(d.topic ?? d.summary, Math.floor(W / (32 * EM_TOPIC)), 2);

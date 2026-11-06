@@ -24,6 +24,15 @@ test('поиск понимает регистр, ё, формы слов и с�
   assert.equal(matchesSearch({ ...entries[0], text:'трёхзначное число' }, 'трехзначное', '', '', false), true);
 });
 
+test('поиск понимает беглую гласную: углы — угол, отрезки — отрезок', () => {
+  const topic = text => ({ ...entries[3], text });
+  for (const [query, text] of [['углы', 'Угол между прямыми'], ['угол', 'Углы при параллельных прямых'], ['угла', 'Измерение углов'],
+    ['отрезки', 'Отрезок и его длина'], ['корни', 'Квадратный корень'], ['делители', 'Делитель и кратное'], ['дробь', 'Сложение дробей']]) {
+    assert.equal(matchesSearch(topic(text), query, '', '', false), true, `«${query}» находит «${text}»`);
+  }
+  assert.equal(matchesSearch(topic('Угол между прямыми'), 'уголок треугольника', '', '', false), false);
+});
+
 test('запрос из адреса, фильтры, ссылки, пустой результат и возврат в истории', t => {
   const dom = new JSDOM(`<main><form data-search-form><input data-search-query><select data-search-grade><option value="">Все</option><option value="6">6</option><option value="8">8</option></select><select data-search-subject><option value="">Все</option><option value="algebra">Алгебра</option></select><input type="checkbox" data-search-ready><button type="submit">Найти</button></form><button data-search-example="дроби"></button><p data-search-status></p><div data-search-results></div><button data-search-more hidden></button></main>`, { url:'https://matshag.ru/poisk/?q=корень' });
   t.after(() => dom.window.close());
@@ -56,4 +65,28 @@ test('список тем ограничивается и раскрываетс
   more.click();
   assert.equal(root.querySelectorAll('.result-row').length, 35);
   assert.equal(more.hidden, true);
+});
+
+test('индекс скачивается один раз и только когда есть запрос; при ошибке — понятное сообщение', async t => {
+  const html = `<main><form data-search-form><input data-search-query><select data-search-grade><option value=""></option></select><select data-search-subject><option value=""></option></select><input type="checkbox" data-search-ready></form><p data-search-status></p><div data-search-results></div><button data-search-more hidden></button></main>`;
+  const dom = new JSDOM(html, { url:'https://matshag.ru/poisk/' });
+  t.after(() => dom.window.close());
+  const root = dom.window.document.querySelector('main');
+  let calls = 0;
+  initSiteSearch(root, async () => { calls++; return entries; });
+  assert.equal(calls, 0, 'без запроса индекс не нужен');
+  const query = root.querySelector('[data-search-query]');
+  query.value = 'дроби'; query.dispatchEvent(new dom.window.Event('input'));
+  assert.match(root.querySelector('[data-search-status]').textContent, /Загружаю/);
+  query.value = 'дробь'; query.dispatchEvent(new dom.window.Event('input'));
+  await new Promise(r => setTimeout(r, 0));
+  assert.equal(calls, 1);
+  assert.equal(root.querySelector('.result-title').textContent, 'Сравнение дробей', 'показан результат последнего запроса');
+
+  const broken = new JSDOM(html, { url:'https://matshag.ru/poisk/?q=дроби' });
+  t.after(() => broken.window.close());
+  const brokenRoot = broken.window.document.querySelector('main');
+  initSiteSearch(brokenRoot, () => Promise.reject(new Error('offline')));
+  await new Promise(r => setTimeout(r, 0));
+  assert.match(brokenRoot.querySelector('[data-search-status]').textContent, /Не удалось загрузить/);
 });
