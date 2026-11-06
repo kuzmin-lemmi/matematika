@@ -86,7 +86,7 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 .icon{padding:.35em .6em;min-width:44px;min-height:44px}
 
 /* доска: на проекторе шрифт не мельче 28px */
-#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
+#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
 .bbar{display:flex;align-items:center;gap:8px;font-size:20px}
 .bbar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap;margin-right:6px}
@@ -137,6 +137,44 @@ svg .dot{fill:var(--b);stroke:var(--surface);stroke-width:3}
 svg .lbl text{font-size:32px;font-weight:700}
 svg .lbl line{stroke:var(--ink);stroke-width:3}
 svg .lbl.warm text{fill:var(--b)} svg .lbl.warm line{stroke:var(--b)}
+/* чертёжные помощники GEO (core/geom.js): линии толще 4px, подписи с подложкой цвета фона — читаются поверх линий */
+svg .g-ln{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+svg .g-thin{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round}
+svg .g-dash{fill:none;stroke:var(--soft);stroke-width:3;stroke-dasharray:12 9;stroke-linecap:round}
+svg .g-hl{fill:none;stroke:var(--b);stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+svg .g-fig{fill:var(--a-soft);fill-opacity:.6;stroke:var(--ink);stroke-width:5;stroke-linejoin:round}
+svg .g-fig.b{fill:var(--b-soft);fill-opacity:.85}
+svg .g-fig.ghost{fill:none;stroke:var(--soft);stroke-width:3;stroke-dasharray:12 9}
+svg .g-circ{fill:none;stroke:var(--ink);stroke-width:3}
+svg .g-pt{fill:var(--ink)}
+svg .g-mark{fill:none;stroke:var(--ink);stroke-width:3}
+svg .g-tick{stroke:var(--b);stroke-width:3.5;stroke-linecap:round}
+svg .g-sec{fill:var(--b-soft);stroke:var(--b);stroke-width:3}
+svg .g-sec.a{fill:var(--a-soft);stroke:var(--a)}
+svg .g-arrow{stroke:var(--b);stroke-width:5;fill:var(--b);stroke-linecap:round}
+svg .g-vl,svg .g-lab,svg .g-num{paint-order:stroke;stroke:var(--bg);stroke-width:8px;stroke-linejoin:round}
+svg .g-vl{font-size:40px;font-weight:700;font-style:italic}
+svg .g-vl .g-sub{font-size:26px;font-style:normal}
+svg .g-lab{font-size:34px;font-weight:600}
+svg .g-num{font-size:34px;font-weight:800}
+svg .g-num.b,svg .g-lab.b{fill:var(--b)} svg .g-num.a,svg .g-lab.a{fill:var(--accent)}
+/* живая доска (core/live.js): ручки — крупные, для пальца и пера; панель — под чертежом */
+.bstage svg.live{touch-action:none;user-select:none;-webkit-user-select:none}
+svg .lv-h{cursor:grab;outline:none}
+#board.dragging,#board.dragging svg .lv-h{cursor:grabbing}
+svg .lv-hit{fill:transparent}
+svg .lv-dot{fill:var(--b);stroke:var(--surface);stroke-width:5}
+svg .lv-h:hover .lv-dot{stroke:var(--accent)}
+svg .lv-h:focus-visible .lv-dot{stroke:var(--accent);stroke-width:9}
+.blive{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:center;padding:6px 0 2px;font-size:22px}
+.blive .lv-c{display:inline-flex;align-items:center;gap:12px;font-weight:600}
+.blive input[type=range]{width:min(320px,55vw);height:40px;accent-color:var(--accent);cursor:pointer}
+.blive output{min-width:3.2em;font-weight:800;color:var(--accent)}
+.blive button{min-height:48px;font-size:20px;padding:.2em .8em}
+.blive button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.blive .lv-tools{display:inline-flex;gap:8px}
+#board.preview .blive{visibility:hidden}
+@media (max-width:600px){ .blive{font-size:17px;gap:6px 14px} .blive button{font-size:16px;min-height:44px} }
 svg .new{animation:fade .6s ease-out both}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion: reduce){ svg .new, .mode:hover{animation:none;transform:none} }
@@ -218,6 +256,9 @@ table.ans .tall td{height:13mm}
 table.key{border-collapse:collapse;width:100%;font-size:10.5pt}
 table.key td,table.key th{border:1px solid #000;padding:1mm 1.2mm;text-align:center;white-space:nowrap}
 table.key td:first-child{font-weight:700}
+.page.key.land{width:297mm;min-height:210mm}
+table.key.wrap td,table.key.wrap th{white-space:normal;padding:.6mm .8mm}
+table.key.wrap td:first-child{white-space:nowrap}
 
 /* тренажёр */
 .hhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:16px}
@@ -274,7 +315,9 @@ table.key td:first-child{font-weight:700}
 
 body.student [data-act="menu"],body.student #hLinks{display:none !important}
 @page{size:A4;margin:0}
+@page land{size:A4 landscape;margin:0}
 @media print{
+  .page.key.land{page:land}
   html,body{background:#fff !important;color:#000 !important;background-image:none !important;padding:0}
   .no-print,.screen:not(#print),.topright{display:none !important}
   #print .wrap{max-width:none;padding:0}
@@ -421,6 +464,7 @@ svg .superpose { animation: superpose 1.1s ease-out both; }
   </div>
   <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
   <div class="bstage" id="bStage"></div>
+  <div class="blive" id="bLive" role="group" aria-label="Управление чертежом" hidden></div>
   <div class="brec"><span class="rt-h">Запись в тетради</span><div id="bRec"></div></div>
   <div class="bctl">
     <button type="button" data-act="prev" title="Назад (←, PageUp)">← Назад</button>
@@ -700,6 +744,165 @@ function parseVal(s) {
   const r = isqrt(under);
   return r != null ? V.q(Q(sign * r)) : { m: under, s: sign };
 }
+
+// ---------- ядро: core/geom.js ----------
+// ================= 📐 Чертёжные помощники (GEO) =================
+// Всё в одном объекте GEO, чтобы не пересекаться с именами темы: const { pt, seg, vertex } = GEO.
+// Координаты — экранные координаты SVG (y вниз), по умолчанию рамка доски 980 × 400.
+// Углы — в градусах, «математические»: 0° — вправо, 90° — вверх, положительный поворот — против часовой стрелки.
+// Рисующие функции возвращают строку SVG; классы g-* описаны в base.css и читаются на проекторе.
+const GEO = (() => {
+  const BOX = { x: 0, y: 0, w: 980, h: 400 };
+  const f1 = n => Math.round(n * 10) / 10;
+  const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const snap = (v, step) => Math.round(v / step) * step;
+  const pt = (x, y) => ({ x, y });
+  const add = (p, q) => pt(p.x + q.x, p.y + q.y);
+  const sub = (p, q) => pt(p.x - q.x, p.y - q.y);
+  const scale = (v, k) => pt(v.x * k, v.y * k);
+  const len = v => Math.hypot(v.x, v.y);
+  const dist = (p, q) => Math.hypot(q.x - p.x, q.y - p.y);
+  const mid = (p, q) => pt((p.x + q.x) / 2, (p.y + q.y) / 2);
+  const lerp = (p, q, t) => pt(p.x + (q.x - p.x) * t, p.y + (q.y - p.y) * t);
+  const unit = (p, q) => { const d = dist(p, q) || 1; return pt((q.x - p.x) / d, (q.y - p.y) / d); };
+  const perp = v => pt(v.y, -v.x);                                   // поворот на 90° против часовой стрелки
+  const polar = (V, a, r) => pt(V.x + r * Math.cos(rad(a)), V.y - r * Math.sin(rad(a)));
+  // направление луча VP: 0…360°
+  const dirDeg = (V, P) => { const a = deg(Math.atan2(V.y - P.y, P.x - V.x)); return a < 0 ? a + 360 : a; };
+  // величина угла AVB: 0…180°
+  const angleAt = (V, A, B) => { let d = Math.abs(dirDeg(V, A) - dirDeg(V, B)); if (d > 180) d = 360 - d; return d; };
+  // поворот точки P вокруг C на a градусов
+  const turn = (P, C, a) => { const c = Math.cos(rad(a)), s = Math.sin(rad(a)), dx = P.x - C.x, dy = P.y - C.y; return pt(C.x + dx * c + dy * s, C.y - dx * s + dy * c); };
+  // проекция точки на прямую AB и отражение относительно неё
+  const project = (P, A, B) => { const d = sub(B, A), k = d.x * d.x + d.y * d.y || 1, t = ((P.x - A.x) * d.x + (P.y - A.y) * d.y) / k; return lerp(A, B, t); };
+  const reflect = (P, A, B) => { const F = project(P, A, B); return pt(2 * F.x - P.x, 2 * F.y - P.y); };
+  // точка пересечения прямых p1q1 и p2q2; null — прямые параллельны
+  function cross(p1, q1, p2, q2) {
+    const d1 = sub(q1, p1), d2 = sub(q2, p2), den = d1.x * d2.y - d1.y * d2.x;
+    if (Math.abs(den) < 1e-9) return null;
+    const t = ((p2.x - p1.x) * d2.y - (p2.y - p1.y) * d2.x) / den;
+    return pt(p1.x + t * d1.x, p1.y + t * d1.y);
+  }
+  // пересечение прямой PQ с окружностью (C, R): 0, 1 или 2 точки — по направлению от P к Q
+  function lineCircle(P, Q, C, R) {
+    const u = unit(P, Q), w = sub(C, P), b = w.x * u.x + w.y * u.y, disc = b * b - (w.x * w.x + w.y * w.y - R * R);
+    if (disc < -1e-9) return [];
+    const s = Math.sqrt(Math.max(0, disc));
+    return (s < 1e-9 ? [b] : [b - s, b + s]).map(t => add(P, scale(u, t)));
+  }
+  // пересечение окружностей (построения циркулем): 0, 1 или 2 точки
+  function circles(C1, R1, C2, R2) {
+    const d = dist(C1, C2);
+    if (d < 1e-9 || d > R1 + R2 + 1e-9 || d < Math.abs(R1 - R2) - 1e-9) return [];
+    const a = (R1 * R1 - R2 * R2 + d * d) / (2 * d), h = Math.sqrt(Math.max(0, R1 * R1 - a * a));
+    const M = lerp(C1, C2, a / d), n = perp(unit(C1, C2));
+    return h < 1e-9 ? [M] : [add(M, scale(n, h)), sub(M, scale(n, h))];
+  }
+  const area = ps => Math.abs(ps.reduce((s, p, i) => { const q = ps[(i + 1) % ps.length]; return s + p.x * q.y - q.x * p.y; }, 0)) / 2;
+  const centroid = ps => pt(ps.reduce((s, p) => s + p.x, 0) / ps.length, ps.reduce((s, p) => s + p.y, 0) / ps.length);
+  // ориентация тройки на экране: > 0 — A → B → C против часовой стрелки
+  const orient = (A, B, C) => -((B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x));
+  // многоугольник «нормальный» для показа: стороны не короче side, углы не меньше angle — контроль вырожденных случаев
+  function fine(ps, { side = 40, angle = 12 } = {}) {
+    return ps.every((p, i) => {
+      const prev = ps[(i + ps.length - 1) % ps.length], next = ps[(i + 1) % ps.length], a = angleAt(p, prev, next);
+      return dist(p, next) >= side && a >= angle && a <= 180 - angle;
+    });
+  }
+  const bbox = ps => { const xs = ps.map(p => p.x), ys = ps.map(p => p.y); return { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) }; };
+  const inBox = (p, pad = 0, box = BOX) => p.x >= box.x + pad && p.x <= box.x + box.w - pad && p.y >= box.y + pad && p.y <= box.y + box.h - pad;
+  const keepIn = (p, pad = 0, box = BOX) => pt(clamp(p.x, box.x + pad, box.x + box.w - pad), clamp(p.y, box.y + pad, box.y + box.h - pad));
+  // вписать точки модели (в своих единицах, y вверх или вниз) в рамку: map(p) → точка SVG, k — масштаб
+  function fit(ps, box = BOX, { pad = 30, flipY = false } = {}) {
+    const b = bbox(ps), k = Math.min((box.w - 2 * pad) / (b.w || 1), (box.h - 2 * pad) / (b.h || 1));
+    const cx = b.x + b.w / 2, cy = b.y + b.h / 2, X = box.x + box.w / 2, Y = box.y + box.h / 2;
+    return { k, map: p => pt(X + (p.x - cx) * k, Y + (flipY ? -1 : 1) * (p.y - cy) * k) };
+  }
+  // прямая через P и Q, обрезанная рамкой (отступ pad); луч — от P через Q до края
+  function clip(P, Q, pad = 20, box = BOX, ray = false) {
+    const d = sub(Q, P), ts = [];
+    if (Math.abs(d.x) > 1e-9) ts.push((box.x + pad - P.x) / d.x, (box.x + box.w - pad - P.x) / d.x);
+    if (Math.abs(d.y) > 1e-9) ts.push((box.y + pad - P.y) / d.y, (box.y + box.h - pad - P.y) / d.y);
+    const ok = ts.filter(t => inBox(add(P, scale(d, t)), pad - 0.01, box));
+    if (!ok.length) return [P, Q];
+    const t1 = Math.max(...ok), t0 = ray ? 0 : Math.min(...ok);
+    return [add(P, scale(d, t0)), add(P, scale(d, t1))];
+  }
+
+  // ---------- рисунок ----------
+  // имя точки с индексом: 'A1' → A₁ (подстрочная цифра)
+  function name(s) {
+    let out = '', down = false;
+    for (const ch of String(s)) {
+      if (ch >= '0' && ch <= '9') { out += `<tspan${down ? '' : ' dy="9"'} class="g-sub">${ch}</tspan>`; down = true; }
+      else { out += down ? `<tspan dy="-9">${ch}</tspan>` : ch; down = false; }
+    }
+    return out;
+  }
+  const seg = (p, q, cls = 'g-ln') => `<line class="${cls}" x1="${f1(p.x)}" y1="${f1(p.y)}" x2="${f1(q.x)}" y2="${f1(q.y)}"/>`;
+  const line = (p, q, cls = 'g-ln', pad = 20) => { const [a, b] = clip(p, q, pad); return seg(a, b, cls); };
+  const ray = (p, q, cls = 'g-ln', pad = 20) => { const [a, b] = clip(p, q, pad, BOX, true); return seg(a, b, cls); };
+  const pts = ps => ps.map(p => `${f1(p.x)},${f1(p.y)}`).join(' ');
+  const poly = (ps, cls = 'g-fig') => `<polygon class="${cls}" points="${pts(ps)}"/>`;
+  const path = (ps, cls = 'g-ln') => `<polyline class="${cls}" points="${pts(ps)}"/>`;
+  const circle = (C, r, cls = 'g-circ') => `<circle class="${cls}" cx="${f1(C.x)}" cy="${f1(C.y)}" r="${f1(r)}"/>`;
+  const dot = (p, cls = 'g-pt', r = 7) => circle(p, r, cls);
+  const text = (p, s, cls = 'g-lab', anchor = 'middle') => `<text class="${cls}" x="${f1(p.x)}" y="${f1(p.y)}" text-anchor="${anchor}" dominant-baseline="central">${s}</text>`;
+  // подпись вершины P на расстоянии r — в сторону от точки from (обычно центр фигуры): подписи не налезают на стороны
+  // и на ручку живой доски в вершине
+  const vertex = (P, s, from, r = 46, cls = 'g-vl') => text(add(P, scale(unit(from, P), r)), name(s), cls);
+  // подпись стороны pq у её середины — снаружи от точки opp
+  function side(p, q, s, opp, r = 30, cls = 'g-num') {
+    const m = mid(p, q), n = perp(unit(p, q)), out = ((m.x - opp.x) * n.x + (m.y - opp.y) * n.y) >= 0 ? 1 : -1;
+    return text(add(m, scale(n, r * out)), s, cls);
+  }
+  // меньший угол AVB: [начало, конец] в градусах, конец > начала
+  function span(V, A, B) {
+    const a = dirDeg(V, A), b = dirDeg(V, B), d = (b - a + 360) % 360;
+    return d <= 180 ? [a, a + d] : [b, b + 360 - d];
+  }
+  const arcD = (V, s, e, r) => { const p = polar(V, s, r), q = polar(V, e, r); return `M${f1(p.x)} ${f1(p.y)}A${f1(r)} ${f1(r)} 0 ${e - s > 180 ? 1 : 0} 0 ${f1(q.x)} ${f1(q.y)}`; };
+  // дуга окружности с центром V от направления s до e (градусы, против часовой стрелки)
+  const arc = (V, s, e, r, cls = 'g-mark') => `<path class="${cls}" d="${arcD(V, s, e, r)}"/>`;
+  // закрашенный угол AVB (меньший), радиус r
+  const sector = (V, A, B, r = 60, cls = 'g-sec') => { const [s, e] = span(V, A, B); return `<path class="${cls}" d="M${f1(V.x)} ${f1(V.y)}L${arcD(V, s, e, r).slice(1)}Z"/>`; };
+  // n дужек равенства угла AVB
+  const arcs = (V, A, B, n = 1, r = 26, cls = 'g-mark') => { const [s, e] = span(V, A, B); let o = ''; for (let i = 0; i < n; i++) o += arc(V, s, e, r + i * 9, cls); return o; };
+  // знак прямого угла AVB
+  const right = (V, A, B, size = 22, cls = 'g-mark') => { const u = scale(unit(V, A), size), w = scale(unit(V, B), size); return path([add(V, u), add(add(V, u), w), add(V, w)], cls); };
+  // n штрихов равенства на отрезке pq
+  function ticks(p, q, n = 1, cls = 'g-tick') {
+    const d = unit(p, q), m = mid(p, q), k = perp(d);
+    let o = '';
+    for (let i = 0; i < n; i++) { const c = add(m, scale(d, (i - (n - 1) / 2) * 11)); o += seg(add(c, scale(k, 11)), sub(c, scale(k, 11)), cls); }
+    return o;
+  }
+  // подпись угла AVB на биссектрисе; у острого угла — дальше от вершины, чтобы число поместилось
+  function angleText(V, A, B, s, r = 0, cls = 'g-num') {
+    const [a, e] = span(V, A, B), rr = r || clamp(34 / Math.sin(rad(Math.max(e - a, 8) / 2)), 58, 130);
+    return text(polar(V, (a + e) / 2, rr), s, cls);
+  }
+  // стрелка от p к q (наконечник — треугольник)
+  function arrow(p, q, cls = 'g-arrow', head = 18) {
+    const d = unit(p, q), n = perp(d), b = sub(q, scale(d, head));
+    return `<g class="${cls}">${seg(p, b, '')}${poly([q, add(b, scale(n, head * .55)), sub(b, scale(n, head * .55))], '')}</g>`;
+  }
+  // знак параллельности: n уголков-стрелок посередине прямой pq
+  function parallel(p, q, n = 1, cls = 'g-mark') {
+    const d = unit(p, q), k = perp(d), m = mid(p, q);
+    let o = '';
+    for (let i = 0; i < n; i++) { const c = add(m, scale(d, (i - (n - 1) / 2) * 13 + 6)); o += path([add(sub(c, scale(d, 12)), scale(k, 10)), c, sub(sub(c, scale(d, 12)), scale(k, 10))], cls); }
+    return o;
+  }
+
+  return {
+    BOX, f1, rad, deg, clamp, snap, pt, add, sub, scale, len, dist, mid, lerp, unit, perp, polar, dirDeg, angleAt, turn,
+    project, reflect, cross, lineCircle, circles, area, centroid, orient, fine, bbox, inBox, keepIn, fit, clip,
+    name, seg, line, ray, poly, path, circle, dot, text, vertex, side, span, arc, sector, arcs, right, ticks, angleText, arrow, parallel,
+  };
+})();
+
 
 // ---------- тема: materials/priznaki-ravenstva-treugolnikov/topic.js ----------
 // Тема «Три признака равенства треугольников» (7 класс, Мерзляк и др.). Только содержание — каркас даёт ядро (core/).
@@ -1805,7 +2008,7 @@ function ogeSheetHTML(v) {
 function ogeKeyHTML(vs) {
   const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
   return `<div class="page key"><h2>Ключ учителя · бланк ответов · ${lowerTitle()}</h2>
-    <table class="key"><tr><th>Вариант</th>${head}</tr>
+    <table class="key"><thead><tr><th>Вариант</th>${head}</tr></thead>
     ${vs.map(v => `<tr><td>${v.label}</td>${v.answers.map(a => `<td>${a}</td>`).join('')}</tr>`).join('')}
     </table><p style="font-size:10pt">Ответ верен, если совпадает с ключом (запятая или точка — одинаково). Ключ всегда можно восстановить
     по номеру варианта: режим «Раздатка», вид листа «Бланк ответов».</p></div>`;
@@ -1813,7 +2016,7 @@ function ogeKeyHTML(vs) {
 function keyHTML(vs) {
   const head = vs[0].tasks.map((_, i) => `<th>${i + 1}</th>`).join('');
   return `<div class="page key"><h2>Ключ учителя · ${lowerTitle()}</h2>
-    <table class="key"><tr><th>Вариант</th>${head}<th>Слово</th></tr>
+    <table class="key"><thead><tr><th>Вариант</th>${head}<th>Слово</th></tr></thead>
     ${vs.map(v => `<tr><td>${v.label}</td>${v.tasks.map(t => `<td>${TYPES[t.type].keyHTML(t)}</td>`).join('')}<td><b>${v.word}</b></td></tr>`).join('')}
     </table><p style="font-size:10pt">Слово сложилось — все ответы верны. Ключ всегда можно восстановить по номеру варианта в режиме «Раздатка».</p></div>`;
 }
@@ -1853,8 +2056,26 @@ function drawSheets() {
     html += `<div class="page half compact ${format.pageClass || ''}">${sheet(vs[i])}${vs[i + 1] ? sheet(vs[i + 1]) : ''}</div>`;
   else html = vs.map(v => `<div class="page ${format.pageClass || ''}${space ? '' : ' compact'}">${sheet(v)}</div>`).join('');
   $('pSheets').innerHTML = (vs.length ? key(vs) : '') + html;
+  fitKeys();
   return vs;
 }
+// Ключ с длинными ответами (многочлены, 9 заданий) шире книжного листа: печатаем его на альбомном A4;
+// не хватило и его — уменьшаем шрифт до 8pt, затем разрешаем перенос внутри ячеек.
+// Размеры в мм, поэтому подгонка на экране верна и для печати.
+function fitKeys() {
+  for (const t of document.querySelectorAll('#pSheets .page.key table')) {
+    const page = t.closest('.page');
+    const avail = () => { const cs = getComputedStyle(page); return page.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight); };
+    if (!(avail() > 0)) continue;                        // лист не на экране (или jsdom без вёрстки)
+    page.classList.remove('land'); t.classList.remove('wrap'); t.style.fontSize = '';
+    if (t.offsetWidth > avail() + 1) page.classList.add('land');
+    for (let pt = 10; t.offsetWidth > avail() + 1 && pt >= 8; pt -= .5) t.style.fontSize = pt + 'pt';
+    if (t.offsetWidth > avail() + 1) t.classList.add('wrap');
+  }
+}
+// шрифт подгрузился позже первой отрисовки — ширина ответов изменилась
+document.fonts?.ready?.then(fitKeys);
+addEventListener('beforeprint', fitKeys);
 function printNow(what) {
   document.body.classList.remove('print-key', 'print-sheets');
   document.body.classList.add(what === 'key' ? 'print-key' : 'print-sheets');
@@ -1903,7 +2124,10 @@ function initPrintFormats() {
 // На экране — то, что видит класс: короткий вопрос, ответ, чертёж и запись в тетради.
 // Что сказать словами — в подсказке учителю (кнопка «💬 Учителю»).
 const BW = 980, BH = 400;
-const B = { e: null, steps: [], i: 0, phase: 0, timer: 0, notes: false };
+const B = { e: null, m: {}, steps: [], i: 0, phase: 0, timer: 0, notes: false };
+// q, a, note и rec шага могут быть строкой или функцией (m — модель живой доски, phase — 0 вопрос, 1 ответ)
+const stepVal = (x, ...args) => typeof x === 'function' ? x(...args) : x;
+const setHTML = (el, s) => { if (el.innerHTML !== s) el.innerHTML = s; };
 const svg = (inner, label) => `<svg viewBox="0 0 ${BW} ${BH}" role="img" aria-label="${label}" preserveAspectRatio="xMidYMid meet">${inner}</svg>`;
 const tx = (x, y, s, cls = 'lab', anchor = 'middle') => `<text class="${cls}" x="${x}" y="${y}" text-anchor="${anchor}">${s}</text>`;
 const sr = s => `√<tspan class="ov">${s}</tspan>`;   // корень в подписи чертежа
@@ -1936,39 +2160,53 @@ function numLine(y, a, b, step, labelEvery, hl, cls = '') {
 }
 
 // пример для показа: тема даёт boardExample(random, прошлый пример) и buildSteps(пример) → шаги
-// {q — вопрос классу, a — ответ, note — подсказка учителю, draw(phase) — SVG или '', rec(phase) — строки тетради}
+// {q — вопрос классу, a — ответ, note — подсказка учителю, draw(phase, m) — SVG или '', rec(phase, m) — строки тетради,
+//  live — что можно двигать и менять на этом шаге (core/live.js)}
 function boardNumbers(random) {
+  liveStop();
   B.e = boardExample(random, B.e || {});
   B.steps = buildSteps(B.e);
+  B.m = liveModel(B.e);
   B.i = 0; B.phase = 0;
+  liveEnter();
 }
 function renderBoard() {
   if (!B.steps.length) boardNumbers(false);
-  const st = B.steps[B.i];
+  const st = B.steps[B.i], m = B.m, ph = B.phase;
   $('bCnt').textContent = `Шаг ${B.i + 1} из ${B.steps.length}`;
-  $('bQ').innerHTML = st.q;
-  $('bA').innerHTML = st.a;
-  $('bA').classList.toggle('hide', B.phase === 0);
-  const pic = st.draw(B.phase);
-  $('bStage').innerHTML = pic ? svg(pic, 'Чертёж к шагу') : '';
-  $('bRec').innerHTML = st.rec(B.phase).map(l => `<div class="ln">${l}</div>`).join('');
-  $('bNote').innerHTML = `<b>Учителю</b>${st.note}`;
+  setHTML($('bQ'), stepVal(st.q, m, ph));
+  setHTML($('bA'), stepVal(st.a, m, ph));
+  $('bA').classList.toggle('hide', ph === 0);
+  const pic = st.draw(ph, m), handles = liveHandlesSVG(st);
+  const focused = document.activeElement?.closest?.('[data-handle]')?.dataset.handle;
+  $('bStage').innerHTML = pic || handles ? svg(pic + handles, 'Чертёж к шагу').replace('<svg ', handles ? '<svg class="live" ' : '<svg ') : '';
+  if (focused) $('bStage').querySelector(`[data-handle="${focused}"]`)?.focus({ preventScroll: true });
+  setHTML($('bRec'), stepVal(st.rec, ph, m).map(l => `<div class="ln">${l}</div>`).join(''));
+  setHTML($('bNote'), `<b>Учителю</b>${stepVal(st.note, m, ph)}`);
   $('bNote').hidden = !B.notes;
   $('bNotesBtn').setAttribute('aria-pressed', String(B.notes));
-  $('bNext').textContent = B.phase === 0 ? 'Показать ответ' : 'Далее →';
-  $('bNext').disabled = B.i === B.steps.length - 1 && B.phase === 1;
+  $('bNext').textContent = ph === 0 ? 'Показать ответ' : 'Далее →';
+  $('bNext').disabled = B.i === B.steps.length - 1 && ph === 1;
+  liveRenderControls(st);
 }
 function boardNext() {
-  if (B.phase === 0) B.phase = 1;
-  else if (B.i < B.steps.length - 1) { B.i++; B.phase = 0; }
-  renderBoard();
+  if (B.phase === 0) { liveStop(); B.phase = 1; renderBoard(); liveReveal(); }
+  else if (B.i < B.steps.length - 1) boardGo(B.i + 1, 0);
 }
 function boardPrev() {
-  if (B.phase === 1) B.phase = 0;
-  else if (B.i > 0) { B.i--; B.phase = 1; }
+  if (B.phase === 1) { liveStop(); B.phase = 0; liveBack(); renderBoard(); }
+  else if (B.i > 0) boardGo(B.i - 1, 1);
+}
+// переход к шагу: модель ставится, как задумано шагом (live.enter); с phase = 1 — сразу итог опыта
+function boardGo(i, phase = 0) {
+  liveStop();
+  const was = B.i;
+  B.i = Math.max(0, Math.min(i, B.steps.length - 1)); B.phase = phase ? 1 : 0;
+  if (B.i !== was || B.phase === 1 || !LV.entered) liveEnter(B.phase === 1);
   renderBoard();
 }
-function boardGo(i, phase = 0) { B.i = Math.max(0, Math.min(i, B.steps.length - 1)); B.phase = phase ? 1 : 0; renderBoard(); }
+// «Заново»: исходная модель примера и первый шаг
+function boardRestart() { liveStop(); B.m = liveModel(B.e); LV.entered = false; boardGo(0, 0); }
 function boardNotes() { B.notes = !B.notes; store.set('notes', B.notes ? 1 : 0); renderBoard(); }
 // превью на сайте: доска сама идёт по шагам до BOARD.previewUntil и начинает сначала
 function boardStartPreview() {
@@ -1982,6 +2220,215 @@ function boardStopPreview() { clearInterval(B.timer); B.timer = 0; }
 // кадр для картинки-превью (npm run posters на сайте): шаг BOARD.poster с показанным ответом
 function boardPoster() { boardStopPreview(); boardGo(BOARD.poster, 1); }
 
+
+// ---------- ядро: core/live.js ----------
+// ================= 🖐 Живая доска =================
+// Тема описывает только математику: модель (const LIVE) и на шагах — что можно двигать и менять (step.live).
+// Ядро берёт на себя мышь, касание и перо (Pointer Events), клавиатуру, сброс, повтор опыта,
+// плавное движение и prefers-reduced-motion. Схема — ИНСТРУКЦИЯ.md, раздел «Живая доска».
+//
+// const LIVE = {
+//   model: e => ({ ... }),      // исходное состояние модели для примера e (простые данные: числа, строки, {x, y}, массивы)
+//   fix(m) { ... },             // необязательно: привести модель к допустимому виду — прилипание, границы
+//   ok: m => true,              // необязательно: false — положение вырождено, движение отменяется
+// };
+// step.live = {
+//   enter(m) { ... },           // как поставить модель при входе в шаг (можно liveTo — плавно)
+//   reveal(m) { ... },          // опыт по кнопке «Показать ответ» (обычно liveTo); «▶ Повторить опыт» запускает его снова
+//   handles: (m, phase) => [{ id, at: {x, y}, label, move(m, p) {...}, key?(m, dx, dy, fine), keyStep?, r? }],
+//   controls: (m, phase) => [
+//     { id, type: 'range', label, min, max, step, get: m => …, set(m, v) {...}, text?: m => '…' },
+//     { id, type: 'toggle', label, get: m => true|false, set(m, v) {...} },
+//     { id, type: 'choice', label, options: [[значение, 'подпись'], …], get, set },
+//     { id, type: 'button', label, run(m) {...} },
+//   ],
+// };
+// draw(phase, m), rec(phase, m), q(m, phase), a(m, phase), note(m, phase) читают модель m.
+const LV = { entered: false, snap: null, anim: null, drag: null, instant: false, handles: [], controls: [], ctlKey: '' };
+const liveCopy = m => JSON.parse(JSON.stringify(m ?? {}));
+const liveOf = () => B.steps[B.i]?.live || null;
+const liveModel = e => typeof LIVE !== 'undefined' ? LIVE.model(e) : {};
+function liveFix(m) { if (typeof LIVE !== 'undefined' && LIVE.fix) LIVE.fix(m); }
+// изменение модели учителем: после fix проверяем ok, вырожденное положение откатываем
+function liveChange(fn) {
+  const before = liveCopy(B.m);
+  fn(B.m);
+  liveFix(B.m);
+  const ok = typeof LIVE === 'undefined' || !LIVE.ok || LIVE.ok(B.m);
+  if (!ok) B.m = before;
+  renderBoard();
+  return ok;
+}
+
+// ---------- шаги ----------
+function liveEnter(revealed = false) {
+  LV.entered = true;
+  const lv = liveOf();
+  if (lv?.enter) { lv.enter(B.m); liveFix(B.m); }
+  LV.snap = liveCopy(LV.anim ? LV.anim.end : B.m);   // исходное положение шага — куда ведёт движение входа
+  if (revealed) { liveStop(); liveRevealNow(); }
+}
+function liveReveal() { const lv = liveOf(); if (lv?.reveal) { lv.reveal(B.m); if (!LV.anim) { liveFix(B.m); renderBoard(); } } }
+function liveRevealNow() { LV.instant = true; try { liveOf()?.reveal?.(B.m); liveFix(B.m); } finally { LV.instant = false; } }
+// «← Назад» с ответа на вопрос — модель снова как до опыта
+function liveBack() { if (liveOf() && LV.snap) B.m = liveCopy(LV.snap); }
+// «⟲ Сбросить»: положение начала шага (на ответе — итог опыта)
+function liveReset() { liveStop(); if (LV.snap) B.m = liveCopy(LV.snap); if (B.phase === 1) liveRevealNow(); renderBoard(); }
+// «▶ Повторить опыт»: вернуть модель к началу шага и снова провести опыт
+function liveAgain() { liveStop(); if (LV.snap) B.m = liveCopy(LV.snap); renderBoard(); liveReveal(); }
+
+// ---------- плавное движение ----------
+// liveTo({ theta: 90 }) или liveTo([{ theta: 40 }, { theta: 120 }], 700) — через точки, ms на каждый отрезок.
+// Числа (и числа внутри {x, y} и массивов) меняются плавно, остальное — в конце. Учитель листает или берёт
+// ручку — движение сразу заканчивается в конечном положении. prefers-reduced-motion — сразу конечное положение.
+const liveCalm = () => typeof requestAnimationFrame !== 'function' || !window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches;
+const liveEase = u => u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2;
+function liveMix(p, q, w) {
+  if (typeof p === 'number' && typeof q === 'number') return p + (q - p) * w;
+  if (p && q && typeof p === 'object' && typeof q === 'object') {
+    const o = Array.isArray(q) ? [] : {};
+    for (const k of Object.keys(q)) o[k] = k in p ? liveMix(p[k], q[k], w) : q[k];
+    return o;
+  }
+  return w < 1 ? p : q;
+}
+function liveTo(to, ms = 800) {
+  liveStop();
+  const list = Array.isArray(to) ? to : [to], pts = [liveCopy(B.m)];
+  list.forEach(q => pts.push({ ...pts[pts.length - 1], ...liveCopy(q) }));
+  const end = pts[pts.length - 1], n = list.length;
+  if (LV.instant || liveCalm()) { Object.assign(B.m, end); return; }
+  const t0 = performance.now(), a = { end, raf: 0 };
+  const tick = now => {
+    const u = Math.min(1, (now - t0) / (ms * n));
+    if (u >= 1) { LV.anim = null; Object.assign(B.m, end); liveFix(B.m); renderBoard(); return; }
+    const k = Math.min(n - 1, Math.floor(u * n));
+    Object.assign(B.m, liveMix(pts[k], pts[k + 1], liveEase(u * n - k)));
+    renderBoard();
+    a.raf = requestAnimationFrame(tick);
+  };
+  LV.anim = a; a.raf = requestAnimationFrame(tick);
+}
+function liveStop() {
+  if (!LV.anim) return;
+  const a = LV.anim; LV.anim = null;
+  cancelAnimationFrame(a.raf);
+  Object.assign(B.m, a.end); liveFix(B.m);
+}
+
+// ---------- ручки на чертеже ----------
+function liveHandlesSVG(st) {
+  LV.handles = st.live?.handles ? st.live.handles(B.m, B.phase).filter(Boolean) : [];
+  return LV.handles.map(h => `<g class="lv-h${h.cls ? ' ' + h.cls : ''}" data-handle="${h.id}" tabindex="0" role="button" ` +
+    `aria-label="${esc(h.label)}: тяните или двигайте стрелками" transform="translate(${GEO.f1(h.at.x)} ${GEO.f1(h.at.y)})">` +
+    `<title>${esc(h.label)}</title><circle class="lv-hit" r="44"/><circle class="lv-dot" r="${h.r || 18}"/></g>`).join('');
+}
+const liveBox = { x: 0, y: 0, w: BW, h: BH };
+// перетащить ручку id в точку p (координаты чертежа); false — положение вырождено и не принято
+function liveDrag(id, p) {
+  const h = LV.handles.find(x => x.id === id);
+  if (!h) return false;
+  liveStop();
+  return liveChange(m => h.move(m, GEO.keepIn(p, 8, liveBox), h));
+}
+// сдвинуть ручку с клавиатуры: стрелки — шаг keyStep (20), с Shift — мельче; у ручки может быть свой key()
+function liveKey(id, dx, dy, fine = false) {
+  const h = LV.handles.find(x => x.id === id);
+  if (!h) return false;
+  liveStop();
+  if (h.key) return liveChange(m => h.key(m, dx, dy, fine));
+  const s = (h.keyStep || 20) / (fine ? 4 : 1);
+  return liveChange(m => h.move(m, GEO.keepIn({ x: h.at.x + dx * s, y: h.at.y + dy * s }, 8, liveBox), h));
+}
+function livePoint(e) {
+  const M = $('bStage').querySelector('svg')?.getScreenCTM?.();
+  if (!M) return null;
+  const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(M.inverse());
+  return { x: p.x, y: p.y };
+}
+$('bStage').addEventListener('pointerdown', e => {
+  const g = e.target.closest?.('[data-handle]'), h = g && LV.handles.find(x => x.id === g.dataset.handle), p = h && livePoint(e);
+  if (!p) return;
+  liveStop();
+  LV.drag = { id: h.id, dx: h.at.x - p.x, dy: h.at.y - p.y };
+  $('bStage').setPointerCapture?.(e.pointerId);
+  g.focus?.({ preventScroll: true });
+  $('board').classList.add('dragging');
+  e.preventDefault();
+});
+$('bStage').addEventListener('pointermove', e => {
+  if (!LV.drag) return;
+  const p = livePoint(e);
+  if (p) liveDrag(LV.drag.id, { x: p.x + LV.drag.dx, y: p.y + LV.drag.dy });
+});
+const liveDragEnd = () => { LV.drag = null; $('board').classList.remove('dragging'); };
+$('bStage').addEventListener('pointerup', liveDragEnd);
+$('bStage').addEventListener('pointercancel', liveDragEnd);
+// клавиатура: true — клавишу обработала живая доска, листать шаги не нужно
+function liveKeydown(e) {
+  if (e.target.closest?.('#bLive') && [' ', 'Enter'].includes(e.key)) return true;   // кнопки панели нажимаются сами
+  const g = e.target.closest?.('[data-handle]');
+  const d = g && { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+  if (!d) return false;
+  e.preventDefault();
+  liveKey(g.dataset.handle, d[0], d[1], e.shiftKey);
+  return true;
+}
+
+// ---------- панель управления под чертежом ----------
+function liveCtlHTML(c) {
+  const id = `data-ctl="${c.id}"`;
+  if (c.type === 'range') return `<label class="lv-c"><span>${c.label}</span><input type="range" ${id} min="${c.min}" max="${c.max}" step="${c.step || 1}"><output data-out="${c.id}"></output></label>`;
+  if (c.type === 'toggle') return `<button type="button" class="lv-t" ${id} aria-pressed="false">${c.label}</button>`;
+  if (c.type === 'choice') return `<span class="lv-c" role="group" aria-label="${esc(String(c.label).replace(/<[^>]+>/g, ''))}"><span>${c.label}</span><span class="seg">` +
+    c.options.map(([, t], i) => `<button type="button" ${id} data-v="${i}" aria-pressed="false">${t}</button>`).join('') + '</span></span>';
+  return `<button type="button" ${id}>${c.label}</button>`;
+}
+function liveRenderControls(st) {
+  const box = $('bLive'), lv = st.live;
+  if (!lv) { box.hidden = true; box.innerHTML = ''; LV.ctlKey = ''; LV.controls = []; return; }
+  const cs = LV.controls = lv.controls ? lv.controls(B.m, B.phase).filter(Boolean) : [];
+  const again = lv.reveal && B.phase === 1;
+  const key = `${B.i}:${B.phase}:${cs.map(c => c.id + c.type + (c.options || []).length).join(',')}`;
+  if (key !== LV.ctlKey) {
+    LV.ctlKey = key;
+    box.innerHTML = cs.map(liveCtlHTML).join('') + '<span class="lv-tools">' +
+      (again ? '<button type="button" data-live="again" title="Вернуть чертёж и провести опыт ещё раз">▶ Повторить опыт</button>' : '') +
+      '<button type="button" data-live="reset" title="Вернуть чертёж к началу шага">⟲ Сбросить</button></span>';
+  }
+  box.hidden = false;
+  for (const c of cs) {
+    const els = box.querySelectorAll(`[data-ctl="${c.id}"]`), v = c.get ? c.get(B.m) : null, off = !!c.disabled?.(B.m);
+    els.forEach(el => { el.disabled = off; });
+    if (c.type === 'range') {
+      if (+els[0].value !== v) els[0].value = v;
+      box.querySelector(`[data-out="${c.id}"]`).innerHTML = c.text ? c.text(B.m) : String(v).replace('-', MINUS).replace('.', ',');
+    }
+    if (c.type === 'toggle') els[0].setAttribute('aria-pressed', String(!!v));
+    if (c.type === 'choice') els.forEach(el => el.setAttribute('aria-pressed', String(c.options[+el.dataset.v][0] === v)));
+  }
+}
+// значение элемента управления: range — число, toggle — true/false (по умолчанию — переключить), choice — значение варианта
+function liveSet(id, value) {
+  const c = LV.controls.find(x => x.id === id);
+  if (!c) return false;
+  liveStop();
+  if (c.type === 'button') { c.run(B.m); if (!LV.anim) { liveFix(B.m); renderBoard(); } return true; }
+  if (c.type === 'toggle') return liveChange(m => c.set(m, value === undefined ? !c.get(m) : !!value));
+  return liveChange(m => c.set(m, value));
+}
+$('bLive').addEventListener('input', e => {
+  const el = e.target.closest('input[data-ctl]');
+  if (el) liveSet(el.dataset.ctl, +el.value);
+});
+$('bLive').addEventListener('click', e => {
+  const el = e.target.closest('button');
+  if (!el) return;
+  if (el.dataset.live === 'reset') return liveReset();
+  if (el.dataset.live === 'again') return liveAgain();
+  const c = LV.controls.find(x => x.id === el.dataset.ctl);
+  if (c) liveSet(c.id, c.type === 'choice' ? c.options[+el.dataset.v][0] : undefined);
+});
 
 // ---------- ядро: core/home.js ----------
 const H = { level: 0, rnd: null, n: 0, score: 0, streak: 0, clean: 0, cats: {}, task: null, hints: 0, hintLevel: 0,
@@ -2184,7 +2631,7 @@ document.addEventListener('click', e => {
   if (act === 'menu') { if (document.fullscreenElement) toggleFull(); show('start'); }
   if (act === 'next') boardNext();
   if (act === 'prev') boardPrev();
-  if (act === 'restart') boardGo(0, 0);
+  if (act === 'restart') boardRestart();
   if (act === 'numbers') { boardNumbers(true); renderBoard(); }
   if (act === 'theme') toggleTheme();
   if (act === 'full') toggleFull();
@@ -2231,7 +2678,7 @@ document.addEventListener('keydown', e => {
     return;
   }
   if (screen === 'home' && e.key === 'Enter' && H.wait) { e.preventDefault(); homeContinue(); return; }
-  if (screen !== 'board') return;
+  if (screen !== 'board' || liveKeydown(e)) return;
   if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); boardNext(); }
   else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); boardPrev(); }
   else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') toggleFull();
@@ -2262,7 +2709,14 @@ window.APP = {
   Q, qeq, decStr, keyQ, parseQ, parseVal, eqRoots, generate, makeVariant, taskRnd, mulberry32, parseNums,
   STUDENT, show, get screen() { return screen; },
   board: { get steps() { return B.steps; }, get i() { return B.i; }, get phase() { return B.phase; }, get e() { return B.e; },
-    next: boardNext, prev: boardPrev, go: boardGo, numbers: random => { boardNumbers(random); renderBoard(); }, poster: boardPoster },
+    next: boardNext, prev: boardPrev, go: boardGo, numbers: random => { boardNumbers(random); renderBoard(); }, poster: boardPoster,
+    restart: boardRestart,
+    // живая доска: модель, ручки и панель текущего шага; drag(id, {x, y}) и key(id, dx, dy) — как учитель рукой и стрелками
+    get model() { return B.m; }, get snap() { return LV.snap; }, get animating() { return !!LV.anim; },
+    get handles() { return LV.handles.map(h => ({ id: h.id, label: h.label, at: { ...h.at } })); },
+    get controls() { return LV.controls.map(c => ({ id: c.id, type: c.type, label: c.label, min: c.min, max: c.max, options: c.options })); },
+    drag: liveDrag, key: liveKey, set: liveSet, reset: liveReset, again: liveAgain },
+  GEO, HAS_LIVE: typeof LIVE !== 'undefined',
   print: { draw: drawSheets, set nums(v) { printNums = v; } },
   home: { state: H, start: homeStart, check: homeCheck, hint: homeHint, next: homeContinue, collect: homeCollect,
     setCount: n => { H.eqCount = n; homeRender(); } },
