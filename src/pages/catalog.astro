@@ -6,11 +6,12 @@ import { SUBJECTS, PARTS } from '../config';
 const all = (await getCollection('items')).sort((a, b) => a.data.order - b.data.order);
 const grades = [...new Set(all.flatMap(i => i.data.grades))].sort((a, b) => a - b);
 ---
-<Base title="Каталог" description="Все материалы: чертежи для доски, раздатки и тренажёры по математике, алгебре и геометрии">
+<Base title="Каталог материалов по математике для 5–9 классов" description="Материалы Матшага по математике, алгебре и геометрии для 5–9 классов: интерактивные объяснения, раздатки с ответами и тренажёры с подсказками.">
   <section>
     <div class="wrap">
-      <h1>Каталог</h1>
-      <div class="filters">
+      <h1>Каталог материалов</h1>
+      <p class="muted">Материалы по математике для 5–9 классов: интерактивные объяснения для доски, печатные задания с ответами и тренажёры для самостоятельной работы.</p>
+      <div class="filters" data-nosnippet>
         <div class="row" data-filter="subject">
           <button aria-pressed="true" data-v="">Все предметы</button>
           {Object.entries(SUBJECTS).map(([k, s]) => <button data-v={k}>{s.label}</button>)}

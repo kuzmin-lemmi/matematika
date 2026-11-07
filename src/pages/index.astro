@@ -29,7 +29,7 @@ const hero = all.filter(i => isReady(i.data) && i.data.added)
         <p class="eyebrow">Материалы для 5–9 классов</p>
         <h1>{SITE.name}</h1>
         <p class="lead">Покажи. Дай решить.<br /><span>Разбери.</span></p>
-        <p class="intro-description">Одна тема — на доске,<br />на бумаге и дома.</p>
+        <p class="intro-description">Материалы по математике для учителя:<br />на доске, на бумаге и дома.</p>
         <a class="btn primary hero-cta" href={`${base}catalog/`}>К материалам <span aria-hidden="true">→</span></a>
         <div class="modes" aria-label="Режимы материалов">
           {Object.entries(PARTS).map(([key, part]) => <a href={`${base}catalog/?part=${key}`}>{part.label} <span aria-hidden="true">↗</span></a>)}
