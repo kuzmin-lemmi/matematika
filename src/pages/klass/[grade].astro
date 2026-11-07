@@ -2,7 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import PlanMaterials from '../../components/PlanMaterials.astro';
 import { getCollection } from 'astro:content';
-import { klassName, gradeSubjects, isReady, openPageHref, pageHref } from '../../lib';
+import { klassName, gradeSubjects, isReady, pageHref } from '../../lib';
 import { SITE, SUBJECTS } from '../../config';
 import plans from '../../data/lesson-plans.json';
 import { quarterTopics, topicMaterials, lessonRanges, PLAN_SOURCES } from '../../lesson-plan';
@@ -20,12 +20,10 @@ const items = (await getCollection('items'))
 // Сразу видна четверть по дате сборки и первый предмет — скрипт потом выберет по адресу и сегодняшней дате.
 // Без этого до запуска скрипта на странице мелькают все четверти обоих предметов.
 const shownQuarter = currentQuarter(new Date());
-// Название темы — ссылка на материал, если он один: сразу на доску (?mode=board).
+// Название темы — ссылка на страницу материала с описанием, если он один.
 // Материалов несколько — название не ссылается (у каждого своя ссылка в группе кнопок).
-const topicHref = (materials: { id: string; data: { url: string; parts: string[] } }[]) =>
-  materials.length === 1
-    ? (materials[0].data.parts.includes('board') ? openPageHref(materials[0], 'board') : pageHref(materials[0].id))
-    : '';
+const topicHref = (materials: { id: string }[]) =>
+  materials.length === 1 ? pageHref(materials[0].id) : '';
 const groups = subjects.map(subject => {
   const plan = plans.find(p => p.grade === grade && p.subject === subject)!;
   const materials = items.filter(i => i.data.subject === subject);
@@ -71,7 +69,7 @@ const groups = subjects.map(subject => {
         {group.unplaced.length > 0 && <section class="unplaced" data-unplaced={group.subject} hidden={group.subject !== subjects[0]}>
           <h2>Ещё материалы · {SUBJECTS[group.subject].label}</h2>
           <p class="plan-note">Готовые материалы, которые пока не привязаны к урокам плана.</p>
-          {group.unplaced.map(item => <div class="lesson-row"><h3><a href={openPageHref(item, 'board')}>{item.data.title}</a></h3><PlanMaterials items={[item]} title={item.data.title} /></div>)}
+          {group.unplaced.map(item => <div class="lesson-row"><h3><a href={pageHref(item.id)}>{item.data.title}</a></h3><PlanMaterials items={[item]} title={item.data.title} /></div>)}
         </section>}
       </>)}
       <div class="plan-footer">
