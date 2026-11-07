@@ -13,19 +13,8 @@ export function initLessonPlan(root: HTMLElement, today = new Date()) {
   const ready = root.querySelector<HTMLInputElement>('[data-ready-only]')!;
   const panes = [...root.querySelectorAll<HTMLElement>('[data-plan-pane]')];
   const live = root.querySelector<HTMLElement>('[data-plan-status]')!;
-  const rails = [...root.querySelectorAll<HTMLElement>('[data-materials]')];
   let subject = subjects[0].dataset.subjectButton!;
   let quarter = '1';
-  function updateRails() {
-    rails.forEach(group => {
-      const rail = group.querySelector<HTMLElement>('[data-plan-rail]')!;
-      const controls = group.querySelector<HTMLElement>('[data-rail-controls]')!;
-      controls.hidden = rail.clientWidth === 0 || rail.scrollWidth <= rail.clientWidth + 1;
-      group.querySelectorAll<HTMLButtonElement>('[data-scroll]').forEach(button => {
-        button.disabled = button.dataset.scroll === '-1' ? rail.scrollLeft < 1 : rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 1;
-      });
-    });
-  }
   function render(writeURL = false) {
     subjects.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.subjectButton === subject)));
     quarters.forEach(button => {
@@ -55,7 +44,6 @@ export function initLessonPlan(root: HTMLElement, today = new Date()) {
       if (ready.checked) url.searchParams.set('ready', '1'); else url.searchParams.delete('ready');
       win.history.replaceState(null, '', url);
     }
-    updateRails();
   }
   function readURL() {
     const params = new URL(win.location.href).searchParams;
@@ -68,13 +56,7 @@ export function initLessonPlan(root: HTMLElement, today = new Date()) {
   subjects.forEach(button => button.addEventListener('click', () => { subject = button.dataset.subjectButton!; render(true); }));
   quarters.forEach(button => button.addEventListener('click', () => { quarter = button.dataset.quarterButton!; render(true); }));
   ready.addEventListener('change', () => render(true));
-  rails.forEach(group => {
-    const rail = group.querySelector<HTMLElement>('[data-plan-rail]')!;
-    group.querySelectorAll<HTMLButtonElement>('[data-scroll]').forEach(button => button.addEventListener('click', () => rail.scrollBy({left: Number(button.dataset.scroll) * Math.max(140, rail.clientWidth * .8), behavior: 'auto'})));
-    rail.addEventListener('scroll', updateRails, {passive:true});
-  });
   win.addEventListener('popstate', readURL);
-  win.addEventListener('resize', updateRails);
   readURL();
   // Якорь может указывать на тему скрытой до инициализации четверти.
   const target = doc.getElementById(win.location.hash.slice(1));

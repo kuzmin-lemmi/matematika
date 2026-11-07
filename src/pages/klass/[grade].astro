@@ -2,7 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import PlanMaterials from '../../components/PlanMaterials.astro';
 import { getCollection } from 'astro:content';
-import { klassName, gradeSubjects, isReady } from '../../lib';
+import { klassName, gradeSubjects, isReady, openPageHref, pageHref } from '../../lib';
 import { SITE, SUBJECTS } from '../../config';
 import plans from '../../data/lesson-plans.json';
 import { quarterTopics, topicMaterials, lessonRanges, PLAN_SOURCES } from '../../lesson-plan';
@@ -20,6 +20,12 @@ const items = (await getCollection('items'))
 // Сразу видна четверть по дате сборки и первый предмет — скрипт потом выберет по адресу и сегодняшней дате.
 // Без этого до запуска скрипта на странице мелькают все четверти обоих предметов.
 const shownQuarter = currentQuarter(new Date());
+// Название темы — ссылка на материал, если он один: сразу на доску (?mode=board).
+// Материалов несколько — название не ссылается (у каждого своя ссылка в группе кнопок).
+const topicHref = (materials: { id: string; data: { url: string; parts: string[] } }[]) =>
+  materials.length === 1
+    ? (materials[0].data.parts.includes('board') ? openPageHref(materials[0], 'board') : pageHref(materials[0].id))
+    : '';
 const groups = subjects.map(subject => {
   const plan = plans.find(p => p.grade === grade && p.subject === subject)!;
   const materials = items.filter(i => i.data.subject === subject);
@@ -55,7 +61,7 @@ const groups = subjects.map(subject => {
             <div class="section-heading"><h2>{quarter} четверть <span>· {SUBJECTS[group.subject].label}</span></h2><span class="hint">Тема · материалы</span></div>
             <ol class="lesson-list">
               {lessons.map(lesson => <li class="lesson-row" id={`topic-${group.subject}-${quarter}-${lesson.annualNumbers[0]}`} value={lesson.number} data-lesson data-annual-numbers={lesson.annualNumbers.join(',')} data-ready={lesson.materials.length + lesson.related.length > 0 ? 'true' : 'false'}>
-                <div class="lesson-topic"><span class="lesson-number" aria-label={`Тема ${lesson.number}`}>{lesson.number}</span><div><h3>{lesson.title}</h3><p class="lesson-meta">{lesson.annualNumbers.length > 1 ? 'уроки' : 'урок'} {lessonRanges(lesson.annualNumbers)} · {lesson.annualNumbers.length} ч</p></div></div>
+                <div class="lesson-topic"><span class="lesson-number" aria-label={`Тема ${lesson.number}`}>{lesson.number}</span><div><h3>{topicHref(lesson.materials) ? <a href={topicHref(lesson.materials)}>{lesson.title}</a> : lesson.title}</h3><p class="lesson-meta">{lesson.annualNumbers.length > 1 ? 'уроки' : 'урок'} {lessonRanges(lesson.annualNumbers)} · {lesson.annualNumbers.length} ч</p></div></div>
                 <PlanMaterials items={lesson.materials} related={lesson.related} title={lesson.title} />
               </li>)}
             </ol>
@@ -65,7 +71,7 @@ const groups = subjects.map(subject => {
         {group.unplaced.length > 0 && <section class="unplaced" data-unplaced={group.subject} hidden={group.subject !== subjects[0]}>
           <h2>Ещё материалы · {SUBJECTS[group.subject].label}</h2>
           <p class="plan-note">Готовые материалы, которые пока не привязаны к урокам плана.</p>
-          {group.unplaced.map(item => <div class="lesson-row"><h3>{item.data.title}</h3><PlanMaterials items={[item]} title={item.data.title} /></div>)}
+          {group.unplaced.map(item => <div class="lesson-row"><h3><a href={openPageHref(item, 'board')}>{item.data.title}</a></h3><PlanMaterials items={[item]} title={item.data.title} /></div>)}
         </section>}
       </>)}
       <div class="plan-footer">
@@ -115,6 +121,8 @@ const groups = subjects.map(subject => {
   .lesson-number{color:var(--accent);font-size:15px;font-variant-numeric:tabular-nums}
   .lesson-meta{margin:2px 0 0;font-size:12px;color:var(--soft);font-variant-numeric:tabular-nums}
   h3{font-size:14px;line-height:1.45;letter-spacing:0;margin:0;font-weight:600;overflow-wrap:anywhere}
+  h3 a{color:inherit;text-decoration:none}
+  h3 a:hover{color:var(--accent);text-decoration:underline}
   .empty-quarter{font-size:14px;color:var(--soft);padding:20px 0}
   .plan-footer{display:flex;justify-content:space-between;gap:24px;align-items:start;padding-top:24px;color:var(--soft);font-size:12px}
   details{max-width:650px}summary{cursor:pointer;color:var(--accent)}
