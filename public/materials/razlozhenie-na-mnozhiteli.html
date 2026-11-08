@@ -202,7 +202,11 @@ svg .new{animation:fade .6s ease-out both}
 .sheets{display:grid;gap:24px;justify-items:center;overflow-x:auto}
 
 /* лист A4: на экране — как на бумаге */
-.page{width:210mm;min-height:297mm;padding:12mm;background:#fff;color:#000;box-shadow:0 2px 16px rgba(0,0,0,.18);font-size:12pt;line-height:1.35}
+/* лист всегда бумажный: светлые токены и в тёмной теме — иначе чертежи на белом выходят светло-серыми */
+.page{width:210mm;min-height:297mm;padding:12mm;background:#fff;color:#000;box-shadow:0 2px 16px rgba(0,0,0,.18);font-size:12pt;line-height:1.35;
+  --bg:#fff; --surface:#fff; --ink:#000; --soft:#4A5A50; --line:#C9D2C4;
+  --accent:#256449; --accent-ink:#fff; --a:#256449; --a-soft:#A8D5BA; --b:#B94C2D; --b-soft:#F6DDD3;
+  --ok:#256449; --ok-soft:#E1EFE5; --bad:#B3261E; --bad-soft:#F8E1DE; --info-soft:#F1ECDD}
 .page.half .sheet{height:136mm;overflow:hidden;gap:1mm}
 .page.half .sheet + .sheet{border-top:1px dashed #888;padding-top:3mm}
 .half .sheet h2{display:none}
