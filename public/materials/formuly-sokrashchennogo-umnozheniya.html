@@ -86,7 +86,7 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 .icon{padding:.35em .6em;min-width:44px;min-height:44px}
 
 /* доска: на проекторе шрифт не мельче 28px */
-#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
+#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
 .bbar{display:flex;align-items:center;gap:8px;font-size:20px}
 .bbar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap;margin-right:6px}
@@ -96,7 +96,8 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 .btext .a{font-size:clamp(28px,2.7vw,42px);line-height:1.35;margin-top:.15em;color:var(--accent);font-weight:600}
 .btext .a ul{margin:.1em 0;padding-left:1.2em;color:var(--ink)}
 .btext .a.hide{visibility:hidden}
-.bstage{min-height:0;display:flex;align-items:center;justify-content:center}
+.bmid{min-height:0;display:flex;gap:12px 24px;align-items:stretch}
+.bstage{flex:1;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center}
 .bstage svg{width:100%;height:100%;max-height:100%}
 .brec{border-top:2px dashed var(--line);padding:6px 0 2px;min-height:calc(2 * 1.9em + 26px);font-size:clamp(26px,2.4vw,36px);line-height:1.9}
 .brec .rt-h{display:block;font-size:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);line-height:1.2}
@@ -110,6 +111,11 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 #board.preview .bctl,#board.preview .bbar button{visibility:hidden}
 #board.preview .bnote{display:none}
 @media (max-width:1150px){ .bbar .ttl{visibility:hidden} .bbar button .t{display:none} }
+/* ноутбук и проектор 1366 × 768: текст поджимается до 28px, остальная высота уходит чертежу */
+@media (max-height:860px){
+  .btext .q{font-size:clamp(28px,2.6vw,36px)} .btext .a{font-size:clamp(28px,2.3vw,32px)}
+  .brec{line-height:1.45;min-height:calc(2 * 1.45em + 22px)} .bctl button{min-height:52px;font-size:24px}
+}
 
 svg text{font-family:var(--font);fill:var(--ink)}
 svg .lab{font-size:38px;font-weight:700}
@@ -166,15 +172,21 @@ svg .lv-hit{fill:transparent}
 svg .lv-dot{fill:var(--b);stroke:var(--surface);stroke-width:5}
 svg .lv-h:hover .lv-dot{stroke:var(--accent)}
 svg .lv-h:focus-visible .lv-dot{stroke:var(--accent);stroke-width:9}
-.blive{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:center;padding:6px 0 2px;font-size:22px}
-.blive .lv-c{display:inline-flex;align-items:center;gap:12px;font-weight:600}
-.blive input[type=range]{width:min(320px,55vw);height:40px;accent-color:var(--accent);cursor:pointer}
+svg .lv-ring{fill:transparent;stroke:var(--b);stroke-width:5;stroke-dasharray:14 8}
+svg .lv-h:hover .lv-ring,svg .lv-h:focus-visible .lv-ring{stroke:var(--accent);stroke-width:8;stroke-dasharray:none}
+/* панель — колонкой справа от чертежа; на узком экране — строкой под ним */
+.blive{display:flex;flex-direction:column;gap:14px;align-self:center;justify-content:center;width:min(300px,26vw);font-size:22px}
+.blive .lv-c{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-weight:600}
+.blive .lv-c>span:first-child{flex:1 0 100%}
+.blive input[type=range]{flex:1;min-width:0;height:40px;accent-color:var(--accent);cursor:pointer}
 .blive output{min-width:3.2em;font-weight:800;color:var(--accent)}
 .blive button{min-height:48px;font-size:20px;padding:.2em .8em}
 .blive button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.blive .lv-tools{display:inline-flex;gap:8px}
-#board.preview .blive{visibility:hidden}
-@media (max-width:600px){ .blive{font-size:17px;gap:6px 14px} .blive button{font-size:16px;min-height:44px} }
+.blive .lv-tools{display:flex;flex-wrap:wrap;gap:8px}
+#board.preview .blive{display:none !important}   /* в превью панели нет — чертёж на всю ширину */
+@media (max-width:900px){ .bmid{flex-direction:column} .blive{flex-direction:row;flex-wrap:wrap;width:auto;gap:8px 20px} .blive .lv-c>span:first-child{flex:0 0 auto} .blive input[type=range]{width:min(320px,55vw);flex:none} }
+@media (max-width:600px){ .blive{font-size:17px;gap:6px 14px} .blive button{font-size:16px;min-height:44px}
+  #board{height:auto;min-height:100vh;grid-template-rows:none} .bbar{flex-wrap:wrap} .bstage{flex:none;min-height:150px} }
 svg .new{animation:fade .6s ease-out both}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion: reduce){ svg .new, .mode:hover{animation:none;transform:none} }
@@ -466,8 +478,11 @@ svg .gn{fill:none}
     <button class="icon" type="button" data-act="full" title="Во весь экран (F)" aria-label="Во весь экран">⛶</button>
   </div>
   <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
-  <div class="bstage" id="bStage"></div>
-  <div class="blive" id="bLive" role="group" aria-label="Управление чертежом" hidden></div>
+  <!-- панель чертежа — колонкой справа: чертёж 980 × 400 шире экрана по пропорциям, высота остаётся ему -->
+  <div class="bmid">
+    <div class="bstage" id="bStage"></div>
+    <div class="blive" id="bLive" role="group" aria-label="Управление чертежом" hidden></div>
+  </div>
   <div class="brec"><span class="rt-h">Запись в тетради</span><div id="bRec"></div></div>
   <div class="bctl">
     <button type="button" data-act="prev" title="Назад (←, PageUp)">← Назад</button>
@@ -906,10 +921,12 @@ const GEO = (() => {
 // ================= Параметры: учитель может поменять их за минуту =================
 const CONFIG = {
   board: {
+    shows: ['warmup', 'dictation', 'truefalse', 'errors'],   // показы в меню — как было при публикации
     a: 20, b: 3,            // первый пример на доске: квадрат со стороной (20 + 3)
     previewDelay: 1700,     // превью на сайте: пауза между шагами, мс
   },
   print: {
+    formats: ['word', 'oge', 'exit', 'test', 'choice', 'pair', 'ladder', 'domino', 'errors'],   // листы в меню — как было при публикации
     variants: 25,           // сколько вариантов печатать по умолчанию
     traps: 2,               // сколько ответов-ловушек на задание в таблице букв
     space: true,            // сетка для решения под каждым заданием
@@ -2227,7 +2244,8 @@ const SHOWS = {
     },
   },
 };
-const showsAvailable = () => Object.entries(SHOWS).filter(([, s]) => s.available());
+// тема выбирает показы сама (CONFIG.board.shows): в меню — только они и только доступные
+const showsAvailable = () => Object.entries(SHOWS).filter(([k, s]) => s.available() && (!CONFIG.board.shows || CONFIG.board.shows.includes(k)));
 
 // переключение вида показа: 'main' — основной показ темы
 function boardUseShow(name) {
@@ -2289,7 +2307,9 @@ function boardTimer() {
 // step.live = {
 //   enter(m) { ... },           // как поставить модель при входе в шаг (можно liveTo — плавно)
 //   reveal(m) { ... },          // опыт по кнопке «Показать ответ» (обычно liveTo); «▶ Повторить опыт» запускает его снова
-//   handles: (m, phase) => [{ id, at: {x, y}, label, move(m, p) {...}, key?(m, dx, dy, fine), keyStep?, r? }],
+//   handles: (m, phase) => [{ id, at: {x, y}, label, move(m, p) {...}, key?(m, dx, dy, fine), keyStep?, r?, ring? }],
+//                               // ring: радиус кольца — для фишки с подписью (точка закрыла бы надпись);
+//                               // подпись под точкой-ручкой тест-контракт считает ошибкой
 //   controls: (m, phase) => [
 //     { id, type: 'range', label, min, max, step, get: m => …, set(m, v) {...}, text?: m => '…' },
 //     { id, type: 'toggle', label, get: m => true|false, set(m, v) {...} },
@@ -2373,9 +2393,11 @@ function liveStop() {
 // ---------- ручки на чертеже ----------
 function liveHandlesSVG(st) {
   LV.handles = st.live?.handles ? st.live.handles(B.m, B.phase).filter(Boolean) : [];
+  // ring: ручка — кольцо вокруг фишки с подписью (подпись видна сквозь него); иначе — точка
   return LV.handles.map(h => `<g class="lv-h${h.cls ? ' ' + h.cls : ''}" data-handle="${h.id}" tabindex="0" role="button" ` +
     `aria-label="${esc(h.label)}: тяните или двигайте стрелками" transform="translate(${GEO.f1(h.at.x)} ${GEO.f1(h.at.y)})">` +
-    `<title>${esc(h.label)}</title><circle class="lv-hit" r="44"/><circle class="lv-dot" r="${h.r || 18}"/></g>`).join('');
+    `<title>${esc(h.label)}</title><circle class="lv-hit" r="${h.ring ? Math.max(44, h.ring + 8) : 44}"/>` +
+    (h.ring ? `<circle class="lv-ring" r="${h.ring}"/>` : `<circle class="lv-dot" r="${h.r || 18}"/>`) + '</g>').join('');
 }
 const liveBox = { x: 0, y: 0, w: BW, h: BH };
 // перетащить ручку id в точку p (координаты чертежа); false — положение вырождено и не принято
@@ -2774,7 +2796,7 @@ window.APP = {
     restart: boardRestart, get show() { return B.show; }, useShow: boardUseShow, timer: boardTimer,
     // живая доска: модель, ручки и панель текущего шага; drag(id, {x, y}) и key(id, dx, dy) — как учитель рукой и стрелками
     get model() { return B.m; }, get snap() { return LV.snap; }, get animating() { return !!LV.anim; },
-    get handles() { return LV.handles.map(h => ({ id: h.id, label: h.label, at: { ...h.at } })); },
+    get handles() { return LV.handles.map(h => ({ id: h.id, label: h.label, at: { ...h.at }, r: h.r || 18, ring: h.ring || 0 })); },
     get controls() { return LV.controls.map(c => ({ id: c.id, type: c.type, label: c.label, min: c.min, max: c.max, options: c.options })); },
     drag: liveDrag, key: liveKey, set: liveSet, reset: liveReset, again: liveAgain },
   GEO, HAS_LIVE: typeof LIVE !== 'undefined',

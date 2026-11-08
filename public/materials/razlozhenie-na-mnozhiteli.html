@@ -86,7 +86,7 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 .icon{padding:.35em .6em;min-width:44px;min-height:44px}
 
 /* доска: на проекторе шрифт не мельче 28px */
-#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
+#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
 .bbar{display:flex;align-items:center;gap:8px;font-size:20px}
 .bbar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap;margin-right:6px}
@@ -96,7 +96,8 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 .btext .a{font-size:clamp(28px,2.7vw,42px);line-height:1.35;margin-top:.15em;color:var(--accent);font-weight:600}
 .btext .a ul{margin:.1em 0;padding-left:1.2em;color:var(--ink)}
 .btext .a.hide{visibility:hidden}
-.bstage{min-height:0;display:flex;align-items:center;justify-content:center}
+.bmid{min-height:0;display:flex;gap:12px 24px;align-items:stretch}
+.bstage{flex:1;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center}
 .bstage svg{width:100%;height:100%;max-height:100%}
 .brec{border-top:2px dashed var(--line);padding:6px 0 2px;min-height:calc(2 * 1.9em + 26px);font-size:clamp(26px,2.4vw,36px);line-height:1.9}
 .brec .rt-h{display:block;font-size:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);line-height:1.2}
@@ -110,6 +111,11 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 #board.preview .bctl,#board.preview .bbar button{visibility:hidden}
 #board.preview .bnote{display:none}
 @media (max-width:1150px){ .bbar .ttl{visibility:hidden} .bbar button .t{display:none} }
+/* ноутбук и проектор 1366 × 768: текст поджимается до 28px, остальная высота уходит чертежу */
+@media (max-height:860px){
+  .btext .q{font-size:clamp(28px,2.6vw,36px)} .btext .a{font-size:clamp(28px,2.3vw,32px)}
+  .brec{line-height:1.45;min-height:calc(2 * 1.45em + 22px)} .bctl button{min-height:52px;font-size:24px}
+}
 
 svg text{font-family:var(--font);fill:var(--ink)}
 svg .lab{font-size:38px;font-weight:700}
@@ -166,15 +172,21 @@ svg .lv-hit{fill:transparent}
 svg .lv-dot{fill:var(--b);stroke:var(--surface);stroke-width:5}
 svg .lv-h:hover .lv-dot{stroke:var(--accent)}
 svg .lv-h:focus-visible .lv-dot{stroke:var(--accent);stroke-width:9}
-.blive{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:center;padding:6px 0 2px;font-size:22px}
-.blive .lv-c{display:inline-flex;align-items:center;gap:12px;font-weight:600}
-.blive input[type=range]{width:min(320px,55vw);height:40px;accent-color:var(--accent);cursor:pointer}
+svg .lv-ring{fill:transparent;stroke:var(--b);stroke-width:5;stroke-dasharray:14 8}
+svg .lv-h:hover .lv-ring,svg .lv-h:focus-visible .lv-ring{stroke:var(--accent);stroke-width:8;stroke-dasharray:none}
+/* панель — колонкой справа от чертежа; на узком экране — строкой под ним */
+.blive{display:flex;flex-direction:column;gap:14px;align-self:center;justify-content:center;width:min(300px,26vw);font-size:22px}
+.blive .lv-c{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-weight:600}
+.blive .lv-c>span:first-child{flex:1 0 100%}
+.blive input[type=range]{flex:1;min-width:0;height:40px;accent-color:var(--accent);cursor:pointer}
 .blive output{min-width:3.2em;font-weight:800;color:var(--accent)}
 .blive button{min-height:48px;font-size:20px;padding:.2em .8em}
 .blive button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.blive .lv-tools{display:inline-flex;gap:8px}
-#board.preview .blive{visibility:hidden}
-@media (max-width:600px){ .blive{font-size:17px;gap:6px 14px} .blive button{font-size:16px;min-height:44px} }
+.blive .lv-tools{display:flex;flex-wrap:wrap;gap:8px}
+#board.preview .blive{display:none !important}   /* в превью панели нет — чертёж на всю ширину */
+@media (max-width:900px){ .bmid{flex-direction:column} .blive{flex-direction:row;flex-wrap:wrap;width:auto;gap:8px 20px} .blive .lv-c>span:first-child{flex:0 0 auto} .blive input[type=range]{width:min(320px,55vw);flex:none} }
+@media (max-width:600px){ .blive{font-size:17px;gap:6px 14px} .blive button{font-size:16px;min-height:44px}
+  #board{height:auto;min-height:100vh;grid-template-rows:none} .bbar{flex-wrap:wrap} .bstage{flex:none;min-height:150px} }
 svg .new{animation:fade .6s ease-out both}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion: reduce){ svg .new, .mode:hover{animation:none;transform:none} }
@@ -446,8 +458,11 @@ table.bubbles.stencil td.on{background:#000;-webkit-print-color-adjust:exact;pri
     <button class="icon" type="button" data-act="full" title="Во весь экран (F)" aria-label="Во весь экран">⛶</button>
   </div>
   <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
-  <div class="bstage" id="bStage"></div>
-  <div class="blive" id="bLive" role="group" aria-label="Управление чертежом" hidden></div>
+  <!-- панель чертежа — колонкой справа: чертёж 980 × 400 шире экрана по пропорциям, высота остаётся ему -->
+  <div class="bmid">
+    <div class="bstage" id="bStage"></div>
+    <div class="blive" id="bLive" role="group" aria-label="Управление чертежом" hidden></div>
+  </div>
   <div class="brec"><span class="rt-h">Запись в тетради</span><div id="bRec"></div></div>
   <div class="bctl">
     <button type="button" data-act="prev" title="Назад (←, PageUp)">← Назад</button>
@@ -867,10 +882,12 @@ const GEO = (() => {
 // ================= Параметры: учитель может поменять их за минуту =================
 const CONFIG = {
   board: {
+    shows: ['warmup', 'errors'],   // показы в меню — неполное вынесение и ошибки в формулах
     k: 3, p: 4, q: 5,        // первый пример на доске: 3·4 + 3·5 = 3·(4 + 5)
     previewDelay: 1700,     // превью на сайте: пауза между шагами, мс
   },
   print: {
+    formats: ['word', 'exit', 'test'],   // листы в меню — неполное вынесение и ошибки в формулах
     variants: 25,           // сколько вариантов печатать по умолчанию
     traps: 2,               // сколько ответов-ловушек на задание в таблице букв
     space: true,            // сетка для решения под каждым заданием
@@ -1187,74 +1204,93 @@ function boardExample(random, old) {
 }
 // Подписи на чертеже — SVG-текст: курсив через tspan, степень — «²» (теги <i> и <sup> в SVG не работают)
 const si = v => `<tspan font-style="italic">${v}</tspan>`;
-const BX = 90, BY = 80;   // левый верхний угол чертежа
-const blines = (lines, y0 = 100) => lines.map((l, i) =>
-  `<g class="${l.cls || ''}">${tx(560, y0 + i * 56, l.t, 'lab s' + (l.lc ? ' ' + l.lc : ''), 'start')}</g>`).join('');
-// Прямоугольник k × p (слева) и k × q (справа): unit пикселей на клетку
-function rectScene(k, p, q, lines = [], opt = {}) {
-  const unit = Math.max(8, Math.floor(Math.min(400 / (p + q), 210 / k)));
-  const x = BX, y = BY, h = k * unit, wp = p * unit, wq = q * unit;
-  let s = `<rect class="gs" x="${x}" y="${y}" width="${wp}" height="${h}"/>`;
-  s += `<rect class="gw" x="${x + wp}" y="${y}" width="${wq}" height="${h}"/>`;
-  s += grid(x, y, p + q, k, unit, 'gn', 4);
-  if (opt.split) s += `<line class="gf" x1="${x + wp}" x2="${x + wp}" y1="${y}" y2="${y + h}"/>`;
-  s += under(x, y + h, wp, opt.hideNums ? '?' : `${k} · ${p} = ${k * p}`, 'warm');
-  s += under(x + wp, y + h, wq, opt.hideNums ? '?' : `${k} · ${q} = ${k * q}`, 'warm');
-  s += tx(x - 14, y + h / 2, opt.hideNums ? '?' : String(k), 'lab s warm', 'end');
+const BX = 90, BY = 70;   // левый верхний угол чертежа
+// строки выкладки: справа от чертежа (x0 = 520) или крупно на всю доску (x0 < 300, кегль .lab)
+const blines = (lines, y0 = 100, x0 = 520) => lines.map((l, i) =>
+  `<g class="${l.cls || ''}">${tx(x0, y0 + i * (x0 < 300 ? 70 : 56), l.t, (x0 < 300 ? 'lab' : 'lab s') + (l.lc ? ' ' + l.lc : ''), 'start')}</g>`).join('');
+// цветом — общий множитель и одинаковые скобки
+const hl = s => `<tspan style="fill:var(--b)">${s}</tspan>`;
+const hl2 = s => `<tspan style="fill:var(--accent)">${s}</tspan>`;
+// Прямоугольник: высота — общий множитель, ширина из двух частей. Длины сторон — снаружи, площади частей — внутри.
+// sides = [высота, ширина левой, ширина правой], areas = [левая, правая]; size = [h, wp, wq] в точках чертежа
+function partsScene(sides, areas, size, lines = [], opt = {}) {
+  const [h, wp, wq] = size, x = BX, y = BY;
+  let s = `<rect class="gs" x="${x}" y="${y}" width="${wp}" height="${h}"/><rect class="gw" x="${x + wp}" y="${y}" width="${wq}" height="${h}"/>`;
+  if (opt.grid) s += grid(x, y, opt.grid[0], opt.grid[1], opt.grid[2], 'gf');   // клетки поверх цвета частей — подложка прозрачная
+  s += `<rect class="gf" x="${x}" y="${y}" width="${wp + wq}" height="${h}"/><line class="gf" x1="${x + wp}" x2="${x + wp}" y1="${y}" y2="${y + h}"/>`;
+  s += under(x, y + h, wp, opt.hideSides ? '?' : sides[1], 'warm') + under(x + wp, y + h, wq, opt.hideSides ? '?' : sides[2], 'warm');
+  s += tx(x - 14, y + h / 2 + 12, opt.hideSides ? '?' : sides[0], 'lab warm', 'end');
+  areas.forEach((t, i) => {
+    const w = i ? wq : wp, cx = x + (i ? wp : 0) + w / 2;
+    s += tx(cx, y + h / 2 + 13, opt.hideAreas ? '?' : t, w < 70 ? 'lab s' : 'lab', 'middle');
+  });
   return s + blines(lines);
 }
+// числа: клетка unit — чтобы k × (p + q) поместился слева (ширина до 380, высота до 250)
+const unitOf = (k, p, q) => Math.max(8, Math.floor(Math.min(380 / (p + q), 250 / k)));
+const rectScene = (k, p, q, lines = [], opt = {}) => {
+  const u = unitOf(k, p, q);
+  return partsScene([String(k), String(p), String(q)], [String(k * p), String(k * q)], [k * u, p * u, q * u], lines,
+    { hideAreas: opt.hideNums, grid: [p + q, k, u] });
+};
 function buildSteps(e) {
   const { k, p, q } = e, S = p + q, all = k * S;
   const xa = `6${si('x')}² + 9${si('x')}`, xb = `3${si('x')}(2${si('x')} + 3)`;
   return [
     { q: `Сколько будет ${k} · ${p} + ${k} · ${q}? Посчитай удобным способом, без столбика.`,
       a: `${k} · (${p} + ${q}) = ${k} · ${S} = ${all}. Общее число ${k} вынесли за скобки.`,
-      note: 'Начало урока: пусть класс сначала посчитает в лоб и удобным способом и сравнит. Ответы запишите на доске.',
-      draw: ph => rectScene(k, p, q, ph ? [{ t: `${k} · ${p} + ${k} · ${q} = ${all}`, cls: 'new', lc: 'acc' }] : [], { split: true, hideNums: !ph }),
+      note: 'Начало урока: пусть класс сначала посчитает в лоб и удобным способом и сравнит. На чертеже: стороны снаружи, площади частей внутри.',
+      draw: ph => rectScene(k, p, q, ph ? [{ t: `${k} · ${p} + ${k} · ${q}`, cls: 'new' }, { t: `= ${k} · (${p} + ${q}) = ${all}`, cls: 'new', lc: 'acc' }] : [], { hideNums: !ph }),
       rec: ph => ph ? [`${k} · ${p} + ${k} · ${q} = ${k} · (${p} + ${q}) = ${all}`] : [] },
-    { q: m => `Части ${m.k} × ${m.p} и ${m.k} × ${m.q}. Двигай границу между ними и ширину: что не меняется?`,
-      a: m => `Площадь всего: ${m.k} · ${m.p} + ${m.k} · ${m.q} = ${m.k} · (${m.p} + ${m.q}) = ${m.k * (m.p + m.q)}. Граница двигается, а ширина ${m.k} и сумма ${m.p} + ${m.q} = ${m.p + m.q} — общие.`,
-      note: 'Тяните границу мышью или стрелками, двигайте ползунки. Вывод: общий множитель k стоит за скобкой, в скобке — сумма.',
+    { q: m => `Части ${m.k} × ${m.p} и ${m.k} × ${m.q}. Двигай границу между частями и высоту: что не меняется?`,
+      a: m => `Площадь всего: ${m.k} · ${m.p} + ${m.k} · ${m.q} = ${m.k} · (${m.p} + ${m.q}) = ${m.k * (m.p + m.q)}. Граница двигается, а высота ${m.k} — общая у обеих частей: её и выносим.`,
+      note: 'Тяните границу за ручку сверху или стрелками, двигайте ползунки. Вывод: общий множитель стоит за скобкой, в скобке — сумма.',
       live: {
         enter(m) { m.k = k; m.p = p; m.q = q; m.go = 0; },
         reveal(m) { liveTo({ go: 1 }, 900); },
         handles: m => {
-          const unit = Math.max(8, Math.floor(Math.min(400 / (m.p + m.q), 210 / m.k)));
-          return [{ id: 'split', at: { x: BX + m.p * unit, y: BY + m.k * unit / 2 }, label: 'Граница частей',
-            move(m, pnt) { const tot = m.p + m.q, v = Math.max(1, Math.min(tot - 1, Math.round((pnt.x - BX) / unit))); m.p = v; m.q = tot - v; },
+          const u = unitOf(m.k, m.p, m.q);
+          return [{ id: 'split', at: { x: BX + m.p * u, y: BY }, label: 'Граница частей',
+            move(m, pnt) { const tot = m.p + m.q, v = Math.max(1, Math.min(tot - 1, Math.round((pnt.x - BX) / u))); m.p = v; m.q = tot - v; },
             key(m, dx) { const tot = m.p + m.q; m.p = Math.max(1, Math.min(tot - 1, m.p + dx)); m.q = tot - m.p; } }];
         },
         controls: () => [
-          { id: 'k', type: 'range', label: 'Общая ширина', min: 2, max: 5, get: m => m.k, set(m, v) { m.k = v; } },
+          { id: 'k', type: 'range', label: 'Высота', min: 2, max: 5, get: m => m.k, set(m, v) { m.k = v; } },
           { id: 'p', type: 'range', label: 'Левая часть', min: 1, max: 9, get: m => m.p, set(m, v) { m.p = v; if (m.q < 1) m.q = 1; } },
         ],
       },
       draw: (ph, m) => rectScene(m.k, m.p, m.q, (ph || m.go > 0.5)
-        ? [{ t: `${m.k} · ${m.p} + ${m.k} · ${m.q} = ${m.k * (m.p + m.q)}`, cls: 'new', lc: 'acc' }] : [], { split: true }),
+        ? [{ t: `${m.k} · ${m.p} + ${m.k} · ${m.q}`, cls: 'new' }, { t: `= ${m.k} · (${m.p} + ${m.q}) = ${m.k * (m.p + m.q)}`, cls: 'new', lc: 'acc' }] : []),
       rec: (ph, m) => ph ? [`${m.k} · ${m.p} + ${m.k} · ${m.q} = ${m.k} · (${m.p} + ${m.q})`] : [] },
     { q: 'Как записать это одним равенством для любых чисел?',
       a: `${LA} · ${LB} + ${LA} · ${LCsym()} = ${LA} · (${LB} + ${LCsym()}). Это распределительное свойство — читаем справа налево: выносим общее за скобки.`,
-      note: 'Вывод урока: вынесение за скобки — это распределительный закон наоборот. Запишите формулу в тетрадь.',
-      draw: () => '',
+      note: 'Вывод урока: вынесение за скобки — это распределительный закон наоборот. Тот же прямоугольник, только стороны — буквы.',
+      draw: ph => partsScene([si('a'), si('b'), si('c')], [`${si('a')}${si('b')}`, `${si('a')}${si('c')}`], [200, 220, 150],
+        ph ? [{ t: `${si('a')}${si('b')} + ${si('a')}${si('c')}`, cls: 'new' }, { t: `= ${hl(si('a'))}(${si('b')} + ${si('c')})`, cls: 'new', lc: 'acc' }] : []),
       rec: () => [`${LA} · ${LB} + ${LA} · ${LCsym()} = ${LA} · (${LB} + ${LCsym()})`] },
     { q: `А с буквами? Разложи ${xa}. Что здесь общее?`,
       a: `Общее — 3${si('x')}: ${xa} = ${xb}. Проверка умножением: 3${si('x')} · 2${si('x')} = 6${si('x')}², 3${si('x')} · 3 = 9${si('x')}.`,
-      note: 'Спросите: НОД коэффициентов 6 и 9? Общая буква в наименьшей степени? Потом проверка умножением — обязательно.',
-      draw: () => '',
+      note: 'Площади частей известны — ищем общую сторону. Спросите: НОД коэффициентов 6 и 9? Общая буква в наименьшей степени? Потом проверка умножением — обязательно.',
+      draw: ph => partsScene([`3${si('x')}`, `2${si('x')}`, '3'], [`6${si('x')}²`, `9${si('x')}`], [200, 240, 130],
+        ph ? [{ t: xa, cls: 'new' }, { t: `= ${hl(`3${si('x')}`)}(2${si('x')} + 3)`, cls: 'new', lc: 'acc' }] : [], { hideSides: !ph }),
       rec: ph => ph ? [`6${si('x')}² + 9${si('x')} = 3${si('x')}(2${si('x')} + 3)`] : [] },
-    { q: `Четыре слагаемых: 2${si('x')} + 2${si('y')} + 3${si('x')} + 3${si('y')}. Общего у всех нет — что делать?`,
-      a: `Группируем: 2(${si('x')} + ${si('y')}) + 3(${si('x')} + ${si('y')}) = (${si('x')} + ${si('y')})(2 + 3).`,
-      note: 'Подкрасьте пары разными цветами. Главное: после первого вынесения появляется одинаковая скобка — её выносим второй раз.',
-      draw: () => '',
-      rec: ph => ph ? [`2${si('x')} + 2${si('y')} + 3${si('x')} + 3${si('y')} = (${si('x')} + ${si('y')})(2 + 3)`] : [] },
+    { q: `Четыре слагаемых: ${si('a')}${si('x')} + ${si('a')}${si('y')} + 2${si('x')} + 2${si('y')}. Общего множителя у всех нет — что делать?`,
+      a: `Группируем по два: ${si('a')}(${si('x')} + ${si('y')}) + 2(${si('x')} + ${si('y')}). Появилась одинаковая скобка — выносим её: (${si('x')} + ${si('y')})(${si('a')} + 2).`,
+      note: 'Пары — разным цветом. Главное: после первого вынесения появляется одинаковая скобка — её выносим второй раз. Проверка умножением.',
+      draw: ph => blines([{ t: `${hl(`${si('a')}${si('x')} + ${si('a')}${si('y')}`)} + ${hl2(`2${si('x')} + 2${si('y')}`)}` }].concat(ph ? [
+        { t: `= ${si('a')}${hl(`(${si('x')} + ${si('y')})`)} + 2${hl(`(${si('x')} + ${si('y')})`)}`, cls: 'new' },
+        { t: `= (${si('x')} + ${si('y')})(${si('a')} + 2)`, cls: 'new', lc: 'acc' }] : []), 100, 110),
+      rec: ph => ph ? [`${si('a')}${si('x')} + ${si('a')}${si('y')} + 2${si('x')} + 2${si('y')} = (${si('x')} + ${si('y')})(${si('a')} + 2)`] : [] },
     { q: `Формулы наоборот: ${si('x')}² ${MINUS} 16 — это разность квадратов. Как разложить?`,
       a: `(${si('x')} ${MINUS} 4)(${si('x')} + 4): два квадрата и «${MINUS}» — две скобки.`,
-      note: 'Напомните формулу из прошлой темы и прочитайте её справа налево. Проверка умножением.',
-      draw: () => '',
+      note: 'Напомните формулу из прошлой темы и прочитайте её справа налево. Цветом — что подставляем вместо a и b. Проверка умножением.',
+      draw: ph => blines([{ t: `${hl(si('a'))}² ${MINUS} ${hl2(si('b'))}² = (${hl(si('a'))} ${MINUS} ${hl2(si('b'))})(${hl(si('a'))} + ${hl2(si('b'))})`, lc: 'soft' },
+        { t: `${si('x')}² ${MINUS} 16 = ${hl(si('x'))}² ${MINUS} ${hl2('4')}²` }].concat(ph ? [
+        { t: `= (${si('x')} ${MINUS} 4)(${si('x')} + 4)`, cls: 'new', lc: 'acc' }] : []), 100, 110),
       rec: ph => ph ? [`${si('x')}² ${MINUS} 16 = (${si('x')} ${MINUS} 4)(${si('x')} + 4)`] : [] },
-    { q: m => `В два шага: 2${si('x')}² ${MINUS} 18. С чего начнём — с формулы или с вынесения? Двигай ползунок шагов.`,
+    { q: m => `В два шага: 2${si('x')}² ${MINUS} 18. С чего начнём — с формулы или с вынесения? Переключай шаги.`,
       a: `Сначала выносим 2: 2(${si('x')}² ${MINUS} 9), потом формула: 2(${si('x')} ${MINUS} 3)(${si('x')} + 3).`,
-      note: 'Ползунок «Шаг» показывает стадии. Типичная ошибка — сразу писать (2x − 6)(2x + 6): проверьте умножением, получится 4x² − 36.',
+      note: 'Переключатель «Шаг» показывает стадии. Типичная ошибка — сразу писать (2x − 6)(2x + 6): проверьте умножением, получится 4x² − 36.',
       live: {
         enter(m) { m.stage = 0; },
         reveal(m) { liveTo({ stage: 2 }, 1200); },
@@ -1266,23 +1302,24 @@ function buildSteps(e) {
       draw: (ph, m) => {
         const st = ph ? 2 : m.stage;
         const rows = [`2${si('x')}² ${MINUS} 18`];
-        if (st >= 1) rows.push(`= 2(${si('x')}² ${MINUS} 9)`);
+        if (st >= 1) rows.push(`= ${hl('2')}(${si('x')}² ${MINUS} 9)`);
         if (st >= 2) rows.push(`= 2(${si('x')} ${MINUS} 3)(${si('x')} + 3)`);
-        return blines(rows.map((t, i) => ({ t, cls: i === rows.length - 1 && st === 2 ? 'new' : '', lc: i === rows.length - 1 ? 'acc' : '' })));
+        return blines(rows.map((t, i) => ({ t, cls: i === rows.length - 1 && st === 2 ? 'new' : '', lc: i === rows.length - 1 ? 'acc' : '' })), 100, 110);
       },
       rec: (ph, m) => (ph || m.stage >= 2) ? [`2${si('x')}² ${MINUS} 18 = 2(${si('x')} ${MINUS} 3)(${si('x')} + 3)`] : [] },
     { q: `Ловушка: ${si('x')}² + 4 — это (${si('x')} + 2)²?`,
-      a: `Нет! (${si('x')} + 2)² = ${si('x')}² + 4${si('x')} + 4 — три слагаемых. Сумма квадратов в 7 классе не раскладывается.`,
+      a: `Нет! (${si('x')} + 2)² = ${si('x')}² + 4${si('x')} + 4 — три слагаемых. А ${si('x')}² + 4 на множители не раскладывается: это не разность квадратов и не квадрат суммы.`,
       note: 'Шаг-ловушка на самой частой ошибке. Пусть класс сам умножит (x + 2)² и сравнит.',
       draw: ph => blines(ph
-        ? [{ t: `(${si('x')} + 2)² = ${si('x')}² + 4${si('x')} + 4`, cls: 'new', lc: 'warm' },
+        ? [{ t: `(${si('x')} + 2)² = ${si('x')}² + ${hl(`4${si('x')}`)} + 4`, cls: 'new', lc: 'warm' },
            { t: `${si('x')}² + 4 — не раскладывается`, cls: 'new', lc: 'acc' }]
-        : [{ t: `(${si('x')} + 2)² = ?`, lc: 'warm' }]),
+        : [{ t: `${si('x')}² + 4 = (${si('x')} + 2)² ?`, lc: 'warm' }], 110, 110),
       rec: ph => ph ? [`(${si('x')} + 2)² = ${si('x')}² + 4${si('x')} + 4 ≠ ${si('x')}² + 4`] : [] },
     { q: `А если вынести не всё: 6${si('x')}² + 9${si('x')} = 3(2${si('x')}² + 3${si('x')}). Готово?`,
-      a: `Нет, можно дальше: = 3${si('x')}(2${si('x')} + 3). Выноси сразу всё общее, а в конце проверь умножением.`,
-      note: 'Покажите: неполное вынесение — не ошибка, но и не ответ. Полный ответ — когда в скобке больше нет общего.',
-      draw: () => '',
+      a: `Нет, в скобке остался общий ${si('x')}: = 3${si('x')}(2${si('x')} + 3). Выноси сразу всё общее, а в конце проверь умножением.`,
+      note: 'Неполное вынесение — не ошибка в вычислении, но и не ответ. Полный ответ — когда в скобке больше нет общего.',
+      draw: ph => blines([{ t: ph ? `3(2${hl(si('x'))}² + 3${hl(si('x'))})` : `3(2${si('x')}² + 3${si('x')})` }].concat(ph ? [
+        { t: `в скобке ещё общий ${si('x')}`, cls: 'new', lc: 'warm' }, { t: `= 3${si('x')}(2${si('x')} + 3)`, cls: 'new', lc: 'acc' }] : [{ t: 'готово?', lc: 'soft' }]), 100, 110),
       rec: ph => ph ? [`3(2${si('x')}² + 3${si('x')}) = 3${si('x')}(2${si('x')} + 3)`] : [] },
     { q: 'Итог: как разложить многочлен на множители?',
       a: 'Три способа: вынести общее за скобки; сгруппировать; применить формулу наоборот. Разложил — умножь обратно.',
@@ -1291,9 +1328,6 @@ function buildSteps(e) {
       rec: () => ['1. Вынеси общее за скобки.', '2. Сгруппируй.', '3. Примени формулу наоборот.', 'Проверка: умножь обратно.'] },
   ];
 }
-// Живая модель доски (core/live.js): ширина k, части p и q, go — раскрытие ответа,
-// stage — стадия разложения в два шага. Ядро даёт мышь, касание, клавиатуру,
-// сброс, повтор опыта и плавное движение; тема пишет только математику.
 const LIVE = {
   model: e => ({ k: e.k ?? 3, p: e.p ?? 4, q: e.q ?? 5, go: 0, stage: 0 }),
   fix(m) {
@@ -2038,7 +2072,8 @@ const SHOWS = {
     },
   },
 };
-const showsAvailable = () => Object.entries(SHOWS).filter(([, s]) => s.available());
+// тема выбирает показы сама (CONFIG.board.shows): в меню — только они и только доступные
+const showsAvailable = () => Object.entries(SHOWS).filter(([k, s]) => s.available() && (!CONFIG.board.shows || CONFIG.board.shows.includes(k)));
 
 // переключение вида показа: 'main' — основной показ темы
 function boardUseShow(name) {
@@ -2100,7 +2135,9 @@ function boardTimer() {
 // step.live = {
 //   enter(m) { ... },           // как поставить модель при входе в шаг (можно liveTo — плавно)
 //   reveal(m) { ... },          // опыт по кнопке «Показать ответ» (обычно liveTo); «▶ Повторить опыт» запускает его снова
-//   handles: (m, phase) => [{ id, at: {x, y}, label, move(m, p) {...}, key?(m, dx, dy, fine), keyStep?, r? }],
+//   handles: (m, phase) => [{ id, at: {x, y}, label, move(m, p) {...}, key?(m, dx, dy, fine), keyStep?, r?, ring? }],
+//                               // ring: радиус кольца — для фишки с подписью (точка закрыла бы надпись);
+//                               // подпись под точкой-ручкой тест-контракт считает ошибкой
 //   controls: (m, phase) => [
 //     { id, type: 'range', label, min, max, step, get: m => …, set(m, v) {...}, text?: m => '…' },
 //     { id, type: 'toggle', label, get: m => true|false, set(m, v) {...} },
@@ -2184,9 +2221,11 @@ function liveStop() {
 // ---------- ручки на чертеже ----------
 function liveHandlesSVG(st) {
   LV.handles = st.live?.handles ? st.live.handles(B.m, B.phase).filter(Boolean) : [];
+  // ring: ручка — кольцо вокруг фишки с подписью (подпись видна сквозь него); иначе — точка
   return LV.handles.map(h => `<g class="lv-h${h.cls ? ' ' + h.cls : ''}" data-handle="${h.id}" tabindex="0" role="button" ` +
     `aria-label="${esc(h.label)}: тяните или двигайте стрелками" transform="translate(${GEO.f1(h.at.x)} ${GEO.f1(h.at.y)})">` +
-    `<title>${esc(h.label)}</title><circle class="lv-hit" r="44"/><circle class="lv-dot" r="${h.r || 18}"/></g>`).join('');
+    `<title>${esc(h.label)}</title><circle class="lv-hit" r="${h.ring ? Math.max(44, h.ring + 8) : 44}"/>` +
+    (h.ring ? `<circle class="lv-ring" r="${h.ring}"/>` : `<circle class="lv-dot" r="${h.r || 18}"/>`) + '</g>').join('');
 }
 const liveBox = { x: 0, y: 0, w: BW, h: BH };
 // перетащить ручку id в точку p (координаты чертежа); false — положение вырождено и не принято
@@ -2585,7 +2624,7 @@ window.APP = {
     restart: boardRestart, get show() { return B.show; }, useShow: boardUseShow, timer: boardTimer,
     // живая доска: модель, ручки и панель текущего шага; drag(id, {x, y}) и key(id, dx, dy) — как учитель рукой и стрелками
     get model() { return B.m; }, get snap() { return LV.snap; }, get animating() { return !!LV.anim; },
-    get handles() { return LV.handles.map(h => ({ id: h.id, label: h.label, at: { ...h.at } })); },
+    get handles() { return LV.handles.map(h => ({ id: h.id, label: h.label, at: { ...h.at }, r: h.r || 18, ring: h.ring || 0 })); },
     get controls() { return LV.controls.map(c => ({ id: c.id, type: c.type, label: c.label, min: c.min, max: c.max, options: c.options })); },
     drag: liveDrag, key: liveKey, set: liveSet, reset: liveReset, again: liveAgain },
   GEO, HAS_LIVE: typeof LIVE !== 'undefined',
