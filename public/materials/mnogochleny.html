@@ -86,7 +86,7 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 .icon{padding:.35em .6em;min-width:44px;min-height:44px}
 
 /* доска: на проекторе шрифт не мельче 28px */
-#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
+#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
 .bbar{display:flex;align-items:center;gap:8px;font-size:20px}
 .bbar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap;margin-right:6px}
@@ -96,7 +96,8 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 .btext .a{font-size:clamp(28px,2.7vw,42px);line-height:1.35;margin-top:.15em;color:var(--accent);font-weight:600}
 .btext .a ul{margin:.1em 0;padding-left:1.2em;color:var(--ink)}
 .btext .a.hide{visibility:hidden}
-.bstage{min-height:0;display:flex;align-items:center;justify-content:center}
+.bmid{min-height:0;display:flex;gap:12px 24px;align-items:stretch}
+.bstage{flex:1;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center}
 .bstage svg{width:100%;height:100%;max-height:100%}
 .brec{border-top:2px dashed var(--line);padding:6px 0 2px;min-height:calc(2 * 1.9em + 26px);font-size:clamp(26px,2.4vw,36px);line-height:1.9}
 .brec .rt-h{display:block;font-size:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);line-height:1.2}
@@ -110,6 +111,11 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 #board.preview .bctl,#board.preview .bbar button{visibility:hidden}
 #board.preview .bnote{display:none}
 @media (max-width:1150px){ .bbar .ttl{visibility:hidden} .bbar button .t{display:none} }
+/* ноутбук и проектор 1366 × 768: текст поджимается до 28px, остальная высота уходит чертежу */
+@media (max-height:860px){
+  .btext .q{font-size:clamp(28px,2.6vw,36px)} .btext .a{font-size:clamp(28px,2.3vw,32px)}
+  .brec{line-height:1.45;min-height:calc(2 * 1.45em + 22px)} .bctl button{min-height:52px;font-size:24px}
+}
 
 svg text{font-family:var(--font);fill:var(--ink)}
 svg .lab{font-size:38px;font-weight:700}
@@ -166,15 +172,21 @@ svg .lv-hit{fill:transparent}
 svg .lv-dot{fill:var(--b);stroke:var(--surface);stroke-width:5}
 svg .lv-h:hover .lv-dot{stroke:var(--accent)}
 svg .lv-h:focus-visible .lv-dot{stroke:var(--accent);stroke-width:9}
-.blive{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:center;padding:6px 0 2px;font-size:22px}
-.blive .lv-c{display:inline-flex;align-items:center;gap:12px;font-weight:600}
-.blive input[type=range]{width:min(320px,55vw);height:40px;accent-color:var(--accent);cursor:pointer}
+svg .lv-ring{fill:transparent;stroke:var(--b);stroke-width:5;stroke-dasharray:14 8}
+svg .lv-h:hover .lv-ring,svg .lv-h:focus-visible .lv-ring{stroke:var(--accent);stroke-width:8;stroke-dasharray:none}
+/* панель — колонкой справа от чертежа; на узком экране — строкой под ним */
+.blive{display:flex;flex-direction:column;gap:14px;align-self:center;justify-content:center;width:min(300px,26vw);font-size:22px}
+.blive .lv-c{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-weight:600}
+.blive .lv-c>span:first-child{flex:1 0 100%}
+.blive input[type=range]{flex:1;min-width:0;height:40px;accent-color:var(--accent);cursor:pointer}
 .blive output{min-width:3.2em;font-weight:800;color:var(--accent)}
 .blive button{min-height:48px;font-size:20px;padding:.2em .8em}
 .blive button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.blive .lv-tools{display:inline-flex;gap:8px}
-#board.preview .blive{visibility:hidden}
-@media (max-width:600px){ .blive{font-size:17px;gap:6px 14px} .blive button{font-size:16px;min-height:44px} }
+.blive .lv-tools{display:flex;flex-wrap:wrap;gap:8px}
+#board.preview .blive{display:none !important}   /* в превью панели нет — чертёж на всю ширину */
+@media (max-width:900px){ .bmid{flex-direction:column} .blive{flex-direction:row;flex-wrap:wrap;width:auto;gap:8px 20px} .blive .lv-c>span:first-child{flex:0 0 auto} .blive input[type=range]{width:min(320px,55vw);flex:none} }
+@media (max-width:600px){ .blive{font-size:17px;gap:6px 14px} .blive button{font-size:16px;min-height:44px}
+  #board{height:auto;min-height:100vh;grid-template-rows:none} .bbar{flex-wrap:wrap} .bstage{flex:none;min-height:150px} }
 svg .new{animation:fade .6s ease-out both}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion: reduce){ svg .new, .mode:hover{animation:none;transform:none} }
@@ -425,7 +437,7 @@ table.bubbles.stencil td.on{background:#000;-webkit-print-color-adjust:exact;pri
     <h1>Многочлены</h1>
     <p class="lead">Одна тема в трёх режимах: показ на доске, раздатка с кодовым словом и тренажёр, который объясняет каждую ошибку.</p>
     <div class="modes">
-      <button class="mode" type="button" data-go="board"><b>🖥 На доске</b><span>Опорный конспект: что такое многочлен, стандартный вид и степень. Живая сортировка членов по степеням. Ловушка: степени не складываются.</span></button>
+      <button class="mode" type="button" data-go="board"><b>🖥 На доске</b><span>Опорный конспект: что такое многочлен, стандартный вид и степень. Фишки-члены переносят на места по убыванию степеней — неверный порядок сразу виден. Ловушка: степень по первому члену.</span></button>
       <button class="mode" type="button" data-go="print"><b>🖨 Раздатка</b><span>У каждого свой вариант, ключ — по номеру варианта.</span></button>
       <button class="mode" type="button" data-go="home"><b>🏠 Тренировка</b><span>Стандартный вид, степень, члены и свободный член, проверка утверждений. Разбор каждой ошибки.</span></button>
     </div>
@@ -446,8 +458,11 @@ table.bubbles.stencil td.on{background:#000;-webkit-print-color-adjust:exact;pri
     <button class="icon" type="button" data-act="full" title="Во весь экран (F)" aria-label="Во весь экран">⛶</button>
   </div>
   <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
-  <div class="bstage" id="bStage"></div>
-  <div class="blive" id="bLive" role="group" aria-label="Управление чертежом" hidden></div>
+  <!-- панель чертежа — колонкой справа: чертёж 980 × 400 шире экрана по пропорциям, высота остаётся ему -->
+  <div class="bmid">
+    <div class="bstage" id="bStage"></div>
+    <div class="blive" id="bLive" role="group" aria-label="Управление чертежом" hidden></div>
+  </div>
   <div class="brec"><span class="rt-h">Запись в тетради</span><div id="bRec"></div></div>
   <div class="bctl">
     <button type="button" data-act="prev" title="Назад (←, PageUp)">← Назад</button>
@@ -531,7 +546,7 @@ table.bubbles.stencil td.on{background:#000;-webkit-print-color-adjust:exact;pri
 'use strict';
 // Материал «Многочлены». Собран конструктором «Матшага» из materials/mnogochleny/ и core/.
 const SLUG = "mnogochleny";
-const META = {"title":"Многочлены","description":"Многочлены: стандартный вид, степень, члены и свободный член. Опорный конспект на доске, раздатка с кодовым словом и тренажёр с разбором ошибок. 7 класс.","kicker":"7 класс · Макарычев и др. · Алгебра","lead":"Одна тема в трёх режимах: показ на доске, раздатка с кодовым словом и тренажёр, который объясняет каждую ошибку.","modeBoard":"Опорный конспект: что такое многочлен, стандартный вид и степень. Живая сортировка членов по степеням. Ловушка: степени не складываются.","modePrint":"У каждого свой вариант, ключ — по номеру варианта.","modeHome":"Стандартный вид, степень, члены и свободный член, проверка утверждений. Разбор каждой ошибки.","printTitle":"Раздатка: многочлены","homeTitle":"Тренировка: многочлены","homeIntro":"Выбери раздел — и начнём. В каждом 10 заданий, после ошибки — разбор и такое же задание с другими числами."};
+const META = {"title":"Многочлены","description":"Многочлены: стандартный вид, степень, члены и свободный член. Опорный конспект на доске, раздатка с кодовым словом и тренажёр с разбором ошибок. 7 класс.","kicker":"7 класс · Макарычев и др. · Алгебра","lead":"Одна тема в трёх режимах: показ на доске, раздатка с кодовым словом и тренажёр, который объясняет каждую ошибку.","modeBoard":"Опорный конспект: что такое многочлен, стандартный вид и степень. Фишки-члены переносят на места по убыванию степеней — неверный порядок сразу виден. Ловушка: степень по первому члену.","modePrint":"У каждого свой вариант, ключ — по номеру варианта.","modeHome":"Стандартный вид, степень, члены и свободный член, проверка утверждений. Разбор каждой ошибки.","printTitle":"Раздатка: многочлены","homeTitle":"Тренировка: многочлены","homeIntro":"Выбери раздел — и начнём. В каждом 10 заданий, после ошибки — разбор и такое же задание с другими числами."};
 // ---------- ядро: core/shell.js ----------
 // Общие константы, адрес материала, хранилище настроек. SLUG и META вставляет сборка.
 const MINUS = '−';
@@ -867,6 +882,7 @@ const GEO = (() => {
 // ================= Параметры: учитель может поменять их за минуту =================
 const CONFIG = {
   board: {
+    shows: ['warmup', 'truefalse'],   // показы в меню — устный счёт и проверка утверждений о степени
     previewDelay: 1700,   // превью на сайте: пауза между шагами, мс
   },
   print: {
@@ -1128,89 +1144,119 @@ function boardExample(random, old) {
 // Подписи на чертеже — SVG-текст: курсив через tspan, степень — «² ³ ⁴» (теги <i> и <sup> в SVG не работают)
 const si = v => `<tspan font-style="italic">${v}</tspan>`;
 const SUPD = ['', '', '²', '³', '⁴'];
-const chipLabel = d => d === 0 ? '7' : `${d + 2}${si('x')}${SUPD[d] || `<tspan dy="-14" font-size="20">${d}</tspan>`}`;
-const BX = 90, BY = 110;
-const blines = (lines, y0 = 80) => lines.map((l, i) =>
-  `<g class="${l.cls || ''}">${tx(560, y0 + i * 54, l.t, 'lab s' + (l.lc ? ' ' + l.lc : ''), 'start')}</g>`).join('');
-// Живая модель: фишки-члены (степень d), порядок — перетаскиванием
+// член k·xᵈ: x¹ пишется просто x, x⁰ — число
+const mono = (k, d) => d === 0 ? String(k) : `${k === 1 ? '' : k === -1 ? MINUS : k}${si('x')}${SUPD[d]}`;
+const chipLabel = d => d === 0 ? '7' : mono(d + 2, d);
+// Члены многочлена плитками: знак члена — внутри плитки, между плитками «+».
+// opt.degs — степени над плитками, opt.hl — номера выделенных плиток, opt.under — подписи под плитками, opt.line — строка внизу
+function tiles(terms, opt = {}) {
+  const n = terms.length, w = n > 3 ? 170 : 190, gap = n > 3 ? 50 : 70, x0 = (980 - n * w - (n - 1) * gap) / 2;
+  let s = '';
+  terms.forEach((t, i) => {
+    const x = x0 + i * (w + gap), hl = opt.hl?.includes(i);
+    s += `<rect class="${hl ? 'gs' : 'ge'}" x="${x}" y="130" width="${w}" height="100" rx="14"/><rect class="gf" x="${x}" y="130" width="${w}" height="100" rx="14"/>` +
+      tx(x + w / 2, 196, t, 'lab', 'middle');
+    if (i) s += tx(x - gap / 2, 194, '+', 'lab soft', 'middle');
+    if (opt.degs) s += tx(x + w / 2, 104, `степень ${opt.degs[i]}`, 'lab s ' + (hl ? 'acc' : 'soft'), 'middle');
+    if (opt.under?.[i]) s += tx(x + w / 2, 280, opt.under[i], 'lab s ' + (hl ? 'acc' : 'soft'), 'middle');
+  });
+  if (opt.line) s += `<g class="new">${tx(490, 362, opt.line, 'lab s acc', 'middle')}</g>`;
+  return s;
+}
+// Ряды «запись — вывод»: класс сначала решает сам, ответ появляется по «Показать ответ»
+const verdicts = (rows, ph) => rows.map(([expr, why, c], i) =>
+  tx(90, 110 + i * 110, expr, 'lab', 'start') + tx(500, 110 + i * 110, ph ? why : '?', 'lab s ' + (ph ? c : 'soft'), 'start')).join('');
+// Живая модель: фишки-члены (степень d) переносят на четыре места; подпись фишки — по её степени
+const CHIP_R = 50, SLOT_Y = 245, ROW_Y = 80;
+const slotX = i => 150 + i * 227;
 const LIVE = {
-  model: e => ({ chips: e.d.map((d, i) => ({ x: 150 + i * 190, y: 150, d })) }),
+  model: e => ({ chips: e.d.map((d, i) => ({ x: slotX(i), y: ROW_Y, d })) }),
   fix(m) {
     if (!Array.isArray(m.chips)) return;   // в видах показа модели нет — только текст шагов
     for (const c of m.chips) {
-      c.x = Math.max(60, Math.min(920, Math.round(c.x)));
-      c.y = Math.max(60, Math.min(340, Math.round(c.y)));
+      c.x = Math.max(CHIP_R + 4, Math.min(980 - CHIP_R - 4, Math.round(c.x)));
+      c.y = Math.max(CHIP_R + 4, Math.min(400 - CHIP_R - 4, Math.round(c.y)));
     }
   },
   ok: m => !Array.isArray(m.chips) || m.chips.every(c => Number.isFinite(c.x) && Number.isFinite(c.y)),
 };
-function chipsScene(m, show) {
+// что стоит на местах: фишка на месте, если её центр ближе радиуса к центру места
+const slotted = m => [0, 1, 2, 3].map(i => m.chips.find(c => Math.hypot(c.x - slotX(i), c.y - SLOT_Y) < CHIP_R));
+function chipsScene(m) {
   if (!Array.isArray(m.chips)) return '';   // в видах показа модели нет — только текст шагов
   let s = '';
-  for (let i = 0; i < 4; i++) {
-    const x = 150 + i * 190;
-    s += `<circle class="gn" cx="${x}" cy="150" r="44"/>` + tx(x, 210, `место ${i + 1}`, 'lab s soft', 'middle');
-  }
+  for (let i = 0; i < 4; i++) s += `<circle class="gx" cx="${slotX(i)}" cy="${SLOT_Y}" r="${CHIP_R + 4}"/>`;
+  s += `<path class="br" d="M${slotX(0)} 322H${slotX(3)}m-16 -10l16 10l-16 10"/>`;   // стрелка: степень убывает слева направо
   m.chips.forEach(c => {
-    s += `<circle class="gf" cx="${c.x}" cy="${c.y}" r="40"/>` + tx(c.x, c.y + 11, chipLabel(c.d), 'lab s', 'middle');
+    s += `<circle class="ge" cx="${c.x}" cy="${c.y}" r="${CHIP_R}"/><circle class="gf" cx="${c.x}" cy="${c.y}" r="${CHIP_R}"/>` +
+      tx(c.x, c.y + 13, chipLabel(c.d), 'lab', 'middle');
   });
-  if (show) s += tx(490, 300, `по убыванию: ${[...m.chips].sort((u, v) => v.d - u.d).map(c => chipLabel(c.d)).join(', ')}`, 'lab s acc', 'middle');
+  // запись того, что собрано на местах: по убыванию — зелёным, иначе — подсказка, что не так
+  const placed = slotted(m).filter(Boolean);
+  if (placed.length) {
+    const down = placed.every((c, i) => !i || placed[i - 1].d > c.d);
+    s += tx(490, 378, placed.map(c => chipLabel(c.d)).join(' + ') + (down ? '' : '  — степени не убывают'), 'lab s ' + (down ? 'acc' : 'warm'), 'middle');
+  }
   return s;
 }
 function buildSteps(e) {
   return [
     { q: `Что такое многочлен? Вот пример: 2${si('x')}³ ${MINUS} ${si('x')} + 5. Из чего он состоит?`,
-      a: `Из трёх одночленов-слагаемых: 2${si('x')}³, ${si('x')} и 5. Многочлен — это сумма одночленов, слагаемые называются членами.`,
-      note: 'Начало урока: пусть класс сам выделит слагаемые. Подчеркните каждое.',
-      draw: () => '',
+      a: `Из трёх одночленов: 2${si('x')}³, ${MINUS}${si('x')} и 5. Многочлен — это сумма одночленов, их называют членами. Знак перед членом — часть члена.`,
+      note: 'Начало урока: пусть класс сам выделит члены. Спросите, какой второй член — x или −x.',
+      draw: ph => ph
+        ? tiles([`2${si('x')}³`, `${MINUS}${si('x')}`, '5'], { under: ['1-й член', '2-й член', '3-й член'],
+          line: `2${si('x')}³ ${MINUS} ${si('x')} + 5 = 2${si('x')}³ + (${MINUS}${si('x')}) + 5` })
+        : tx(490, 210, `2${si('x')}³ ${MINUS} ${si('x')} + 5`, 'lab', 'middle'),
       rec: ph => ph ? [`многочлен — сумма одночленов (члены)`] : [] },
-    { q: 'Расставь фишки по убыванию степеней: слева — старшая. Тяни мышью, пальцем или стрелками.',
-      a: 'По убыванию: сначала x³, потом x², x и число. В стандартном виде члены так и идут.',
-      note: '«Показать ответ» расставит сам; «Сбросить» вернёт. Спросите: где должна стоять фишка «7»?',
+    { q: 'Расставь члены по местам: слева — старшая степень, дальше по убыванию.',
+      a: 'По убыванию степеней: 5x³ + 4x² + 3x + 7. Число 7 — член нулевой степени, оно в конце.',
+      note: 'Пусть ученик перетащит фишки на места (мышь, палец или стрелки). Поставьте не по порядку — строка внизу предупредит. «Показать ответ» расставит сам, «Сбросить» вернёт. Спросите: где место числа 7?',
       live: {
         enter() {},
-        reveal(m) { liveTo({ chips: [...m.chips].sort((u, v) => v.d - u.d).map((c, i) => ({ ...c, x: 150 + i * 190, y: 150 })) }, 1200); },
-        handles: m => (Array.isArray(m.chips) ? m.chips : []).map((c, i) => ({ id: 'c' + i, at: { x: c.x, y: c.y }, label: 'Член ' + (i + 1),
+        reveal(m) { liveTo({ chips: [...m.chips].sort((u, v) => v.d - u.d).map((c, i) => ({ ...c, x: slotX(i), y: SLOT_Y })) }, 1200); },
+        handles: m => (Array.isArray(m.chips) ? m.chips : []).map((c, i) => ({ id: 'c' + i, at: { x: c.x, y: c.y }, ring: CHIP_R + 6,
+          label: 'Член ' + chipLabel(c.d).replace(/<[^>]+>/g, ''),
           move(mm, p) { mm.chips[i].x = p.x; mm.chips[i].y = p.y; },
-          key(mm, dx, dy) { mm.chips[i].x += dx; mm.chips[i].y += dy; } })),
+          key(mm, dx, dy) { mm.chips[i].x += dx * 20; mm.chips[i].y += dy * 20; } })),
       },
-      draw: (ph, m) => chipsScene(m, ph),
-      rec: (ph, m) => ph ? [`стандартный вид: члены по убыванию степеней`] : [] },
-    { q: 'Когда многочлен записан в стандартном виде? Два условия.',
-      a: `Первое: подобные приведены. Второе: члены идут по убыванию степеней: 2${si('x')}³ + 4${si('x')}² ${MINUS} ${si('x')} + 7.`,
-      note: 'Запишите оба условия в тетрадь. Проверяйте их по очереди в каждом задании.',
-      draw: () => '',
+      draw: (ph, m) => chipsScene(m),
+      rec: ph => ph ? [`стандартный вид: члены по убыванию степеней`] : [] },
+    { q: 'Когда многочлен записан в стандартном виде? Проверь три записи.',
+      a: `Два условия: подобные приведены и степени членов убывают. Подходит только ${si('x')}² + 5${si('x')}.`,
+      note: 'Пусть класс про каждую запись скажет «да» или «нет» и почему. Запишите оба условия в тетрадь.',
+      draw: ph => verdicts([[`${si('x')}² + 2${si('x')} + 3${si('x')}`, 'нет: подобные не приведены', 'warm'],
+        [`3${si('x')} + ${si('x')}²`, 'нет: степени не убывают', 'warm'], [`${si('x')}² + 5${si('x')}`, 'да: стандартный вид', 'acc']], ph),
       rec: () => ['стандартный вид: 1) подобные приведены; 2) степени убывают'] },
     { q: `Какая степень у многочлена 2${si('x')}³ ${MINUS} ${si('x')} + 5?`,
       a: `Третья: степени членов 3, 1 и 0 — наибольшая 3.`,
       note: 'Степень числа — нулевая: 5 = 5x⁰. Это часто забывают.',
-      draw: () => '',
+      draw: ph => tiles([`2${si('x')}³`, `${MINUS}${si('x')}`, '5'], ph ? { degs: [3, 1, 0], hl: [0], line: 'степень многочлена — наибольшая: 3' } : {}),
       rec: ph => ph ? [`степень — наибольшая из степеней членов`] : [] },
-    { q: `Ловушка: степень ${si('x')}³ + ${si('x')}² — это 3 + 2 = 5?`,
-      a: `Нет! Степени не складываются: члены со степенями 3 и 2, наибольшая — 3.`,
-      note: 'Шаг-ловушка: складываются только коэффициенты подобных, а степени — никогда.',
-      draw: ph => blines(ph
-        ? [{ t: `${si('x')}³ + ${si('x')}² — степень 3, а не 5`, cls: 'new', lc: 'acc' }]
-        : [{ t: `${si('x')}³ + ${si('x')}² = ?`, lc: 'warm' }]),
-      rec: ph => ph ? [`степени не складываются`] : [] },
-    { q: `Что такое свободный член? Найди его: 2${si('x')}³ ${MINUS} ${si('x')} + 5.`,
-      a: `5 — слагаемое без буквы. Знак не теряем.`,
-      note: 'Типичная ошибка: называют коэффициент при x.',
-      draw: () => '',
-      rec: ph => ph ? [`свободный член — без буквы`] : [] },
-    { q: `А если условие нарушить: ${si('x')}² + ${si('x')}² — это уже стандартный вид?`,
-      a: `Нет: подобные не приведены. Сначала ${si('x')}² + ${si('x')}² = 2${si('x')}² — и только потом порядок.`,
-      note: 'Порядок шагов: сначала привести подобные, потом упорядочить.',
-      draw: () => '',
+    { q: `Ловушка: у 5 + 2${si('x')} ${MINUS} ${si('x')}³ степень 1 — по первому члену с ${si('x')}?`,
+      a: `Нет: степень — наибольшая из степеней членов, где бы член ни стоял. У ${MINUS}${si('x')}³ степень 3. В стандартном виде старший член впереди: ${MINUS}${si('x')}³ + 2${si('x')} + 5.`,
+      note: 'Шаг-ловушка: степень ищут по первому члену, не приведя многочлен к стандартному виду.',
+      draw: ph => tiles(['5', `2${si('x')}`, `${MINUS}${si('x')}³`], ph
+        ? { degs: [0, 1, 3], hl: [2], line: `стандартный вид: ${MINUS}${si('x')}³ + 2${si('x')} + 5, степень 3` } : {}),
+      rec: ph => ph ? [`степень ищем среди всех членов`] : [] },
+    { q: `Что такое свободный член? Найди его: 3${si('x')}² + ${si('x')} ${MINUS} 4.`,
+      a: `${MINUS}4 — член без буквы. Знак берём вместе с числом: не 4, а ${MINUS}4.`,
+      note: 'Типичные ошибки: называют 4 без знака или коэффициент при x.',
+      draw: ph => tiles([`3${si('x')}²`, si('x'), `${MINUS}4`], ph ? { hl: [2], under: ['', '', 'свободный член'] } : {}),
+      rec: ph => ph ? [`свободный член — без буквы, со своим знаком`] : [] },
+    { q: `А если условие нарушено: ${si('x')}³ + 2${si('x')} + ${si('x')}³ ${MINUS} 1 — это стандартный вид?`,
+      a: `Нет: ${si('x')}³ и ${si('x')}³ подобные. Сначала приводим: 2${si('x')}³ + 2${si('x')} ${MINUS} 1 — теперь стандартный вид, степень 3.`,
+      note: 'Порядок шагов: сначала привести подобные, потом упорядочить по степеням.',
+      draw: ph => tiles([`${si('x')}³`, `2${si('x')}`, `${si('x')}³`, `${MINUS}1`], ph
+        ? { hl: [0, 2], under: ['подобные', '', 'подобные', ''], line: `= 2${si('x')}³ + 2${si('x')} ${MINUS} 1` } : {}),
       rec: ph => ph ? [`сначала привести подобные, потом упорядочить`] : [] },
     { q: 'Итог-опорник: что проверяем у многочлена?',
-      a: 'Члены, стандартный вид (два условия), степень, свободный член.',
+      a: 'Члены (со знаками), стандартный вид (два условия), степень, свободный член.',
       note: 'Пусть класс повторит опорник своими словами.',
       draw: () => '',
       rec: () => ['1. Члены.', '2. Стандартный вид.', '3. Степень.', '4. Свободный член.'] },
   ];
 }
-// превью на сайте крутит шаги до previewUntil (счёт с 0); картинка-превью — шаг poster с показанным ответом
 const BOARD = { previewUntil: 2, poster: 1 };
 
 // Формулы в справке (help.html): ядро вызывает helpInit() при запуске
@@ -1941,7 +1987,8 @@ const SHOWS = {
     },
   },
 };
-const showsAvailable = () => Object.entries(SHOWS).filter(([, s]) => s.available());
+// тема выбирает показы сама (CONFIG.board.shows): в меню — только они и только доступные
+const showsAvailable = () => Object.entries(SHOWS).filter(([k, s]) => s.available() && (!CONFIG.board.shows || CONFIG.board.shows.includes(k)));
 
 // переключение вида показа: 'main' — основной показ темы
 function boardUseShow(name) {
@@ -2003,7 +2050,9 @@ function boardTimer() {
 // step.live = {
 //   enter(m) { ... },           // как поставить модель при входе в шаг (можно liveTo — плавно)
 //   reveal(m) { ... },          // опыт по кнопке «Показать ответ» (обычно liveTo); «▶ Повторить опыт» запускает его снова
-//   handles: (m, phase) => [{ id, at: {x, y}, label, move(m, p) {...}, key?(m, dx, dy, fine), keyStep?, r? }],
+//   handles: (m, phase) => [{ id, at: {x, y}, label, move(m, p) {...}, key?(m, dx, dy, fine), keyStep?, r?, ring? }],
+//                               // ring: радиус кольца — для фишки с подписью (точка закрыла бы надпись);
+//                               // подпись под точкой-ручкой тест-контракт считает ошибкой
 //   controls: (m, phase) => [
 //     { id, type: 'range', label, min, max, step, get: m => …, set(m, v) {...}, text?: m => '…' },
 //     { id, type: 'toggle', label, get: m => true|false, set(m, v) {...} },
@@ -2087,9 +2136,11 @@ function liveStop() {
 // ---------- ручки на чертеже ----------
 function liveHandlesSVG(st) {
   LV.handles = st.live?.handles ? st.live.handles(B.m, B.phase).filter(Boolean) : [];
+  // ring: ручка — кольцо вокруг фишки с подписью (подпись видна сквозь него); иначе — точка
   return LV.handles.map(h => `<g class="lv-h${h.cls ? ' ' + h.cls : ''}" data-handle="${h.id}" tabindex="0" role="button" ` +
     `aria-label="${esc(h.label)}: тяните или двигайте стрелками" transform="translate(${GEO.f1(h.at.x)} ${GEO.f1(h.at.y)})">` +
-    `<title>${esc(h.label)}</title><circle class="lv-hit" r="44"/><circle class="lv-dot" r="${h.r || 18}"/></g>`).join('');
+    `<title>${esc(h.label)}</title><circle class="lv-hit" r="${h.ring ? Math.max(44, h.ring + 8) : 44}"/>` +
+    (h.ring ? `<circle class="lv-ring" r="${h.ring}"/>` : `<circle class="lv-dot" r="${h.r || 18}"/>`) + '</g>').join('');
 }
 const liveBox = { x: 0, y: 0, w: BW, h: BH };
 // перетащить ручку id в точку p (координаты чертежа); false — положение вырождено и не принято
@@ -2488,7 +2539,7 @@ window.APP = {
     restart: boardRestart, get show() { return B.show; }, useShow: boardUseShow, timer: boardTimer,
     // живая доска: модель, ручки и панель текущего шага; drag(id, {x, y}) и key(id, dx, dy) — как учитель рукой и стрелками
     get model() { return B.m; }, get snap() { return LV.snap; }, get animating() { return !!LV.anim; },
-    get handles() { return LV.handles.map(h => ({ id: h.id, label: h.label, at: { ...h.at } })); },
+    get handles() { return LV.handles.map(h => ({ id: h.id, label: h.label, at: { ...h.at }, r: h.r || 18, ring: h.ring || 0 })); },
     get controls() { return LV.controls.map(c => ({ id: c.id, type: c.type, label: c.label, min: c.min, max: c.max, options: c.options })); },
     drag: liveDrag, key: liveKey, set: liveSet, reset: liveReset, again: liveAgain },
   GEO, HAS_LIVE: typeof LIVE !== 'undefined',

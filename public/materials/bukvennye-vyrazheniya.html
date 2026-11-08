@@ -86,7 +86,7 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 .icon{padding:.35em .6em;min-width:44px;min-height:44px}
 
 /* доска: на проекторе шрифт не мельче 28px */
-#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
+#board{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100vh;height:100dvh;padding:10px clamp(12px,3vw,40px)}
 .bbar{display:flex;align-items:center;gap:8px;font-size:20px}
 .bbar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bbar .cnt{color:var(--soft);font-weight:600;white-space:nowrap;margin-right:6px}
@@ -96,7 +96,8 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 .btext .a{font-size:clamp(28px,2.7vw,42px);line-height:1.35;margin-top:.15em;color:var(--accent);font-weight:600}
 .btext .a ul{margin:.1em 0;padding-left:1.2em;color:var(--ink)}
 .btext .a.hide{visibility:hidden}
-.bstage{min-height:0;display:flex;align-items:center;justify-content:center}
+.bmid{min-height:0;display:flex;gap:12px 24px;align-items:stretch}
+.bstage{flex:1;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center}
 .bstage svg{width:100%;height:100%;max-height:100%}
 .brec{border-top:2px dashed var(--line);padding:6px 0 2px;min-height:calc(2 * 1.9em + 26px);font-size:clamp(26px,2.4vw,36px);line-height:1.9}
 .brec .rt-h{display:block;font-size:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);line-height:1.2}
@@ -110,6 +111,11 @@ h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing
 #board.preview .bctl,#board.preview .bbar button{visibility:hidden}
 #board.preview .bnote{display:none}
 @media (max-width:1150px){ .bbar .ttl{visibility:hidden} .bbar button .t{display:none} }
+/* ноутбук и проектор 1366 × 768: текст поджимается до 28px, остальная высота уходит чертежу */
+@media (max-height:860px){
+  .btext .q{font-size:clamp(28px,2.6vw,36px)} .btext .a{font-size:clamp(28px,2.3vw,32px)}
+  .brec{line-height:1.45;min-height:calc(2 * 1.45em + 22px)} .bctl button{min-height:52px;font-size:24px}
+}
 
 svg text{font-family:var(--font);fill:var(--ink)}
 svg .lab{font-size:38px;font-weight:700}
@@ -166,15 +172,21 @@ svg .lv-hit{fill:transparent}
 svg .lv-dot{fill:var(--b);stroke:var(--surface);stroke-width:5}
 svg .lv-h:hover .lv-dot{stroke:var(--accent)}
 svg .lv-h:focus-visible .lv-dot{stroke:var(--accent);stroke-width:9}
-.blive{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:center;padding:6px 0 2px;font-size:22px}
-.blive .lv-c{display:inline-flex;align-items:center;gap:12px;font-weight:600}
-.blive input[type=range]{width:min(320px,55vw);height:40px;accent-color:var(--accent);cursor:pointer}
+svg .lv-ring{fill:transparent;stroke:var(--b);stroke-width:5;stroke-dasharray:14 8}
+svg .lv-h:hover .lv-ring,svg .lv-h:focus-visible .lv-ring{stroke:var(--accent);stroke-width:8;stroke-dasharray:none}
+/* панель — колонкой справа от чертежа; на узком экране — строкой под ним */
+.blive{display:flex;flex-direction:column;gap:14px;align-self:center;justify-content:center;width:min(300px,26vw);font-size:22px}
+.blive .lv-c{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-weight:600}
+.blive .lv-c>span:first-child{flex:1 0 100%}
+.blive input[type=range]{flex:1;min-width:0;height:40px;accent-color:var(--accent);cursor:pointer}
 .blive output{min-width:3.2em;font-weight:800;color:var(--accent)}
 .blive button{min-height:48px;font-size:20px;padding:.2em .8em}
 .blive button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.blive .lv-tools{display:inline-flex;gap:8px}
-#board.preview .blive{visibility:hidden}
-@media (max-width:600px){ .blive{font-size:17px;gap:6px 14px} .blive button{font-size:16px;min-height:44px} }
+.blive .lv-tools{display:flex;flex-wrap:wrap;gap:8px}
+#board.preview .blive{display:none !important}   /* в превью панели нет — чертёж на всю ширину */
+@media (max-width:900px){ .bmid{flex-direction:column} .blive{flex-direction:row;flex-wrap:wrap;width:auto;gap:8px 20px} .blive .lv-c>span:first-child{flex:0 0 auto} .blive input[type=range]{width:min(320px,55vw);flex:none} }
+@media (max-width:600px){ .blive{font-size:17px;gap:6px 14px} .blive button{font-size:16px;min-height:44px}
+  #board{height:auto;min-height:100vh;grid-template-rows:none} .bbar{flex-wrap:wrap} .bstage{flex:none;min-height:150px} }
 svg .new{animation:fade .6s ease-out both}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion: reduce){ svg .new, .mode:hover{animation:none;transform:none} }
@@ -425,7 +437,7 @@ table.bubbles.stencil td.on{background:#000;-webkit-print-color-adjust:exact;pri
     <h1>Буквенные выражения и подобные слагаемые</h1>
     <p class="lead">Одна тема в трёх режимах: показ на доске, раздатка с кодовым словом и тренажёр, который объясняет каждую ошибку.</p>
     <div class="modes">
-      <button class="mode" type="button" data-go="board"><b>🖥 На доске</b><span>Три тетради по a рублей и ещё две: сколько всего? Сортировка слагаемых на две кучки — подобное к подобному. Ловушки: 2x + 3y = 5xy и минус перед скобкой.</span></button>
+      <button class="mode" type="button" data-go="board"><b>🖥 На доске</b><span>Тетради по a рублей: сколько стоят все? Слагаемые-фишки разносим по группам подобных — чужая фишка сразу видна. Ловушки: 2x + 3y = 5xy и минус перед скобкой.</span></button>
       <button class="mode" type="button" data-go="print"><b>🖨 Раздатка</b><span>У каждого свой вариант, ключ — по номеру варианта.</span></button>
       <button class="mode" type="button" data-go="home"><b>🏠 Тренировка</b><span>Подобные слагаемые, раскрытие скобок, значение выражения при данных буквах. Разбор каждой ошибки.</span></button>
     </div>
@@ -446,8 +458,11 @@ table.bubbles.stencil td.on{background:#000;-webkit-print-color-adjust:exact;pri
     <button class="icon" type="button" data-act="full" title="Во весь экран (F)" aria-label="Во весь экран">⛶</button>
   </div>
   <div class="btext" aria-live="polite"><div class="q" id="bQ"></div><div class="a" id="bA"></div></div>
-  <div class="bstage" id="bStage"></div>
-  <div class="blive" id="bLive" role="group" aria-label="Управление чертежом" hidden></div>
+  <!-- панель чертежа — колонкой справа: чертёж 980 × 400 шире экрана по пропорциям, высота остаётся ему -->
+  <div class="bmid">
+    <div class="bstage" id="bStage"></div>
+    <div class="blive" id="bLive" role="group" aria-label="Управление чертежом" hidden></div>
+  </div>
   <div class="brec"><span class="rt-h">Запись в тетради</span><div id="bRec"></div></div>
   <div class="bctl">
     <button type="button" data-act="prev" title="Назад (←, PageUp)">← Назад</button>
@@ -532,7 +547,7 @@ table.bubbles.stencil td.on{background:#000;-webkit-print-color-adjust:exact;pri
 'use strict';
 // Материал «Буквенные выражения и подобные слагаемые». Собран конструктором «Матшага» из materials/bukvennye-vyrazheniya/ и core/.
 const SLUG = "bukvennye-vyrazheniya";
-const META = {"title":"Буквенные выражения и подобные слагаемые","description":"Буквенные выражения: подобные слагаемые, раскрытие скобок, значение выражения. Показ на доске, раздатка с кодовым словом и тренажёр с разбором ошибок. 7 класс.","kicker":"7 класс · Макарычев и др. · Алгебра","lead":"Одна тема в трёх режимах: показ на доске, раздатка с кодовым словом и тренажёр, который объясняет каждую ошибку.","modeBoard":"Три тетради по a рублей и ещё две: сколько всего? Сортировка слагаемых на две кучки — подобное к подобному. Ловушки: 2x + 3y = 5xy и минус перед скобкой.","modePrint":"У каждого свой вариант, ключ — по номеру варианта.","modeHome":"Подобные слагаемые, раскрытие скобок, значение выражения при данных буквах. Разбор каждой ошибки.","printTitle":"Раздатка: буквенные выражения","homeTitle":"Тренировка: буквенные выражения","homeIntro":"Выбери раздел — и начнём. В каждом 10 заданий, после ошибки — разбор и такое же задание с другими числами."};
+const META = {"title":"Буквенные выражения и подобные слагаемые","description":"Буквенные выражения: подобные слагаемые, раскрытие скобок, значение выражения. Показ на доске, раздатка с кодовым словом и тренажёр с разбором ошибок. 7 класс.","kicker":"7 класс · Макарычев и др. · Алгебра","lead":"Одна тема в трёх режимах: показ на доске, раздатка с кодовым словом и тренажёр, который объясняет каждую ошибку.","modeBoard":"Тетради по a рублей: сколько стоят все? Слагаемые-фишки разносим по группам подобных — чужая фишка сразу видна. Ловушки: 2x + 3y = 5xy и минус перед скобкой.","modePrint":"У каждого свой вариант, ключ — по номеру варианта.","modeHome":"Подобные слагаемые, раскрытие скобок, значение выражения при данных буквах. Разбор каждой ошибки.","printTitle":"Раздатка: буквенные выражения","homeTitle":"Тренировка: буквенные выражения","homeIntro":"Выбери раздел — и начнём. В каждом 10 заданий, после ошибки — разбор и такое же задание с другими числами."};
 // ---------- ядро: core/shell.js ----------
 // Общие константы, адрес материала, хранилище настроек. SLUG и META вставляет сборка.
 const MINUS = '−';
@@ -867,10 +882,12 @@ const GEO = (() => {
 // ================= Параметры: учитель может поменять их за минуту =================
 const CONFIG = {
   board: {
+    shows: ['warmup', 'truefalse', 'errors'],   // показы в меню — «2x + 3y = 5xy?» и знаки при раскрытии скобок
     a: 3, n: 2,            // первый пример на доске: 3 тетради по a рублей и ещё 2
     previewDelay: 1700,   // превью на сайте: пауза между шагами, мс
   },
   print: {
+    formats: ['word', 'exit', 'test'],   // листы в меню — «2x + 3y = 5xy?» и знаки при раскрытии скобок
     variants: 25,         // сколько вариантов печатать по умолчанию
     traps: 2,             // сколько ответов-ловушек на задание в таблице букв
     space: true,          // сетка для решения под каждым заданием
@@ -1192,101 +1209,119 @@ function boardExample(random, old) {
 // Подписи на чертеже — SVG-текст: курсив через tspan (тег <i> в SVG не работает)
 const si = v => `<tspan font-style="italic">${v}</tspan>`;
 const BX = 90, BY = 90;
-const blines = (lines, y0 = 90) => lines.map((l, i) =>
-  `<g class="${l.cls || ''}">${tx(500, y0 + i * 54, l.t, 'lab s' + (l.lc ? ' ' + l.lc : ''), 'start')}</g>`).join('');
-// Полка с тетрадями: a одинаковых стопок слева и n справа
+// строки выкладки: справа от картинки (x0 = 520) или крупно на всю доску (x0 = 120, кегль .lab)
+const blines = (lines, y0 = 90, x0 = 520) => lines.map((l, i) =>
+  `<g class="${l.cls || ''}">${tx(x0, y0 + i * (x0 < 300 ? 70 : 54), l.t, (x0 < 300 ? 'lab' : 'lab s') + (l.lc ? ' ' + l.lc : ''), 'start')}</g>`).join('');
+// Полка с тетрадями: a одинаковых стопок слева и n справа (не шире 480 — справа место для записи)
 function shelfScene(a, n, lines = [], opt = {}) {
   const w = 44, h = 120, x = BX, y = BY;
   let s = '';
   for (let i = 0; i < a; i++) s += `<rect class="gs" x="${x + i * (w + 8)}" y="${y}" width="${w}" height="${h}"/>`;
   const x2 = x + a * (w + 8) + 40;
   for (let i = 0; i < n; i++) s += `<rect class="gw" x="${x2 + i * (w + 8)}" y="${y}" width="${w}" height="${h}"/>`;
-  s += under(x, y + h, a * (w + 8) - 8, opt.hideNums ? '?' : `${a} по ${si('a')} р.`, 'warm');
-  s += under(x2, y + h, n * (w + 8) - 8, opt.hideNums ? '?' : `${n} по ${si('a')} р.`, 'warm');
-  if (!opt.hideNums) s += tx(x, y - 16, `${a}${si('a')} + ${n}${si('a')} = ${a + n}${si('a')}`, 'lab s acc', 'start');
+  s += under(x, y + h, a * (w + 8) - 8, opt.hideNums ? '?' : `${a}${si('a')}`, 'warm');
+  s += under(x2, y + h, n * (w + 8) - 8, opt.hideNums ? '?' : `${n}${si('a')}`, 'warm');
   return s + blines(lines);
 }
-// Живая модель доски: фишки-слагаемые (подобные к подобному) и стадии раскрытия скобок
+// Фишки-слагаемые: подпись фишки — по её номеру (в модели только положение, движение подпись не теряет)
+const TERMS = [{ t: `2${si('x')}`, g: 'x' }, { t: `3${si('y')}`, g: 'y' }, { t: si('x'), g: 'x' }, { t: `5${si('y')}`, g: 'y' }];
+const CHIP_R = 46;
+const CHIPS_START = [{ x: 190, y: 72 }, { x: 390, y: 72 }, { x: 590, y: 72 }, { x: 790, y: 72 }];
+const CHIPS_SORTED = [{ x: 170, y: 272 }, { x: 650, y: 272 }, { x: 340, y: 272 }, { x: 820, y: 272 }];
+// две группы: левая для x, правая для y; фишка в группе — её центр внутри прямоугольника
+const GROUPS = [{ g: 'x', x0: 60, x1: 450 }, { g: 'y', x0: 530, x1: 920 }], GY0 = 150, GY1 = 392;
 const LIVE = {
-  model: e => ({
-    chips: [{ x: 150, y: 150, g: 'x' }, { x: 300, y: 150, g: 'y' }, { x: 450, y: 150, g: 'x' }, { x: 600, y: 150, g: 'y' }],
-    stage: 0, go: 0,
-  }),
+  model: e => ({ chips: CHIPS_START.map(p => ({ ...p })), stage: 0 }),
   fix(m) {
     if (!Array.isArray(m.chips)) return;   // в видах показа модели нет — только текст шагов
     for (const c of m.chips) {
-      c.x = Math.max(60, Math.min(920, Math.round(c.x)));
-      c.y = Math.max(60, Math.min(340, Math.round(c.y)));
+      c.x = Math.max(CHIP_R + 4, Math.min(980 - CHIP_R - 4, Math.round(c.x)));
+      c.y = Math.max(CHIP_R + 4, Math.min(400 - CHIP_R - 4, Math.round(c.y)));
     }
     m.stage = Math.max(0, Math.min(2, Math.round(m.stage)));
-    if (!Number.isFinite(m.go)) m.go = 0;
   },
   ok: m => !Array.isArray(m.chips) || (m.chips.every(c => Number.isFinite(c.x) && Number.isFinite(c.y)) && m.stage >= 0 && m.stage <= 2),
 };
-// две кучки: левая для x, правая для y
-const pile = (cx, label, color) => `<rect class="${color}" x="${cx - 130}" y="60" width="260" height="280" rx="14"/>` +
-  tx(cx, 320, label, 'lab s', 'middle');
-function chipsScene(m, show) {
-  if (!Array.isArray(m.chips)) return '';   // в видах показа модели нет — только текст шагов
-  let s = pile(220, `с ${si('x')}`, 'gs') + pile(700, `с ${si('y')}`, 'gw');
-  const name = (c, i) => c.g === 'x' ? `2${si('x')}` : `3${si('y')}`;
-  m.chips.forEach((c, i) => {
-    s += `<circle class="gf" cx="${c.x}" cy="${c.y}" r="34"/>` + tx(c.x, c.y + 10, show ? name(c, i) : `${si('?')}`, 'lab s', 'middle');
+const inGroup = (c, G) => c.x >= G.x0 && c.x <= G.x1 && c.y >= GY0 && c.y <= GY1;
+// Группа подписывает то, что в неё положили: подобные — зелёным, чужая фишка — предупреждение
+function groupsScene(chips, opt = {}) {
+  let s = '';
+  for (const G of GROUPS) {
+    const inside = chips.map((c, i) => ({ c, i })).filter(({ c }) => inGroup(c, G)).sort((u, v) => u.c.x - v.c.x);
+    const mixed = inside.some(({ i }) => TERMS[i].g !== G.g);
+    const cx = (G.x0 + G.x1) / 2;
+    s += `<rect class="${G.g === 'x' ? 'gs' : 'gw'}" x="${G.x0}" y="${GY0}" width="${G.x1 - G.x0}" height="${GY1 - GY0}" rx="14"/>`;
+    if (inside.length) {
+      const sum = inside.map(({ i }) => TERMS[i].t).join(' + ');
+      s += tx(cx, GY0 + 46, opt.sums && !mixed ? `${sum} = ${opt.sums[G.g]}` : sum, 'lab s' + (mixed ? ' warm' : ' acc'), 'middle');
+    }
+    s += tx(cx, GY1 - 18, mixed ? 'не подобные!' : `слагаемые с ${si(G.g)}`, 'lab s' + (mixed ? ' warm' : ''), 'middle');
+  }
+  chips.forEach((c, i) => {
+    s += `<circle class="ge" cx="${c.x}" cy="${c.y}" r="${CHIP_R}"/><circle class="gf" cx="${c.x}" cy="${c.y}" r="${CHIP_R}"/>` +
+      tx(c.x, c.y + 13, TERMS[i].t, 'lab', 'middle');
   });
   return s;
 }
+// Цветом — знаки, которые поменялись, и подставленное число
+const hl = s => `<tspan style="fill:var(--b)">${s}</tspan>`;
 function buildSteps(e) {
   const { a, n } = e, S = a + n;
   return [
-    { q: `Три тетради по ${si('a')} рублей и ещё две по ${si('a')} рублей. Сколько стоят все?`,
-      a: `${a}${si('a')} + ${n}${si('a')} = ${S}${si('a')}. Одинаковые буквы складываем: 3 + 2 = 5.`,
-      note: 'Начало урока: цена выражена буквой. Спросите: что общего у слагаемых и что получится?',
-      draw: ph => shelfScene(a, n, ph ? [{ t: `${a}a + ${n}a = ${S}a`, cls: 'new', lc: 'acc' }] : [], { hideNums: !ph }),
+    { q: `${a} ${plural(a, 'тетрадь', 'тетради', 'тетрадей')} по ${si('a')} рублей и ещё ${n} по ${si('a')} рублей. Сколько стоят все?`,
+      a: `${a}${si('a')} + ${n}${si('a')} = ${S}${si('a')}. Буква одна и та же — складываем числа: ${a} + ${n} = ${S}.`,
+      note: 'Начало урока: цена выражена буквой. Спросите: что общего у слагаемых и что получится? «Другие числа» меняет количество тетрадей.',
+      draw: ph => shelfScene(a, n, ph ? [{ t: `${a}${si('a')} + ${n}${si('a')} = ${S}${si('a')}`, cls: 'new', lc: 'acc' }] : [], { hideNums: !ph }),
       rec: ph => ph ? [`${a}a + ${n}a = ${S}a`] : [] },
-    { q: 'Здесь четыре фишки: 2x, 3y, x, 5y. Разложи их на две кучки — подобное к подобному.',
-      a: 'Слева всё с x, справа всё с y. Внутри кучек слагаемые подобные — их можно складывать.',
-      note: 'Тяните фишки мышью, пальцем или стрелками. «Показать ответ» соберёт кучки сам; «Сбросить» вернёт.',
+    { q: `Четыре слагаемых: 2${si('x')}, 3${si('y')}, ${si('x')}, 5${si('y')}. Разнеси их по двум группам: подобные — вместе.`,
+      a: `Слева 2${si('x')} и ${si('x')}, справа 3${si('y')} и 5${si('y')}. В группе одинаковая буквенная часть — такие слагаемые подобные.`,
+      note: 'Пусть ученик перетащит фишки у доски (мышь, палец или стрелки). Положите 3y к иксам — группа предупредит: складывать нельзя. «Показать ответ» разнесёт сам, «Сбросить» вернёт.',
       live: {
-        enter(m) { m.go = 0; },
-        reveal() { liveTo([{ chips: [{ x: 150, y: 150 }, { x: 700, y: 150 }, { x: 290, y: 150 }, { x: 560, y: 150 }] }, { go: 1 }], 1200); },
-        handles: m => m.chips.map((c, i) => ({ id: 'c' + i, at: { x: c.x, y: c.y }, label: 'Фишка ' + (i + 1),
+        enter(m) { m.chips = CHIPS_START.map(p => ({ ...p })); },
+        reveal(m) { liveTo({ chips: CHIPS_SORTED.map(p => ({ ...p })) }, 1200); },
+        handles: m => m.chips.map((c, i) => ({ id: 'c' + i, at: { x: c.x, y: c.y }, ring: CHIP_R + 6, label: 'Фишка ' + TERMS[i].t.replace(/<[^>]+>/g, ''),
           move(mm, p) { mm.chips[i].x = p.x; mm.chips[i].y = p.y; },
-          key(mm, dx, dy) { mm.chips[i].x += dx; mm.chips[i].y += dy; } })),
+          key(mm, dx, dy) { mm.chips[i].x += dx * 20; mm.chips[i].y += dy * 20; } })),
       },
-      draw: (ph, m) => chipsScene(m, ph || m.go > 0.5) + blines((ph || m.go > 0.5)
-        ? [{ t: `слева: 2${si('x')} + ${si('x')}`, cls: 'new', lc: 'acc' }, { t: `справа: 3${si('y')} + 5${si('y')}`, cls: 'new', lc: 'acc' }] : []),
-      rec: (ph, m) => ph ? [`подобные: 2${si('x')}, ${si('x')} и 3${si('y')}, 5${si('y')}`] : [] },
-    { q: 'Какие слагаемые называются подобными?',
-      a: `Подобные — с одинаковой буквенной частью: 2${si('x')} и ${si('x')} — подобные, а ${si('x')} и ${si('y')} — нет.`,
-      note: 'Вывод: смотрим на буквы, а не на числа. Коэффициенты могут быть любыми.',
-      draw: () => '',
+      draw: (ph, m) => groupsScene(m.chips),
+      rec: ph => ph ? [`подобные: 2${si('x')} и ${si('x')}; 3${si('y')} и 5${si('y')}`] : [] },
+    { q: 'Какие слагаемые называются подобными? Посмотри на пары.',
+      a: `Подобные — с одинаковой буквенной частью: 2${si('x')} и ${si('x')} подобные, а 3${si('x')} и 3${si('y')} — нет, хотя числа одинаковые.`,
+      note: 'Пусть класс сначала скажет про каждую пару «да» или «нет». Вывод: смотрим на буквы, а не на числа.',
+      draw: ph => [[`2${si('x')}   и   ${si('x')}`, 'да: буквенная часть x', 'acc'], [`3${si('y')}   и   5${si('y')}`, 'да: буквенная часть y', 'acc'],
+        [`3${si('x')}   и   3${si('y')}`, 'нет: буквы разные', 'warm']].map(([pair, why, c], i) =>
+        tx(110, 110 + i * 110, pair, 'lab', 'start') + tx(470, 110 + i * 110, ph ? why : '?', 'lab s ' + (ph ? c : 'soft'), 'start')).join(''),
       rec: () => [`подобные: одинаковая буквенная часть`] },
-    { q: `Сложи кучки: 2${si('x')} + ${si('x')} и 3${si('y')} + 5${si('y')}.`,
-      a: `3${si('x')} и 8${si('y')}. Складываем коэффициенты, буквы не трогаем.`,
-      note: 'Степень тоже не меняется: x + x = 2x, а не x².',
-      draw: () => '',
+    { q: `Приведи подобные в каждой группе: 2${si('x')} + ${si('x')} и 3${si('y')} + 5${si('y')}.`,
+      a: `3${si('x')} и 8${si('y')}. Складываем числа перед буквой — коэффициенты, буквенная часть не меняется.`,
+      note: 'Напомните: у x коэффициент 1. Степень тоже не меняется: x + x = 2x, а не x².',
+      draw: ph => groupsScene(CHIPS_SORTED, { sums: ph ? { x: `3${si('x')}`, y: `8${si('y')}` } : { x: '?', y: '?' } }),
       rec: ph => ph ? [`2${si('x')} + ${si('x')} = 3${si('x')}`, `3${si('y')} + 5${si('y')} = 8${si('y')}`] : [] },
     { q: `Ловушка: 2${si('x')} + 3${si('y')} = 5${si('xy')}?`,
       a: `Нет! ${si('x')} и ${si('y')} — неподобные, складывать нельзя: 2${si('x')} + 3${si('y')} так и остаётся.`,
-      note: 'Шаг-ловушка на самую частую ошибку. Пусть класс объяснит, почему «5xy» неверно.',
+      note: 'Шаг-ловушка на самую частую ошибку. Пусть класс объяснит, почему «5xy» неверно: подставьте x = 1, y = 1 — слева 5, справа 5, а при x = 2, y = 1 — 7 и 10.',
       draw: ph => blines(ph
         ? [{ t: `2${si('x')} + 3${si('y')} ≠ 5${si('xy')}`, cls: 'new', lc: 'warm' },
            { t: `разные буквы — не складываем`, cls: 'new', lc: 'acc' }]
-        : [{ t: `2${si('x')} + 3${si('y')} = ?`, lc: 'warm' }]),
+        : [{ t: `2${si('x')} + 3${si('y')} = ?`, lc: 'warm' }], 110, 120),
       rec: ph => ph ? [`2${si('x')} + 3${si('y')} — не упрощается`] : [] },
     { q: `Плюс перед скобкой: ${si('x')} + (2${si('x')} ${MINUS} 5). Что получится?`,
-      a: `${si('x')} + 2${si('x')} ${MINUS} 5 = 3${si('x')} ${MINUS} 5. Плюс ничего не меняет.`,
-      note: 'Скобку с плюсом просто убираем.',
-      draw: () => '',
+      a: `${si('x')} + 2${si('x')} ${MINUS} 5 = 3${si('x')} ${MINUS} 5. Плюс перед скобкой знаков не меняет.`,
+      note: 'Скобку с плюсом просто убираем, знаки внутри остаются.',
+      draw: ph => blines([{ t: `${si('x')} + (2${si('x')} ${MINUS} 5)` }].concat(ph ? [
+        { t: `= ${si('x')} + 2${si('x')} ${MINUS} 5`, cls: 'new' }, { t: `= 3${si('x')} ${MINUS} 5`, cls: 'new', lc: 'acc' },
+        { t: 'знаки в скобке те же', cls: 'new', lc: 'soft' }] : []), 90, 120),
       rec: ph => ph ? [`${si('x')} + (2${si('x')} ${MINUS} 5) = 3${si('x')} ${MINUS} 5`] : [] },
     { q: `А минус? 5${si('x')} ${MINUS} (2${si('x')} + 1).`,
-      a: `5${si('x')} ${MINUS} 2${si('x')} ${MINUS} 1 = 3${si('x')} ${MINUS} 1. Минус меняет все знаки в скобке.`,
-      note: 'Главная ловушка скобок: минус относится к каждому слагаемому, а не только к первому.',
-      draw: () => '',
+      a: `5${si('x')} ${MINUS} 2${si('x')} ${MINUS} 1 = 3${si('x')} ${MINUS} 1. Минус перед скобкой меняет знак каждого слагаемого в ней.`,
+      note: 'Главная ловушка скобок: минус относится к каждому слагаемому, а не только к первому. Цветом — знаки, которые поменялись.',
+      draw: ph => blines([{ t: `5${si('x')} ${MINUS} (2${si('x')} + 1)` }].concat(ph ? [
+        { t: `= 5${si('x')} ${hl(MINUS)} 2${si('x')} ${hl(MINUS)} 1`, cls: 'new' }, { t: `= 3${si('x')} ${MINUS} 1`, cls: 'new', lc: 'acc' },
+        { t: 'оба знака в скобке поменялись', cls: 'new', lc: 'warm' }] : []), 90, 120),
       rec: ph => ph ? [`5${si('x')} ${MINUS} (2${si('x')} + 1) = 3${si('x')} ${MINUS} 1`] : [] },
-    { q: m => `В два шага: 2(${si('x')} + 3) + 3(${si('x')} ${MINUS} 1). Двигай ползунок стадий.`,
+    { q: m => `В два шага: 2(${si('x')} + 3) + 3(${si('x')} ${MINUS} 1). Переключай шаги: скобки, потом подобные.`,
       a: `Сначала скобки: 2${si('x')} + 6 + 3${si('x')} ${MINUS} 3, потом подобные: 5${si('x')} + 3.`,
-      note: 'Ползунок «Шаг» показывает стадии. Ошибка «букву с числом сложить» видна сразу.',
+      note: 'Переключатель «Шаг» показывает стадии. Ошибка «букву с числом сложить» видна сразу.',
       live: {
         enter(m) { m.stage = 0; },
         reveal(m) { liveTo({ stage: 2 }, 1200); },
@@ -1300,13 +1335,14 @@ function buildSteps(e) {
         const rows = [`2(${si('x')} + 3) + 3(${si('x')} ${MINUS} 1)`];
         if (st >= 1) rows.push(`= 2${si('x')} + 6 + 3${si('x')} ${MINUS} 3`);
         if (st >= 2) rows.push(`= 5${si('x')} + 3`);
-        return blines(rows.map((t, i) => ({ t, cls: i === rows.length - 1 && st === 2 ? 'new' : '', lc: i === rows.length - 1 ? 'acc' : '' })));
+        return blines(rows.map((t, i) => ({ t, cls: i === rows.length - 1 && st === 2 ? 'new' : '', lc: i === rows.length - 1 ? 'acc' : '' })), 90, 120);
       },
       rec: (ph, m) => (ph || m.stage >= 2) ? [`2(${si('x')} + 3) + 3(${si('x')} ${MINUS} 1) = 5${si('x')} + 3`] : [] },
     { q: `Сколько будет 3${si('a')} + 2 при ${si('a')} = 5?`,
       a: `3 · 5 + 2 = 17. Подставили число вместо буквы: сначала умножение, потом сложение.`,
-      note: 'Буква — это место для числа. Порядок действий обычный.',
-      draw: () => '',
+      note: 'Буква — это место для числа. Порядок действий обычный. Цветом — подставленное число.',
+      draw: ph => blines([{ t: `3${si('a')} + 2,   ${si('a')} = ${hl('5')}` }].concat(ph ? [
+        { t: `= 3 · ${hl('5')} + 2`, cls: 'new' }, { t: '= 15 + 2 = 17', cls: 'new', lc: 'acc' }] : []), 110, 120),
       rec: ph => ph ? [`3 · 5 + 2 = 17`] : [] },
     { q: 'Итог: что делаем с буквенным выражением?',
       a: 'Убираем скобки (минус меняет знаки), складываем подобное с подобным, для значения — подставляем число.',
@@ -2047,7 +2083,8 @@ const SHOWS = {
     },
   },
 };
-const showsAvailable = () => Object.entries(SHOWS).filter(([, s]) => s.available());
+// тема выбирает показы сама (CONFIG.board.shows): в меню — только они и только доступные
+const showsAvailable = () => Object.entries(SHOWS).filter(([k, s]) => s.available() && (!CONFIG.board.shows || CONFIG.board.shows.includes(k)));
 
 // переключение вида показа: 'main' — основной показ темы
 function boardUseShow(name) {
@@ -2109,7 +2146,9 @@ function boardTimer() {
 // step.live = {
 //   enter(m) { ... },           // как поставить модель при входе в шаг (можно liveTo — плавно)
 //   reveal(m) { ... },          // опыт по кнопке «Показать ответ» (обычно liveTo); «▶ Повторить опыт» запускает его снова
-//   handles: (m, phase) => [{ id, at: {x, y}, label, move(m, p) {...}, key?(m, dx, dy, fine), keyStep?, r? }],
+//   handles: (m, phase) => [{ id, at: {x, y}, label, move(m, p) {...}, key?(m, dx, dy, fine), keyStep?, r?, ring? }],
+//                               // ring: радиус кольца — для фишки с подписью (точка закрыла бы надпись);
+//                               // подпись под точкой-ручкой тест-контракт считает ошибкой
 //   controls: (m, phase) => [
 //     { id, type: 'range', label, min, max, step, get: m => …, set(m, v) {...}, text?: m => '…' },
 //     { id, type: 'toggle', label, get: m => true|false, set(m, v) {...} },
@@ -2193,9 +2232,11 @@ function liveStop() {
 // ---------- ручки на чертеже ----------
 function liveHandlesSVG(st) {
   LV.handles = st.live?.handles ? st.live.handles(B.m, B.phase).filter(Boolean) : [];
+  // ring: ручка — кольцо вокруг фишки с подписью (подпись видна сквозь него); иначе — точка
   return LV.handles.map(h => `<g class="lv-h${h.cls ? ' ' + h.cls : ''}" data-handle="${h.id}" tabindex="0" role="button" ` +
     `aria-label="${esc(h.label)}: тяните или двигайте стрелками" transform="translate(${GEO.f1(h.at.x)} ${GEO.f1(h.at.y)})">` +
-    `<title>${esc(h.label)}</title><circle class="lv-hit" r="44"/><circle class="lv-dot" r="${h.r || 18}"/></g>`).join('');
+    `<title>${esc(h.label)}</title><circle class="lv-hit" r="${h.ring ? Math.max(44, h.ring + 8) : 44}"/>` +
+    (h.ring ? `<circle class="lv-ring" r="${h.ring}"/>` : `<circle class="lv-dot" r="${h.r || 18}"/>`) + '</g>').join('');
 }
 const liveBox = { x: 0, y: 0, w: BW, h: BH };
 // перетащить ручку id в точку p (координаты чертежа); false — положение вырождено и не принято
@@ -2594,7 +2635,7 @@ window.APP = {
     restart: boardRestart, get show() { return B.show; }, useShow: boardUseShow, timer: boardTimer,
     // живая доска: модель, ручки и панель текущего шага; drag(id, {x, y}) и key(id, dx, dy) — как учитель рукой и стрелками
     get model() { return B.m; }, get snap() { return LV.snap; }, get animating() { return !!LV.anim; },
-    get handles() { return LV.handles.map(h => ({ id: h.id, label: h.label, at: { ...h.at } })); },
+    get handles() { return LV.handles.map(h => ({ id: h.id, label: h.label, at: { ...h.at }, r: h.r || 18, ring: h.ring || 0 })); },
     get controls() { return LV.controls.map(c => ({ id: c.id, type: c.type, label: c.label, min: c.min, max: c.max, options: c.options })); },
     drag: liveDrag, key: liveKey, set: liveSet, reset: liveReset, again: liveAgain },
   GEO, HAS_LIVE: typeof LIVE !== 'undefined',
